@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dept">
+	<!-- 查询所有数据 -->
+	<select id="dept.selectList" parameterType="net.jeeshop.core.system.bean.Dept" resultType="net.jeeshop.core.system.bean.Dept">
+	 select t.* from t_dept t where 1=1 
+	 <if test="pid!=null and pid!=''">
+		 and t.pid=#{pid}
+	 </if>
+	 <if test="id!=null and id!=''">
+		 and t.id=#{id}
+	 </if>
+	 <if test="type!=null and type!=''">
+		 and t.type=#{type}
+	 </if>
+	  order by orderNum 
+	</select>
+	
+	<!-- 新增数据 -->
+	<insert id="dept.insert" parameterType="net.jeeshop.core.system.bean.Dept" useGeneratedKeys="true" keyProperty="id">
+		insert into t_dept
+		(
+		pid
+		<if test="name!=null and name!=''">
+		,name
+		</if>
+		<if test="code!=null and code!=''">
+		,code
+		</if>
+		<if test="type !=null and type !=''">
+		,type
+		</if>
+		<if test="orderNum!=0">
+		,orderNum
+		</if>
+		)
+		values
+		(
+		#{pid}
+		<if test="name !=null and name !=''">
+		,#{name}
+		</if>
+		<if test="code!=null and code!=''">
+		,#{code}
+		</if>
+		<if test="type !=null and type !=''">
+		,#{type}
+		</if>
+		<if test="orderNum !=0">
+		,#{orderNum}
+		</if>
+	)</insert>
+	
+	<!-- 根据id或code查询一条数据 -->
+	<select id="dept.selectOne" parameterType="net.jeeshop.core.system.bean.Dept" resultType="net.jeeshop.core.system.bean.Dept">
+	 select * 
+	 from t_dept t where 1=1 
+	 <if test="id!=null and id!=''"> and id=#{id} </if>
+	 <if test="pid!=null and pid!=''"> and id=#{pid} </if>
+	 <if test="name!=null and name!=''"> and name=#{name} </if>
+	 <if test="code!=null and code!=''"> and code=#{code} </if>
+	</select>
+	
+	<!-- 根据id更新数据 -->
+	<update id="dept.update" parameterType="net.jeeshop.core.system.bean.Dept">
+		update t_dept set id=#{id}, pid=#{pid}
+		<if test="name !=null and name !=''">
+		,name=#{name}
+		</if>
+		<if test="code !=null and code !=''">
+		,code=#{code}
+		</if>
+		<if test="type !=null and type !=''">
+		,type=#{type}
+		</if>
+		<if test="orderNum !=0">
+		,orderNum=#{orderNum}
+		</if>
+		 where 1=1 and id=#{id}
+	</update>
+	
+	<!-- 根据id删除部门 -->
+	<delete id="dept.deleteById" parameterType="net.jeeshop.core.system.bean.Dept">
+		delete from t_dept where 1=1 and id=#{id}
+	</delete>
+	
+	<!-- 根据上级部门id删除部门 -->
+	<delete id="dept.deleteByPid" parameterType="net.jeeshop.core.system.bean.Dept">
+		delete from t_dept where 1=1 and pid=#{pid}
+	</delete>
+	
+</mapper>  

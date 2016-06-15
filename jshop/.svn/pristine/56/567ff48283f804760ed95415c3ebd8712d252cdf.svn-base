@@ -1,0 +1,53 @@
+log4j.rootLogger=debug,Console,F
+
+#Console 
+log4j.appender.Console=org.apache.log4j.ConsoleAppender 
+log4j.appender.Console.layout=org.apache.log4j.PatternLayout 
+#log4j.appender.Console.layout.ConversionPattern=%d [%t] %-p [%c] - %m%n 
+log4j.appender.Console.layout.ConversionPattern=%d %-5p [%t] %c{3}:%L -%X{clientIp}:%X{name} - %m%n
+
+#File
+log4j.appender.F=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.F.encoding=UTF-8
+#log4j.appender.F.Threshold=debug
+log4j.appender.F.File=${catalina.base}/logs/DATAONLINE/shop.log
+log4j.appender.F.Append=true
+log4j.appender.F.DatePattern='.'yyyy-MM-dd-a
+log4j.appender.F.layout=org.apache.log4j.PatternLayout
+log4j.appender.F.layout.ConversionPattern=%d %-5p [%t] %c{3}:%L -%X{clientIp}:%X{name} - %m%n
+#log4j.appender.F.layout.ConversionPattern=%d %-5p -%-4r [%t] %c %x - %m%n
+
+###DEBUG,ERROR
+log4j.logger.net.jeeshop=DUBUG
+log4j.logger.net.jeeshop.core.mybatis.interceptor.LowerCaseSqlInterceptor=ERROR
+log4j.logger.net.jeeshop.core.freemarker.view.FreemarkerView=ERROR
+log4j.logger.org.apache=ERROR
+log4j.logger.org.springframework=ERROR
+log4j.logger.org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping=ERROR
+log4j.logger.org.aspectj=ERROR
+log4j.logger.com.opensymphony=ERROR
+log4j.logger.freemarker=ERROR
+log4j.logger.net.sf.ehcache=ERROR
+log4j.logger.net.sf.json=ERROR
+log4j.logger.httpclient=INFO
+##sql-client  DUBUG ##
+log4j.logger.front=DUBUG
+log4j.logger.manage=DUBUG
+log4j.logger.dept=DUBUG
+log4j.logger.menu=DUBUG
+log4j.logger.privilege=DUBUG
+log4j.logger.role=DUBUG
+##--------------##
+
+###DEBUG,ERROR;set db log config
+log4j.logger.p6spy=ERROR
+log4j.logger.com.alibaba=INFO
+log4j.logger.com.mysql=INFO
+#log4j.logger.com.p6spy=INFO
+log4j.logger.org.mybatis=ERROR
+log4j.logger.com.mchange.v2=ERROR
+#
+log4j.logger.java.sql.Connection=ERROR
+log4j.logger.java.sql.ResultSet=ERROR
+log4j.logger.java.sql.Statement=ERROR 
+log4j.logger.java.sql.PreparedStatement=ERROR 

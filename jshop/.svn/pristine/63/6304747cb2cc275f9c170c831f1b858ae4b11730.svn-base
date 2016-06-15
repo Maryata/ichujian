@@ -1,0 +1,1 @@
+package net.jeeshop.services.manage.account;import java.util.Map;import net.jeeshop.core.Services;import net.jeeshop.services.manage.account.bean.Account;public interface AccountService extends Services<Account> {		/**	 * 同步用户到核心系统	 * @param acId 同步用户Id	 * @return	 */	public Map<String,Object> syncAccount2Sys(String acId);		}

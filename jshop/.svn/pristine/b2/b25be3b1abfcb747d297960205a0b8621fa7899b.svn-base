@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+	
+	<select id="user.selectPageList" parameterType="net.jeeshop.core.system.bean.User" resultType="hashMap">
+		SELECT t.id,t.usercode,t.discount,t.phone,t.brandType,t.username,t.nickname,t.password,DATE_FORMAT(t.createtime,'%Y-%m-%d') createtime,t.email,
+		t.status,t.rid,(select r.role_name from t_role r where r.id=t.rid) role_name
+		 FROM t_user t  where 1=1  
+		<if test="id!=null and id!=''">
+			and t.id=#{id}
+		</if>
+		<if test="usercode!=null and usercode!=''">
+			and t.usercode like CONCAT('%',#{usercode},'%') 
+		</if>
+		<if test="username!=null and username!=''">
+			and t.username like CONCAT('%',#{username},'%') 
+		</if>
+		<if test="nickname!=null and nickname!=''">
+			and t.nickname like CONCAT('%',#{nickname},'%') 
+		</if>
+		<if test="password!=null and password!=''">
+			and t.password=#{password} 
+		</if>
+		<if test="status!=null and status!=''">
+			and t.status= #{status}
+		</if>
+		<if test="rid!=null and rid!=''">
+			and t.rid=#{rid}
+		</if> 
+		order by id desc 
+		limit #{offset},#{pageSize}
+<!-- 		<include refid="sqlWhere2"/> -->
+	</select>
+	<select id="user.selectXszlPhone" parameterType="net.jeeshop.core.system.bean.User" resultType="hashMap">
+		SELECT t.phone,t.usercode  FROM t_user t where 1=1 and status='y' and EXISTS( select 1 from t_role r where r.role_name=#{role_name} and r.id=t.rid )
+	</select>
+	
+	<select id="user.SelectInfoAll" parameterType="net.jeeshop.core.system.bean.User" resultType="hashMap">
+		SELECT t.id,t.usercode,t.brandType,t.username,t.nickname,t.phone,t.email
+		 FROM t_user t  where 1=1 and status='y'
+	</select>
+	
+	<select id="user.selectPageCount" parameterType="net.jeeshop.core.system.bean.User" resultType="java.lang.Integer">
+		select count(*) from (
+				SELECT t.id,t.usercode,t.discount,t.phone,t.brandType,t.username,t.password,DATE_FORMAT(t.createtime,'%Y-%m-%d') createtime,t.email,
+				t.status,t.rid,(select r.role_name from t_role r where r.id=t.rid) role_name
+				 FROM t_user t  where 1=1  
+				<if test="id!=null and id!=''">
+					and t.id=#{id}
+				</if>
+				<if test="usercode!=null and usercode!=''">
+					and t.usercode like CONCAT('%',#{usercode},'%') 
+				</if>
+				<if test="username!=null and username!=''">
+					and t.username like CONCAT('%',#{username},'%') 
+				</if>
+				<if test="nickname!=null and nickname!=''">
+					and t.nickname like CONCAT('%',#{nickname},'%') 
+				</if>
+				<if test="password!=null and password!=''">
+					and t.password=#{password} 
+				</if>
+				<if test="status!=null and status!=''">
+					and t.status= #{status}
+				</if>
+				<if test="rid!=null and rid!=''">
+					and t.rid=#{rid}
+				</if>    
+		<!-- 		<include refid="sqlWhere2"/> -->
+		) a
+	</select>
+	
+	<select id="user.SelectSaleMessage" parameterType="net.jeeshop.core.system.bean.User" resultType="map">
+		SELECT t.id,t.usercode,t.brandType,t.username,t.nickname,t.phone,t.email from t_user t 
+		where 1=1  
+			<if test="id!=null and id!=''">
+				and t.id=#{id}
+			</if>
+			<if test="usercode!=null and usercode!=''">
+			    and t.usercode =#{usercode}
+		    </if>
+			<if test="username!=null and username!=''">
+				and t.username=#{username} 
+			</if>
+			<if test="password!=null and password!=''">
+				and t.password=#{password} 
+			</if>
+			<if test="status!=null and status!=''">
+				and t.status= #{status}
+			</if>
+			<if test="rid!=null and rid!=''">
+				and t.rid=#{rid}
+			</if> 
+			limit 1   
+<!-- 		<include refid="sqlWhere"/> -->
+    </select>
+	<select id="user.selectOne" parameterType="net.jeeshop.core.system.bean.User" resultType="net.jeeshop.core.system.bean.User">
+		SELECT t.id,t.usercode,t.discount,t.otherDiscount,t.phone,t.email,t.brandType,t.username,t.nickname,t.password,DATE_FORMAT(t.createtime,'%Y-%m-%d'),t.email,
+		(select role_dbPrivilege from t_role r where r.id=t.rid) role_dbPrivilege,
+		t.status,t.rid  ,d.id as deptId,d.pid as deptPId,d.`name` as deptName FROM t_user t LEFT JOIN t_userdept as ud on t.id=ud.uid inner JOIN t_dept as d on ud.did=d.id
+		where 1=1   
+			<if test="id!=null and id!=''">
+				and t.id=#{id}
+			</if>
+			<if test="usercode!=null and usercode!=''">
+			and t.usercode like CONCAT('%',#{usercode},'%') 
+		    </if>
+			<if test="username!=null and username!=''">
+				and t.username=#{username} 
+			</if>
+			<if test="password!=null and password!=''">
+				and t.password=#{password} 
+			</if>
+			<if test="status!=null and status!=''">
+				and t.status= #{status}
+			</if>
+			<if test="rid!=null and rid!=''">
+				and t.rid=#{rid}
+			</if> 
+			limit 1   
+<!-- 		<include refid="sqlWhere"/> -->
+	</select>
+	
+	<select id="user.selectCount" parameterType="net.jeeshop.core.system.bean.User" resultType="int">
+		SELECT count(*) from t_user where 1=1 
+		<if test="username!=null and username!=''">
+			and username=#{username} 
+		</if>
+		<if test="nickname!=null and nickname!=''">
+			and nickname=#{nickname} 
+		</if>
+	</select>
+	
+	<select id="user.selectOneByCondition" parameterType="net.jeeshop.core.system.bean.User" resultType="net.jeeshop.core.system.bean.User">
+		SELECT * from t_user where 1=1 
+		<if test="nickname!=null and nickname!=''">
+			and nickname=#{nickname} 
+		</if>
+		<if test="username!=null and username!=''">
+			and username=#{username} 
+		</if>
+		<if test="usercode!=null and usercode!=''">
+			and usercode=#{usercode} 
+		</if>
+	</select>
+	<!-- 通过工号查询人员是否存在 -->
+	<select id="user.CheckSaleCode" parameterType="net.jeeshop.core.system.bean.User" resultType="int">
+		SELECT count(1) from t_user where 1=1 
+		<if test="usercode!=null and usercode!=''">
+			and usercode=#{usercode} 
+		</if>
+		<if test="id!=null and id!=''">
+			and id<![CDATA[<>]]>#{id}
+		</if>
+	</select>
+	
+	<insert id="user.insert" parameterType="net.jeeshop.core.system.bean.User" useGeneratedKeys="true" 
+		keyProperty="id">
+		insert into t_user (id,username,password,createtime,createAccount,status,rid,nickname,email,usercode,brandType,phone,discount,otherDiscount)
+		 values (id,#{username},#{password},now(),#{createAccount},#{status},#{rid},#{nickname},#{email},#{usercode},#{brandType},#{phone},#{discount},#{otherDiscount})
+	</insert>
+	
+	<update id="user.update" parameterType="net.jeeshop.core.system.bean.User">
+		update t_user set id=#{id},updatetime=now(),updateAccount=#{updateAccount}
+	
+		<if test="username!=null and username!=''">
+			, username=#{username} 
+		</if>
+		<if test="password!=null">
+			,password=#{password}
+		</if>
+		<if test="status!=null">
+			,status=#{status}
+		</if>
+		<if test="rid!=null">
+			,rid=#{rid}
+		</if>
+		<if test="nickname!=null and nickname!=''">
+			,nickname=#{nickname}
+		</if>
+		<if test="email!=null and email!=''">
+			,email=#{email}
+		</if>
+		<if test="usercode!=null and usercode!=''">
+			,usercode=#{usercode}
+		</if>
+		<if test="phone!=null and phone!=''">
+			,phone=#{phone}
+		</if>
+		<if test="brandType!=null and brandType!=''">
+			,brandType=#{brandType}
+		</if>
+		<if test="discount!=null and discount!=''">
+			,discount=#{discount}
+		</if>
+		<if test="otherDiscount !=null and otherDiscount !=''">
+			,otherDiscount=#{otherDiscount}
+		</if>
+		where id=#{id}
+	</update>
+	
+<!-- 	<delete id="user.delete" parameterType="net.jeeshop.core.system.bean.User"> -->
+<!-- 		delete from t_user where id=#{id} -->
+<!-- 	</delete> -->
+
+	<!-- 根据用户id查询部门id -->
+	<select id="user.getDept" parameterType="net.jeeshop.core.system.bean.User" resultType="java.lang.Integer">
+		select d.did from t_user u,t_userdept d where u.status = 'y' and u.id = d.uid 
+		<if test="id!=null and id!=''">
+			and u.id = #{id}
+		</if>
+	</select>
+	
+	<!-- 根据用户id修改所属部门 -->
+	<update id="user.updateDept" parameterType="net.jeeshop.core.system.bean.UserDept">
+		update t_userdept set did=#{did} where uid=#{uid}
+	</update>
+	
+	<!-- 添加用户所属部门 -->
+	<insert id="user.insertDept" parameterType="net.jeeshop.core.system.bean.UserDept" useGeneratedKeys="true" 
+		keyProperty="id">
+		insert into t_userdept(uid,did) values(#{uid},#{did})
+	</insert>
+	
+	<!-- 根据用户id查询部门 -->
+	<select id="user.getUserDept" parameterType="String" resultType="net.jeeshop.core.system.bean.Dept">
+		SELECT d.id, d.name
+		FROM t_userdept u, t_dept d
+		WHERE u.uid = #{uid} AND u.did = d.id
+	</select>
+	
+	<!-- 根据部门id删除用户部门中间表数据 -->
+	<delete id="user.deleteUserDept" parameterType="String">
+		delete from t_userdept where did = #{did}
+	</delete>
+	
+	<!-- 根据部门id查询用户部门中间表数据 -->
+	<select id="user.selectDept" parameterType="String" resultType="net.jeeshop.core.system.bean.UserDept">
+		select * from t_userdept where did = #{did}
+	</select>
+	
+	<!-- 根据部门id查询部门下的所有用户 -->
+	<select id="user.getUserByDeptId" parameterType="String" resultType="net.jeeshop.core.system.bean.User">
+		SELECT u.id id,u.username username,u.nickname nickname ,u.usercode usercode
+		  FROM t_user u, t_userdept d 
+		 WHERE u.id = d.uid and d.did = #{did}
+	</select>
+	
+	<select id="user.getUsersPhone" resultType="map">
+	 select  distinct  phone from t_user t where 1=1 
+	 <if test="ids!=null and ids.length &gt; 0">
+	  and id in <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">  
+  			#{item}  
+ 		</foreach>
+ 	</if>
+	</select>
+	
+</mapper>  

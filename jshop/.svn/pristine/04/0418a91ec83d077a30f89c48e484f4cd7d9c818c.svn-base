@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>购物车</title>
+<link rel="shortcut icon" href="images/favicon.ico" />
+<link href="css/ichujian.css" rel="stylesheet">
+</head>
+
+<body>
+<!--导航-->
+<div class="header">
+  <div class="head">
+    <div class="logo"><a href="index.html"><img src="images/logo.png"  title="触键分销系统"></a></div>
+    <div class="nav"><a class="active" href="#">首页</a><a href="#">促销活动</a><a href="#">联系我们</a></div>
+    <div class="search">
+      <input type="text" id="name" placeholder="请输入名称">
+      <button type="submit" class="btn-search"><span>搜索</span></button>
+      <button type="submit" class="shopping-cart">购物车</button>
+    </div>
+    <div class="login-box"><a href="#">注册</a>|<a href="#">登录</a></div>
+  </div>
+</div>
+<!--内容-->
+<div class="content">
+  <!--左内容-->
+  <div class="left-box">
+    <div class="left-nav">
+      <ul>
+        <li><a href="#">全部</a></li>
+        <li><a href="#">钢化膜</a></li>
+        <li><a href="#">智能膜</a></li>
+      </ul>
+    </div>
+    <div class="new-box">
+      <h3><span>新品上市</span></span></h3>
+      <ul>
+        <li>
+          <div class="img-box"><a href="#"><img src="images/s6.png"></a></div>
+          <a class="title" href="#">三星S6钢化膜</a> <span class="jiage">¥60.00</span> </li>
+        <li>
+          <div class="img-box"><a href="#"><img src="images/s6.png"></a></div>
+          <a class="title" href="#">三星S6钢化膜</a> <span class="jiage">¥60.00</span> </li>
+      </ul>
+    </div>
+  </div>
+  <!--右内容-->
+  <div class="right-box">
+    <!--面包屑-->
+    <div class="crumbs"><a class="active" href="#">1.查看购物车</a><a href="#">2.确认订单</a><a href="#">3.确认收货</a></div>
+    <!--表格信息-->
+    <table class="list-info" border="0" cellspacing="0" cellpadding="0">
+      <thead>
+      <tr>
+        <td width="25"><input type="checkbox"></td>
+        <td colspan="2" class="title">品牌：三星</td>
+        <td width="90">型号</td>
+        <td width="60">材质</td>
+        <td width="80">单价(元)</td>
+        <td width="120">数量(个)</td>
+        <td width="120">小计(元)</td>
+        <td width="80">操作</td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="img-box"><img src="images/s6.png" height="40" title="标题如果过长就会显示省略号(*^__^*)"></td>
+        <td><span class="img-title" title="标题如果过长就会显示省略号(*^__^*) ">标题如果过长就会显示省略号(*^__^*) </span></td>
+        <td>GALAXY S6</td>
+        <td>钢化膜</td>
+        <td class="price">￥60.00</td>
+        <td><a class="fuhao" >+</a><input type="text" class="nub" value="20" id="name"><a class="fuhao" >-</a></td>
+        <td class="price">￥1200.00</td>
+        <td><a href="#" class="del-btn">删除</a></td>
+      </tr>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="img-box"><img src="images/s6.png" height="40" title="标题如果过长就会显示省略号(*^__^*)"></td>
+        <td><span class="img-title" title="标题如果过长就会显示省略号(*^__^*) ">标题如果过长就会显示省略号(*^__^*) </span></td>
+        <td>GALAXY S6</td>
+        <td>钢化膜</td>
+        <td class="price">￥60.00</td>
+        <td><a class="fuhao" >+</a><input type="text" class="nub" value="20" id="name"><a class="fuhao" >-</a></td>
+        <td class="price">￥1200.00</td>
+        <td><a href="#" class="del-btn">删除</a></td>
+      </tr>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="img-box"><img src="images/s6.png" height="40" title="标题如果过长就会显示省略号(*^__^*)"></td>
+        <td><span class="img-title" title="标题如果过长就会显示省略号(*^__^*) ">标题如果过长就会显示省略号(*^__^*) </span></td>
+        <td>GALAXY S6</td>
+        <td>钢化膜</td>
+        <td class="price">￥60.00</td>
+        <td><a class="fuhao" >+</a><input type="text" class="nub" value="20" id="name"><a class="fuhao" >-</a></td>
+        <td class="price">￥1200.00</td>
+        <td><a href="#" class="del-btn">删除</a></td>
+      </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="9">
+            <span class="money">合计：3600.00</span>
+            <span class="total">总数：80</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <table class="list-info" border="0" cellspacing="0" cellpadding="0">
+      <thead>
+      <tr>
+        <td width="25"><input type="checkbox"></td>
+        <td colspan="2" class="title">品牌：三星</td>
+        <td width="90">型号</td>
+        <td width="60">材质</td>
+        <td width="80">单价(元)</td>
+        <td width="120">数量(个)</td>
+        <td width="120">小计(元)</td>
+        <td width="80">操作</td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="img-box"><img src="images/s6.png" height="40" title="标题如果过长就会显示省略号(*^__^*)"></td>
+        <td><span class="img-title" title="标题如果过长就会显示省略号(*^__^*) ">标题如果过长就会显示省略号(*^__^*) </span></td>
+        <td>GALAXY S6</td>
+        <td>钢化膜</td>
+        <td class="price">￥60.00</td>
+        <td><a class="fuhao" >+</a><input type="text" class="nub" value="20" id="name"><a class="fuhao" >-</a></td>
+        <td class="price">￥1200.00</td>
+        <td><a href="#" class="del-btn">删除</a></td>
+      </tr>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="img-box"><img src="images/s6.png" height="40" title="标题如果过长就会显示省略号(*^__^*)"></td>
+        <td><span class="img-title" title="标题如果过长就会显示省略号(*^__^*) ">标题如果过长就会显示省略号(*^__^*) </span></td>
+        <td>GALAXY S6</td>
+        <td>钢化膜</td>
+        <td class="price">￥60.00</td>
+        <td><a class="fuhao" >+</a><input type="text" class="nub" value="20" id="name"><a class="fuhao" >-</a></td>
+        <td class="price">￥1200.00</td>
+        <td><a href="#" class="del-btn">删除</a></td>
+      </tr>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="img-box"><img src="images/s6.png" height="40" title="标题如果过长就会显示省略号(*^__^*)"></td>
+        <td><span class="img-title" title="标题如果过长就会显示省略号(*^__^*) ">标题如果过长就会显示省略号(*^__^*) </span></td>
+        <td>GALAXY S6</td>
+        <td>钢化膜</td>
+        <td class="price">￥60.00</td>
+        <td><a class="fuhao" >+</a><input type="text" class="nub" value="20" id="name"><a class="fuhao" >-</a></td>
+        <td class="price">￥1200.00</td>
+        <td><a href="#" class="del-btn">删除</a></td>
+      </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="9">
+            <span class="money">合计：3600.00</span>
+            <span class="total">总数：80</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <!--功能操作-->
+    <div class="function-box">
+    <a class="enter-btn" href="#">准备下单</a>
+     <span class="operation"><a href="#">全选</a><a href="#">反选</a><a href="#">删除</a></span>
+     <span class="money">实付：￥7200.00</span>
+            <span class="total">已选数量：80</span>
+     
+    </div>
+  </div>
+</div>
+<!--底部-->
+<div class="footer">
+  <div class="foot">
+    <div class="logo"><a href="index.html"><img src="images/logo.png" title="触键分销系统"></a></div>
+    <div class="copyright">Copyright © 2014 沪ICP备14047731</div>
+  </div>
+</div>
+</body>
+</html>

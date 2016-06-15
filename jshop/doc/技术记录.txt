@@ -1,0 +1,63 @@
+1. struts2集成freemarker
+(1) struts2默认通过FreemarkerManager对freemarker进行管理，可以通过struts.xml中的配置struts.freemarker.manager.classname进行修改
+(2) FreemarkerManager中会读取classpath:/freemarker.properties文件作为全局freemarker配置
+(3) freemarker自定义函数
+(3.1) 扩展TemplateMethodModelEx创建新的函数，如CurrentUserGetter用于获取当前登录用户
+(3.2) 在自行扩展的FreemarkerManager#init()中追加
+config.setSharedVariable("currentUser", new CurrentUserGetter());
+(3.3) 使用时，直接调用
+${currentUser().username}
+
+2. freemarker中使用taglib
+(1) 首先在web.xml中增加
+    <servlet>
+        <servlet-name>JspSupportServlet</servlet-name>
+        <servlet-class>
+            org.apache.struts2.views.JspSupportServlet
+        </servlet-class>
+        <!--配置JspSupportServlet自启动-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+(2) 在ftl文件中，使用：
+<#assign pg = JspTaglibs["/WEB-INF/jsp/pager-taglib.tld"]/>
+这里的JspTagLibs只能是项目中可以找到的tld文件，不能是http://jsptags.com/tags/navigation/pager形式的URL
+
+3. freemarker中的map迭代
+    <#assign map = {'y':'启用','n':'禁用'}>
+    <select id="unit" name="e.openResponsive" class="input-medium">
+        <#list map?keys as key>
+            <option value="${key}" <#if e.openResponsive?? && e.openResponsive==key>selected="selected" </#if>>${map[key]}</option>
+        </#list>
+    </select>
+
+4. 在linux环境下，默认mysql的表名是区分大小写的，如果需要不区分大小写，需要在[mysqld]中追加配置：
+lower_case_table_names=1
+
+5. idea中使用正则查找替换功能，使<s:property name="name"/>形式的内容替换为${name!""}
+查找：<s:property value="(.+?)"\s?/>，替换为:\\${item.$1!""}
+查找：<s:textfield (.*?) name="(.+?)",替换为：<input type="text"  value="\\${$2!""}" name="$2" $1
+查找：<result\sname="(.*?)"\stype="freemarker"\s?>(.*?)\.ftl</result>
+替换为：private static final String page_$1 = "$2";
+查找： /(.*?)\!(.*?)\.action 替换为: /$1/$2
+查找：name="e\.(.+?)" 替换为: name="$1"
+
+6. maven启动时，出现com.sun.image.codec.jpeg找不到的问题解决：
+该包放在jre/lib/rt.jar中，默认的javac无法读取到该包，所以需要增加参数-XDignore.symbol.file=true，在maven的pom文件中配置如下：
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>2.3.2</version>
+    <configuration>
+        <source>1.6</source>
+        <target>1.6</target>
+        <encoding>utf8</encoding>
+        <compilerArgument>-XDignore.symbol.file=true -Xlint</compilerArgument>
+        <testCompilerArgument>-XDignore.symbol.file=true -Xlint</testCompilerArgument>
+    </configuration>
+</plugin>
+
+7. logback与p6spy的集成
+(1) 创建p6spy的P6Logger实现类net.jeeshop.core.p6spy.LogbackLogger
+(2) 修改spy.properties文件，修改appender为
+appender=net.jeeshop.core.p6spy.LogbackLogger

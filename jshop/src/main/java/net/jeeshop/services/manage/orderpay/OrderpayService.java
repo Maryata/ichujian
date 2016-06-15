@@ -1,0 +1,1 @@
+package net.jeeshop.services.manage.orderpay;import java.util.List;import net.jeeshop.core.Services;import net.jeeshop.services.manage.orderpay.bean.Orderpay;public interface OrderpayService extends Services<Orderpay> {		/**     * 查询在线支付记录     * @param orderId     * @return     */    public List<?> getPayList(String orderId);}

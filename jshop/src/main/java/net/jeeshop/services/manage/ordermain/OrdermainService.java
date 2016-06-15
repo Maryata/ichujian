@@ -1,0 +1,1 @@
+package net.jeeshop.services.manage.ordermain;import net.jeeshop.core.Services;import net.jeeshop.services.manage.ordermain.bean.Ordermain;public interface OrdermainService extends Services<Ordermain> {}

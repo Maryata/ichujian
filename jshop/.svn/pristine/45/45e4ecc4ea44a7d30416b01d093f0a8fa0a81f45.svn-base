@@ -1,0 +1,9 @@
+#pro
+query_url=http://payment.chinapay.com/CTITS/service/rest/forward/syn/000000000060/0/0/0/0/0
+pay_url=http://payment.chinapay.com/CTITS/service/rest/page/nref/000000000017/0/0/0/0/0
+refund_url=http://payment.chinapay.com/CTITS/service/rest/forward/syn/000000000065/0/0/0/0/0
+
+#test
+#query_url=http://newpayment-test.chinapay.com/CTITS/service/rest/forward/syn/000000000060/0/0/0/0/0
+#pay_url=http://newpayment-test.chinapay.com/CTITS/service/rest/page/nref/000000000017/0/0/0/0/0
+#refund_url=http://newpayment-test.chinapay.com/CTITS/service/rest/forward/syn/000000000065/0/0/0/0/0

@@ -1,0 +1,1 @@
+package net.jeeshop.services.front.orderpay.dao;import java.util.List;import net.jeeshop.core.DaoManager;import net.jeeshop.services.front.orderpay.bean.Orderpay;public interface OrderpayDao extends DaoManager<Orderpay> {	public Orderpay selectByOrderSid(String out_trade_no);}
