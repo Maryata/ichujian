@@ -1,0 +1,92 @@
+<%@ page language="java" import="java.util.*" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@page import="com.org.mokey.common.*"%>
+<%@page import="com.org.mokey.system.entiy.TSysUser"%>
+<%
+TSysUser user = AbstractAction.getSessionLoginUser();
+if(user==null){
+	user = new TSysUser();
+}
+%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>mokey后台管理系統</title>
+<SCRIPT language="JavaScript" type="text/javascript" src="../js/public.js"></script>
+<link href="../css/css.css" rel="stylesheet" type="text/css" />
+<style>
+	.navright a:hover{
+		color:#00FF00;
+	}
+</style>
+<script type="text/javascript">
+//点击一个功能菜单，则将这个功能菜单文字设为红色，其它设为黑色
+function changeColor(obj){
+  for(i=0;i<document.all.Item_bg.length;i++){
+    document.all.Item_bg[i].style.foreground ='#FFFFFF';
+  }
+  obj.style.foreground ='#000000';
+}
+//点击菜单进入相应的子菜单
+function changeBg(bg)
+{   
+    oBj=document.all.Item_bg;
+    for(i=0;i<oBj.length;i++){
+       oBj[i].style.backgroundImage="url(<bt:root/>/images/bq02.jpg)";
+    oBj[i].style.color="#000000";
+    }
+    bg.style.backgroundImage="url(<bt:root/>/images/bq01.jpg)";
+    bg.style.color="#FFFFFF";
+    //parent.window.frames["mainFrame"].location.href="<bt:root/>/menu/blank.jsp";
+}
+function changeMain()
+{   
+    //parent.window.frames["mainFrame"].location.href="<bt:root/>/menu/blank.jsp";
+}
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+//-->
+function getToday()
+{
+	var sdate=new Date();
+	tdDate.innerHTML="今天是"+sdate.getFullYear()+"年"+(parseInt(sdate.getMonth())+1)+"月"+sdate.getDate()+"日";
+}
+function out(){
+	if(window.confirm("是否退出？")){
+		window.parent.location.href='<%=request.getContextPath()%>/login!logOut.action';
+	}
+}
+</script>
+</head>
+
+<body onLoad="getToday();">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="380"><img src="../image/top_left.jpg" width="380" height="69" /></td>
+    <td ><table width="100%" border="0" cellpadding="0" cellspacing="0" background="../image/top_bg.jpg" class="white">
+      <tr>
+        <td width="39%"><img src="../image/top_lefttop.jpg" width="313" height="42" /></td>
+        <td width="61%" align="right"><span id="tdDate"></span>&nbsp;&nbsp;&nbsp;登录用户：<span class="green"><%=user.getUserName() %></span>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      </tr>
+    </table>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0" background="../image/top_bombg.jpg" class="navright">
+        <tr>
+         <td height="27" align="right" valign="middle" >
+        <a href="../menu/basedata.jsp" target="leftFrame" style="text-decoration:none; color:#000; padding:0 5px;">基础信息</a>
+        <a href="../menu/sysInfo.jsp" target="leftFrame" style="text-decoration:none; color:#000; padding:0 5px;">系统信息</a>
+        <a href="../menu/analyse.jsp" target="leftFrame" style="text-decoration:none; color:#000; padding:0 5px;">运营分析</a>
+        <a href="../menu/report.jsp" target="leftFrame" style="text-decoration:none; color:#000; padding:0 5px;">报表管理</a>
+        <a href="../menu/systemManager.jsp" target="leftFrame" style="text-decoration:none; color:#000; padding:0 5px;">系统管理</a>
+        <a href="javascript:out()" style="text-decoration:none; color:#000; padding:0 5px;">退出</a>
+         </td>
+         <td width='5%'></td>
+        </tr>
+      </table></td>
+  </tr>
+</table>
+</body>
+</html>

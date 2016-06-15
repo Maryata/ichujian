@@ -1,0 +1,47 @@
+package com.org.mokey.analyse.entiy;
+
+/**
+ * Created by Maryn on 2016/6/7.
+ */
+public class CallingBill {
+
+    private String date;
+
+    private Long ekCallingTime;
+
+    private Long fyCallingTime;
+
+    private Long difference;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public Long getEkCallingTime() {
+        return ekCallingTime;
+    }
+
+    public void setEkCallingTime(Long ekCallingTime) {
+        this.ekCallingTime = ekCallingTime;
+    }
+
+    public Long getFyCallingTime() {
+        return fyCallingTime;
+    }
+
+    public void setFyCallingTime(Long fyCallingTime) {
+        this.fyCallingTime = fyCallingTime;
+    }
+
+    public Long getDifference() {
+        return difference;
+    }
+
+    public void setDifference(Long difference) {
+        this.difference = difference;
+    }
+}

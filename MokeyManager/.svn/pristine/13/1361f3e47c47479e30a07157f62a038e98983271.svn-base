@@ -1,0 +1,136 @@
+package com.org.mokey.analyse.dao.impl;
+
+import com.org.mokey.analyse.dao.FreeCallDao;
+import com.org.mokey.util.StrUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/6/7.
+ */
+@Repository
+public class FreeCallDaoImpl implements FreeCallDao {
+
+    private static final Log LOGGER = LogFactory.getLog(FreeCallDaoImpl.class);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Override
+    public List<Map<String, Object>> callingBill(String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT TT1.C_DATE, TT1.TOTAL_EK, TT2.TOTAL_FY FROM" +
+                    " (SELECT C_DATE, SUM(TIME) TOTAL_EK FROM( SELECT T.C_FYACCID," +
+                    " TO_CHAR(T.C_DATE, 'YYYY-MM-DD') C_DATE, CEIL((T.C_ETIME - T.C_STIME) / (1000*60)) TIME" +
+                    " FROM T_FY_CALLING_REC T WHERE T.C_FYACCID IS NOT NULL AND T.C_UID != -1" +
+                    " AND T.C_STIME IS NOT NULL AND T.C_ETIME IS NOT NULL" +
+                    " AND T.C_DATE >= TO_DATE(?, 'YYYY-MM-DD') AND T.C_DATE < TO_DATE(?, 'YYYY-MM-DD') + 1) T1" +
+                    " GROUP BY T1.C_DATE) TT1," +
+                    " (SELECT T2.C_DATE, SUM(TIME) TOTAL_FY FROM (SELECT T.C_FYACCOUNTID," +
+                    " CEIL((C.C_CALLENDTIME - C.C_CALLSTARTTIME) / (1000*60)) TIME," +
+                    " TO_CHAR(C.C_STIME, 'YYYY-MM-DD') C_DATE FROM T_FY_AUTH T, T_FY_CALLHIS C" +
+                    " WHERE T.C_FYCALLID = C.C_FYCALLID AND C.C_STIME >= TO_DATE(?, 'YYYY-MM-DD')" +
+                    " AND C.C_STIME < TO_DATE(?, 'YYYY-MM-DD') + 1) T2 GROUP BY T2.C_DATE ) TT2" +
+                    " WHERE TT1.C_DATE = TT2.C_DATE ORDER BY C_DATE";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            args.add(sDate);
+            args.add(eDate);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> callingBill_ek(String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT C_DATE, SUM(TIME) TOTAL_FY FROM( SELECT T.C_FYACCID," +
+                    " TO_CHAR(T.C_DATE, 'YYYY-MM-DD') C_DATE, CEIL((T.C_ETIME - T.C_STIME) / (1000*60)) TIME" +
+                    " FROM T_FY_CALLING_REC T WHERE T.C_FYACCID IS NOT NULL AND T.C_UID != -1 AND" +
+                    " T.C_STIME IS NOT NULL AND T.C_ETIME IS NOT NULL AND" +
+                    " T.C_DATE >= TO_DATE(?, 'YYYY-MM-DD') AND" +
+                    " T.C_DATE < TO_DATE(?, 'YYYY-MM-DD') + 1) T1 GROUP BY T1.C_DATE ORDER BY C_DATE";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill_ek failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> callingBill_fy(String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT T2.C_DATE, SUM(TIME) TOTAL_FY FROM (SELECT T.C_FYACCOUNTID," +
+                    "  CEIL((C.C_CALLENDTIME - C.C_CALLSTARTTIME) / (1000*60)) TIME," +
+                    "  TO_CHAR(C.C_STIME, 'YYYY-MM-DD') C_DATE FROM T_FY_AUTH T, T_FY_CALLHIS C" +
+                    "  WHERE T.C_FYCALLID = C.C_FYCALLID AND C.C_STIME >= TO_DATE(?, 'YYYY-MM-DD')" +
+                    "  AND C.C_STIME < TO_DATE(?, 'YYYY-MM-DD') + 1) T2 GROUP BY T2.C_DATE ORDER BY C_DATE";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill_fy failed ! e : ", e);
+        }
+        return list;
+    }
+
+    /**
+     * 话单闲情查询
+     *
+     * @param sDate
+     * @param eDate
+     * @param phone
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectCallDetailList(String sDate, String eDate, String phone) {
+        List<Map<String, Object>> list=new ArrayList<>();
+        try {
+            StringBuffer sql = new StringBuffer("SELECT TO_CHAR(T.C_DATE,'yyyy-MM-dd') AS DAY,T.C_FYACCID,TU.C_GLOBALMOBILEPHONE," +
+                   " TO_CHAR(T.C_STIME / (1000 * 60 * 60 * 24) + TO_DATE('1970-01-01 08:00:00', 'YYYY-MM-DD HH:MI:SS'), 'YYYY-MM-DD HH:MI:SS') AS EKSTIME," +
+                   " TO_CHAR(T.C_ETIME / (1000 * 60 * 60 * 24) +  TO_DATE('1970-01-01 08:00:00', 'YYYY-MM-DD HH:MI:SS'), 'YYYY-MM-DD HH:MI:SS') AS EKETIME," +
+                   " CEIL((T.C_ETIME-T.C_STIME)/(1000*60)) AS EKTIME FROM T_FY_CALLING_REC T ,T_FY_USER TU" +
+                   " WHERE T.C_FYACCID=TU.C_FYACCOUNTID  AND T.C_STIME IS NOT NULL AND T.C_FYACCID IS NOT NULL AND T.C_CALLER IS NOT NULL");
+            List<Object> args = new ArrayList<>();
+            if (StrUtils.isNotEmpty(sDate)) {
+                sql.append(" AND T .C_DATE >= TO_DATE (?, 'yyyy-MM-dd')");
+                args.add(sDate);
+            }
+            if (StrUtils.isNotEmpty(eDate)) {
+                sql.append(" AND T .C_DATE < TO_DATE (?, 'yyyy-MM-dd') + 1");
+                args.add(eDate);
+            }
+            if (StrUtils.isNotEmpty(phone)) {
+                sql.append(" AND TU.C_GLOBALMOBILEPHONE = ?");
+                args.add(phone);
+            }
+            sql.append(" ORDER BY DAY,TU.C_GLOBALMOBILEPHONE,TO_CHAR(T.C_STIME / (1000 * 60 * 60 * 24) + TO_DATE('1970-01-01 08:00:00', 'YYYY-MM-DD HH:MI:SS'), 'YYYY-MM-DD HH:MI:SS') ");
+            list = jdbcTemplate.queryForList(sql.toString(), args.toArray());
+
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill_ek failed ! e : ", e);
+        }
+        return list;
+    }
+}

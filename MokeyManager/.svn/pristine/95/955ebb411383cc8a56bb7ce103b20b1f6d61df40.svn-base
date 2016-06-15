@@ -1,0 +1,100 @@
+package com.org.mokey.analyse.action;
+
+import com.org.mokey.analyse.service.EkeyKeyUsingService;
+import com.org.mokey.analyse.service.UserAnalyseService;
+import com.org.mokey.analyse.vo.EkeyKeyUsingBean;
+import com.org.mokey.common.AbstractAction;
+import com.org.mokey.common.util.ApDateTime;
+import com.org.mokey.util.StrUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/5.
+ */
+@Controller("ekeyKeyUsingAction")
+public class EkeyKeyUsingAction extends AbstractAction {
+
+    private static final Log LOGGER = LogFactory.getLog(EkeyKeyUsingAction.class);
+
+    public static final String USERTYPE_ACT = "1";
+    public static final String USERTYPE_ALL = "2";
+    public static final String TIMETYPE_DAY = "1";
+    public static final String TIMETYPE_WEEK = "2";
+    public static final String TIMETYPE_MONTH = "3";
+
+    @Autowired
+    private EkeyKeyUsingService ekeyKeyUsingService;
+
+    @Autowired
+    private UserAnalyseService userAnalyseService;
+
+    public String keyUsingData() {
+        String userId = getSessionLoginUser().getUserId();// 当前用户id
+        String timeType = getParameter("timeType");// 时间类型 1.日，2.周，3.月
+        String userType = getParameter("userType");// 用户类型 1.激活用户，2.所有用户
+        String supCode = getParameter("supCode");// 供应商代码
+//        supCode = "888001";
+        String sDate = getParameter("sDate");// 起始时间
+        String eDate = getParameter("eDate");// 截止时间
+        String timeStr = "";
+        String timePattern = "";
+        try {
+            if (TIMETYPE_DAY.equals(timeType)) {
+                timeStr = "d";
+                timePattern = ApDateTime.DATE_TIME_YMD;
+            } else if (TIMETYPE_MONTH.equals(timeType)) {
+                timeStr = "m";
+                timePattern = ApDateTime.DATE_TIME_YM;
+            }
+            if(StrUtils.isEmpty(sDate)){// 默认起始时间为今天的六天前
+                sDate = ApDateTime.dateAdd(timeStr, -6, new java.util.Date(), timePattern);
+            }
+            if(StrUtils.isEmpty(eDate)){// 默认截止日期为今天
+                eDate = ApDateTime.getNowDateTime(timePattern);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EkeyKeyUsingAction.keyUsingData --> get default time failed ! e : ", e);
+        }
+        getRequest().setAttribute("sDate", sDate);
+        getRequest().setAttribute("eDate", eDate);
+        getRequest().setAttribute("supCode", supCode);
+        getRequest().setAttribute("timeType", timeType);
+        getRequest().setAttribute("userType", userType);
+        try {
+
+            List<EkeyKeyUsingBean> keyUsingData = ekeyKeyUsingService.keyUsingData(timePattern, userId, timeType, userType, supCode, sDate, eDate);
+            getRequest().setAttribute("keyUsingData", keyUsingData);
+
+            List<Map<String, Object>> suppliers = userAnalyseService.visibleSupplier(userId, "");
+            getRequest().setAttribute("suppliers", suppliers);
+
+        } catch (Exception e) {
+            LOGGER.error("EkeyKeyUsingAction.keyUsingData failed ! e : ", e);
+        }
+        return "keyUsingData";
+    }
+
+
+    public String test() {
+        String uid = getSessionLoginUser().getUserId();// 当前用户id
+        String supCode = "0";
+        String sDate = getParameter("sDate");// 起始时间
+        String eDate = getParameter("eDate");// 截止时间
+        String timeStr = "d";
+        String timePattern = ApDateTime.DATE_TIME_YMD;
+        if(StrUtils.isEmpty(sDate)){// 默认起始时间为今天的六天前
+            sDate = ApDateTime.dateAdd(timeStr, -6, new java.util.Date(), timePattern);
+        }
+        if(StrUtils.isEmpty(eDate)){// 默认截止日期为今天
+            eDate = ApDateTime.getNowDateTime(timePattern);
+        }
+        List<List<Object>> list = ekeyKeyUsingService.stayingUser(uid, supCode, sDate, eDate);
+        return NONE;
+    }
+}

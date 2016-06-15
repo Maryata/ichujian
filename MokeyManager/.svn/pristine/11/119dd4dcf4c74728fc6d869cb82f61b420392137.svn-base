@@ -1,0 +1,79 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+		 pageEncoding="UTF-8"%>
+<%@ taglib uri="/struts-tags" prefix="s" %>
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,user-scalable=no">
+	<meta name="screen-orientation" content="portrait">
+	<meta name="x5-orientation" content="portrait">
+	<title>活动分类</title>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/ekpages/css/iconfont.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/ekpages/css/style.css">
+	<script src="${pageContext.request.contextPath}/js/jquery/jquery-1.8.3.js" type="text/javascript"></script>
+	<script src="${pageContext.request.contextPath}/ekpages/js/jquery.min.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/js/laypage/laypage.js"></script>
+	<script src="${pageContext.request.contextPath}/ekpages/layer/layer.js" type="text/javascript"></script>
+	<script src="${pageContext.request.contextPath}/ekpages/js/ekActivityCagetoryInfoList.js" type="text/javascript"></script>
+</head>
+<body class="padding_10">
+<div class="m_b10 div_h45">
+	<input type="hidden" name="activityInfos" id="activityInfos" value="<s:property value="#request.activityInfos"/>"/>
+</div>
+<table class="table_css w_all"  width="0" border="0" cellspacing="0" cellpadding="0">
+	<thead>
+	<tr class="tc"><th>选择</th><th>ID</th><th>标题名</th><th width="100">操作</th></tr>
+	</thead>
+	<tbody id="mytable">
+
+	</tbody>
+</table>
+<input type="hidden" id="cateTotal" />
+<div id="page11"></div>
+
+<div class="w_all bc_f7 t_c p_20_0" id="photo" style="display: none;">
+	<img src="" id="img" style="width: 300px;height: 150px;">
+</div>
+<script src="${pageContext.request.contextPath}/ekpages/js/jquery.raty.js"></script>
+<!--切换传图js-->
+<script src="${pageContext.request.contextPath}/ekpages/js/slideshow.js"></script>
+<script type="text/javascript">
+	SlideShow(100000);
+</script>
+<!--上传图片js-->
+<script type="text/javascript">
+	oFReader = new FileReader(), rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+	var checkPreviewId;
+	oFReader.onload = function (oFREvent) {
+		document.getElementById(checkPreviewId).src   =  oFREvent.target.result;
+		//checkPreview.src =  oFREvent.target.result;
+	};
+
+	function loadImageFile(obj) {
+		checkPreviewId = $(obj).prev().attr("id");
+		if (obj.files.length === 0) { return; }
+		var oFile = obj.files[0];
+		if (!rFilter.test(oFile.type)) { alert("You must select a valid image file!"); return; }
+		oFReader.readAsDataURL(oFile);
+	}
+</script>
+<script>
+	//图片预览
+	function  selectPhoto(logo){
+		$("#img").attr("src",logo);
+		layer.open({
+			title: '图片预览',
+			type: 1,
+			skin: 'layui-layer-rim', //加上边框
+			area: ['420px', '240px'], //宽高
+			content:  $('#photo')
+		});
+	}
+
+</script>
+</body>
+
+</body>
+</html>
+

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="ekeyIndex" extends="struts-default" namespace="/basedata/ekey">
+		<!--留言管理-->
+		<action name="eKMessageAction!*" method="{1}" class="eKMessageAction">
+			<result name="input">/ekpages/pages/index/editMessage.jsp</result>
+		</action>
+		<action name="ekIndexAppAction!*" method="{1}" class="eKIndexAppAction"></action>
+
+		<!--首页模板维护-->
+		<action name="eKIndexModelAction!*" method="{1}" class="eKIndexModelAction">
+			<result name="toHandle">/ekpages/pages/index/indexModel-handle.jsp</result>
+		</action>
+
+		
+        <!--首页广告-->
+		<action name="eKIndexAdvertAction!*" method="{1}" class="eKIndexAdvertAction">
+			<result name="ekIndexAdvertList">/ekpages/pages/index/indexAdvertList.jsp</result>
+			<result name="toAdd">/ekpages/pages/index/indexAdvert-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKIndexAdvertAction!toEKIndexAdvertList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/index/indexAdvert-update.jsp</result>
+		</action>
+
+		<!--首页键位管理-->
+		<action name="eKIndexKeyAppAction!*" method="{1}" class="eKIndexKeyAppAction">
+			<result name="toEKIndexKeyAppList">/ekpages/pages/index/indexKeyAppList.jsp</result>
+			<result name="toAdd">/ekpages/pages/index/indexKeyApp-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKIndexKeyAppAction!toKeyAppList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/index/indexKeyApp-update.jsp</result>
+		</action>
+
+		<!--定制App管理-->
+		<action name="eKIndexSuppIndexAppAction!*" method="{1}" class="eKIndexSuppIndexAppAction">
+			<result name="toList">/ekpages/pages/index/indexSuppIndexAppList.jsp</result>
+			<result name="toAdd">/ekpages/pages/index/indexSuppIndexApp-add.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKIndexSuppIndexAppAction!toList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/index/indexSuppIndexApp-update.jsp</result>
+		</action>
+
+	</package>
+
+</struts>

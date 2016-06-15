@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="MokeyManager"
+  id="myeclipse.1385274836419"
+  context-root="/IchujianManager"
+  j2ee-spec="5.0"
+  archive="IchujianManager.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

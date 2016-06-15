@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="ekeyGame" extends="struts-default" namespace="/basedata/ekey">
+
+		<!-- 游戏分类 -->
+		<action name="eKGameCategoryAction!*" method="{1}" class="eKGameCategoryAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+			<result name="toGameCategoryList">/ekpages/pages/game/gameCategory-List.jsp</result>
+			<result name="toUpdate">/ekpages/pages/game/gameCategory-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKGameCategoryAction!toGameCategoryList</param>
+			</result>
+			<result name="toHandle">/ekpages/pages/game/gameCategory-handle.jsp</result>
+		</action>
+
+		<!-- h5游戏分类 -->
+		<action name="eKH5GameCategoryAction!*" method="{1}" class="eKH5GameCategoryAction">
+			<result name="toH5GameCategoryList">/ekpages/pages/game/h5GameCategory-List.jsp</result>
+			<result name="toUpdate">/ekpages/pages/game/h5GameCategory-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKH5GameCategoryAction!toH5GameCategoryList</param>
+			</result>
+			<result name="toHandle">/ekpages/pages/game/h5GameCategory-handle.jsp</result>
+		</action>
+
+		<!-- 游戏活动 -->
+		<action name="eKGameActAction!*" method="{1}" class="eKGameActAction">
+			<result name="gameActList">/ekpages/pages/game/gameAct-List.jsp</result>
+			<result name="toGameActAdd">/ekpages/pages/game/gameAct-Add.jsp</result>
+			<result name="saveGameAct" type="redirectAction">
+				<param name="actionName">eKGameActAction!toActList</param>
+			</result>
+			<result name="users">/ekpages/pages/game/gameActUsers.jsp</result>
+		</action>
+
+		<!-- 首页分类 -->
+		<action name="eKGameColAction!*" method="{1}" class="eKGameCollectionAction">
+			<result name="gameCol">/ekpages/pages/game/gameCol-List.jsp</result>
+			<result name="addCol" type="redirectAction">
+				<param name="actionName">eKGameColAction!gameCol</param>
+			</result>
+			<result name="deleteCol" type="redirectAction">
+				<param name="actionName">eKGameColAction!gameCol</param>
+			</result>
+			<result name="toModify">/ekpages/pages/game/gameCol-modify.jsp</result>
+			<result name="modifyCol" type="redirectAction">
+				<param name="actionName">eKGameColAction!gameCol</param>
+			</result>
+			<result name="isvalid" type="redirectAction">
+				<param name="actionName">eKGameColAction!gameCol</param>
+			</result>
+			<result name="toHandle">/ekpages/pages/game/gameCol-handle.jsp</result>
+		</action>
+
+		<!-- 游戏提示语 -->
+		<action name="eKGameCueAction!*" method="{1}" class="eKGameCueAction">
+			<result name="gameCue">/ekpages/pages/game/gameCue.jsp</result>
+		</action>
+
+		<!-- 游戏礼包 -->
+		<action name="eKGameGiftAction!*" method="{1}" class="eKGameGiftAction">
+			<result name="gameGiftList">/ekpages/pages/game/gameGift-List.jsp</result>
+			<result name="toGameGiftAdd">/ekpages/pages/game/gameGift-Add.jsp</result>
+			<result name="saveGameGift" type="redirectAction">
+				<param name="actionName">eKGameGiftAction!toGiftList</param>
+			</result>
+			<result name="toGiftCodesList">/ekpages/pages/game/gameGiftCodes-List.jsp</result>
+		</action>
+
+		<!-- 礼包分类 -->
+		<action name="eKGameGiftCateAction!*" method="{1}" class="eKGameGiftCateAction">
+			<result name="toGameGiftCateList">/ekpages/pages/game/gameGiftCate-List.jsp</result>
+			<result name="toUpdate">/ekpages/pages/game/gameGiftCate-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKGameGiftCateAction!toGameGiftCateList</param>
+			</result>
+			<result name="toHandle">/ekpages/pages/game/gameGiftCate-handle.jsp</result>
+		</action>
+
+		<!-- 游戏资讯 -->
+		<action name="eKGameInfoAction!*" method="{1}" class="eKGameInfoAction">
+			<result name="gameInfoList">/ekpages/pages/game/gameInfo-List.jsp</result>
+			<result name="toGameInfoAdd">/ekpages/pages/game/gameInfo-Add.jsp</result>
+			<result name="saveGameInfo" type="redirectAction">
+				<param name="actionName">eKGameInfoAction!toInfoList</param>
+			</result>
+		</action>
+
+		<!-- 游戏攻略 -->
+		<action name="eKGameStrategyAction!*" method="{1}" class="eKGameStrategyAction">
+			<result name="gameStrategyList">/ekpages/pages/game/gameStrategy-List.jsp</result>
+			<result name="toGameStrategyAdd">/ekpages/pages/game/gameStrategy-Add.jsp</result>
+			<result name="saveGameStrategy" type="redirectAction">
+				<param name="actionName">eKGameStrategyAction!toStrategyList</param>
+			</result>
+		</action>
+
+		<!-- 广告位 -->
+		<action name="eKAdvertInfo!*" method="{1}" class="eKAdvertInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+
+		<!--e键 ： 游戏攻略分类 -->
+		<action name="eKGameStrategyCateAction!*" method="{1}" class="eKGameStrategyCateAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+			<result name="toGameStrategyCateList">/ekpages/pages/game/gameStrategyCate-List.jsp</result>
+			<result name="toUpdate">/ekpages/pages/game/gameStrategyCate-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKGameStrategyCateAction!toGameStrategyCateList</param>
+			</result>
+			<result name="toHandle">/ekpages/pages/game/gameStrategyCate-handle.jsp</result>
+		</action>
+	</package>
+
+</struts>

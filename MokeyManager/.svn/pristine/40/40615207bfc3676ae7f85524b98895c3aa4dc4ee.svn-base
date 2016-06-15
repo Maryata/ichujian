@@ -1,0 +1,125 @@
+package com.org.mokey.basedata.sysinfo.service.impl;
+
+import com.org.mokey.basedata.sysinfo.dao.EKFreeCallDao;
+import com.org.mokey.basedata.sysinfo.service.EKFreeCallService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/4/11.
+ * e 键
+ * 免费通话 管理
+ */
+@Service
+public class EKFreeCallServiceImpl implements EKFreeCallService {
+    @Autowired
+    private EKFreeCallDao eKFreeCallDao;
+
+    /**
+     * 免费通话  列表
+     *
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> freeCallList(int page, String fyAccountId, String phone, String status, String sdate, String edate) {
+        return eKFreeCallDao.freeCallList(page, fyAccountId, phone, status, sdate, edate);
+    }
+
+    /**
+     * 查询  飞语账户信息  By   id
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectFyUserById(String id) {
+        return eKFreeCallDao.selectFyUserById(id);
+    }
+
+    /**
+     * 修改本地账号的状态
+     *
+     * @param id
+     * @param status
+     */
+    @Override
+    public void updateFreeCall(String id, String status) {
+        List<Object> args = new ArrayList<Object>();
+        if ("1".equals(status)) {
+            status = "2";
+            args.add(status);
+        } else {
+            status = "1";
+            args.add(status);
+        }
+        args.add(id);
+        eKFreeCallDao.updateFreeCall(args);
+
+
+    }
+
+    /**
+     * 授权列表
+     *
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> authList(int page, String hjType, String whShow, String fyId) {
+        return eKFreeCallDao.authList(page, hjType, whShow, fyId);
+    }
+
+    /**
+     * 话单列表
+     *
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> callHisList(int page, String hjId, String zdReason) {
+        return eKFreeCallDao.callHisList(page, hjId, zdReason);
+    }
+
+    /**
+     * 查询飞语账号信息
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectOne(String id) {
+        return eKFreeCallDao.selectOne(id);
+    }
+
+    @Override
+    public int addAccount(String fyAccountId, String fyAccountPwd, String addDate, String status, String id) {
+        return eKFreeCallDao.addAccount(fyAccountId, fyAccountPwd, addDate, status, id);
+    }
+
+    /**
+     * 删除时间
+     *
+     * @param fYiD
+     * @return
+     */
+    @Override
+    public int deleteTime(String fYiD) {
+        return eKFreeCallDao.deleteTime(fYiD);
+    }
+
+    @Override
+    public void addTime(String fyAccountId) {
+         eKFreeCallDao.addTime(fyAccountId);
+    }
+
+    @Override
+    public int selectAll() {
+        return eKFreeCallDao.selectAll();
+    }
+
+}

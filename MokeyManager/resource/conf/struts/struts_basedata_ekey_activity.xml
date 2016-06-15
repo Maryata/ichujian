@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="ekey" extends="struts-default" namespace="/basedata/ekey">
+
+		<!-- ｅ键：活动分类 -->
+		<action name="EKActivityCategoryInfoAction!*" method="{1}" class="ekActivityCategoryInfoAction">
+			<result name="ekActivityCategoryInfoList">/ekpages/pages/activity/ekActivityCategoryInfoList.jsp</result>
+			<result name="toAdd">/ekpages/pages/activity/ekActivityCategoryInfo-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">EKActivityCategoryInfoAction!toEKActivityCategoryInfoList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/activity/ekActivityCategoryInfo-update.jsp</result>
+			<result name="toHandle">/ekpages/pages/activity/ekActivityCategoryInfo-handle.jsp</result>
+		</action>
+		<!-- ｅ键：活动标签 -->
+		<action name="EKActivityCategoryTagAction!*" method="{1}" class="ekActivityCategoryTagAction">
+			<result name="ekActivityCategoryTagList">/ekpages/pages/activity/ekActivityCategoryTagList.jsp</result>
+			<result name="toAdd">/ekpages/pages/activity/ekActivityCategoryTag-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">EKActivityCategoryTagAction!toEKActivityCategoryTagList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/activity/ekActivityCategoryTag-update.jsp</result>
+		</action>
+		<!-- ｅ键：活动注意事项 -->
+		<action name="EKActivityNoticeAction!*" method="{1}" class="ekActivityNoticeAction">
+			<result name="ekActivityNoticeList">/ekpages/pages/activity/ekActivityNoticeList.jsp</result>
+			<result name="toAdd">/ekpages/pages/activity/ekActivityNotice-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">EKActivityNoticeAction!toEKActivityNoticeList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/activity/ekActivityNotice-update.jsp</result>
+		</action>
+
+		<!-- ｅ键：活动详情 -->
+		<action name="EKActivityAction!*" method="{1}" class="ekActivityAction">
+			<result name="ekActivityList">/ekpages/pages/activity/ekActivityList.jsp</result>
+			<result name="toAdd">/ekpages/pages/activity/ekActivity-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">EKActivityAction!toEKActivityList</param>
+			</result>
+			<result name="toUpdate">/ekpages/pages/activity/ekActivity-update.jsp</result>
+		</action>
+
+		<!-- ｅ键：活动头条 -->
+		<action name="eKActivityHeadLineAction!*" method="{1}" class="eKActivityHeadLineAction">
+			<result name="toHandle">/ekpages/pages/activity/ekActivityHeadLine-handle.jsp</result>
+		</action>
+
+		<!-- ｅ键：活动首页 -->
+		<action name="EKActivityIndexAction!*" method="{1}" class="ekActivityIndexAction">
+			<result name="toActivityIndex">/ekpages/pages/activity/ekActivityIndex.jsp</result>
+			<result name="toEKActivityHeadLineList">/ekpages/pages/activity/ekActivityHeadLineList.jsp</result>
+			<result name="toEKActivityCagetoryInfoList">/ekpages/pages/activity/ekActivityCagetoryInfoList.jsp</result>
+			<result name="toEKActivityInfo">/ekpages/pages/activity/ekActivityInfo.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">EKActivityIndexAction!toActivityIndex</param>
+			</result>
+		</action>
+
+		<!-- ｅ键：首页分类管理 -->
+		<action name="eKActivityIndexCategoryAction!*" method="{1}" class="eKActivityIndexCategoryAction">
+			<result name="toHandle">/ekpages/pages/activity/ekActivityIndexCategory-handle.jsp</result>
+		</action>
+
+
+	</package>
+
+</struts>

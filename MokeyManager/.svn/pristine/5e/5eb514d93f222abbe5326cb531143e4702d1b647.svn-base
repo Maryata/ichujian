@@ -1,0 +1,240 @@
+*{margin: 0;padding: 0;list-style: none;}
+/*
+KISSY CSS Reset
+理念：1. reset 的目的不是清除浏览器的默认样式，这仅是部分工作。清除和重置是紧密不可分的。
+2. reset 的目的不是让默认样式在所有浏览器下一致，而是减少默认样式有可能带来的问题。
+3. reset 期望提供一套普适通用的基础样式。但没有银弹，推荐根据具体需求，裁剪和修改后再使用。
+特色：1. 适应中文；2. 基于最新主流浏览器。
+维护：玉伯<lifesinger@gmail.com>, 正淳<ragecarrier@gmail.com>
+ */
+ 
+
+/** 清除内外边距 **/
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, /* structural elements 结构元素 */
+dl, dt, dd, ul, ol, li, /* list elements 列表元素 */
+pre, /* text formatting elements 文本格式元素 */
+form, fieldset, legend, button, input, textarea,select, /* form elements 表单元素 */
+th, td /* table elements 表格元素 */ {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline:none;
+}
+
+/** 设置默认字体 **/
+body,
+button, input, select, textarea /* for ie */ {
+  font: 14px/1.5 "微软雅黑","宋体",tahoma, arial, \5b8b\4f53, sans-serif;
+}
+h1, h2, h3, h4, h5, h6 { font-size: 100%; }
+address, cite, dfn, em, var { font-style: normal; } /* 将斜体扶正 */
+code, kbd, pre, samp { font-family: courier new, courier, monospace; } /* 统一等宽字体 */
+small { font-size: 12px; } /* 小于 12px 的中文很难阅读，让 small 正常化 */
+
+/** 重置列表元素 **/
+ul, ol { list-style: none; }
+
+/** 重置文本格式元素 **/
+a { text-decoration: none; color:#000; cursor:pointer; }
+a:hover { text-decoration: none; }
+
+
+/** 重置表单元素 **/
+legend { color: #000; } /* for ie6 */
+fieldset, img { border: 0; } /* img 搭车：让链接里的 img 无边框 */
+button, input, select, textarea { font-size: 100%; } /* 使得表单元素在 ie 下能继承字体大小 */
+/* 注：optgroup 无法扶正 */
+
+/** 重置表格元素 **/
+table { border-collapse: collapse; border-spacing: 0; }
+
+/* 清除浮动 */
+.ks-clear:after, .clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear, .clear {
+  *zoom: 1;
+}
+
+
+
+/*通用样式*/
+h1 { font-size:24px; }
+h2 { font-size:20px; }
+h3 { font-size:18px; }
+h4 { font-size:16px; }
+h5 { font-size:14px; }
+h6 { font-size:12px; }
+.pointer { cursor:pointer; }
+.no_border { border:0 none; }
+.no_padding { padding:0; }
+.t_l { text-align:left; }
+.t_c { text-align:center; }
+.t_r { text-align:right; }
+.v_b{vertical-align: bottom;}
+.break { word-break:break-all; word-wrap:break-word; }
+.no_break { word-break:keep-all; word-wrap:normal; }
+.nowrap{white-space: nowrap;}
+.f_l { float:left; }
+.f_r { float:right; }
+.t_0{ top:0px;}
+.r_0{ right:0px;}
+.b_0{ bottom:0px;}
+.l_0{ left:0px;}
+.un_line { text-decoration:underline; }
+.no_un_line { text-decoration:none; }
+.absolute { position:absolute; }
+.relative { position:relative; }
+.fixed{ position: fixed;}
+.wrapper { clear:both; overflow:hidden; }
+.o_hidden { overflow:hidden; }
+.invisible { visibility:hidden; }
+.none { display:none; }
+.block { display:block; }
+.inline-block{ display:inline-block;}
+.f_b { font-weight:bold; }
+.f_n { font-weight:normal; }
+.f_i { font-style:italic; }
+.f_10 { font-size:10px; font-size:0.625rem; }
+.f_11 { font-size:11px;  font-size:0.688rem;}
+.f_12 { font-size:12px; font-size:0.75rem; }
+.f_13 { font-size:13px; font-size:0.813rem; }
+.f_14 { font-size:14px; font-size:0.875rem; }
+.f_15 { font-size:15px; font-size:0.938rem; }
+.f_16 { font-size:16px; font-size:1rem; }
+.f_18 { font-size:18px; font-size:1.125rem; }
+.f_20 { font-size:20px; font-size:1.25rem; }
+.f_22 { font-size:22px; font-size:1.375rem; }
+.f_24 { font-size:24px; font-size:1.5rem;}
+.f_36 { font-size:36px; }
+.div_h1, .div_h5, .div_h10, .div_h15, .div_h20, .div_h25, .div_h30, .div_h40 { width:100%; overflow:hidden; }
+.div_h1 { height:1px; }
+.div_h5 { height:5px; }
+.div_h8 { height:8px; }
+.div_h10 { height:10px; }
+.div_h15 { height:15px; }
+.div_h20 { height:20px; }
+.div_h25 { height:25px; }
+.div_h30 { height:30px; }
+.div_h40 { height:40px; }
+.div_h45 { height:45px; }
+.div_h60 { height:60px; }
+.div_h80 { height:80px; }
+.div_h96 { height:96px; }
+.l_h1 { line-height:1px; }
+.l_h10 { line-height:10px; }
+.l_h15 { line-height:15px; }
+.l_h18 { line-height:18px; }
+.l_h20 { line-height:20px; }
+.l_h25 { line-height:25px; }
+.l_h30 { line-height:30px; }
+.l_h35 { line-height:35px; }
+.m_t1{ margin-top:1px}
+.m_t5{ margin-top:5px}
+.m_t7{ margin-top:7px}
+.m_t10{ margin-top:10px}
+.m_t-10{ margin-top:-10px}
+.m_t-15{ margin-top:-15px}
+.m_t-20{ margin-top:-20px}
+.m_t15{ margin-top:15px}
+.m_t20{ margin-top:20px}
+.m_t30{ margin-top:30px}
+.m_t40{ margin-top:40px}
+.m_t50{ margin-top:50px}
+.m_t60{ margin-top:60px}
+.m_t70{ margin-top:70px}
+.m_t80{ margin-top:80px}
+.m_t120{ margin-top:120px}
+.m_l5{ margin-left:5px}
+.m_l10{ margin-left:10px}
+.m_l15{ margin-left:15px}
+.m_l20{ margin-left:20px}
+.m_l30{ margin-left:30px}
+.m_l40{ margin-left:40px}
+.m_l50{ margin-left:50px}
+.m_l100{ margin-left:100px}
+.m_r5{ margin-right:5px}
+.m_r10{ margin-right:10px}
+.m_r-10{ margin-right:-10px}
+.m_r20{ margin-right:20px}
+.m_r30{ margin-right:30px}
+.m_r40{ margin-right:40px}
+.m_r50{ margin-right:50px}
+.m_b5{ margin-bottom:5px}
+.m_b10{ margin-bottom:10px}
+.m_b30{ margin-bottom:30px}
+.m_b-4{margin-bottom: -4px}
+.m_cen{ margin:0 auto;}
+.p_20_0{ padding:20px 0;}
+.p_50_0{ padding:50% 0;}
+.padding_10_20{ padding:10px 20px;}
+.padding_10{ padding:10px;}
+.padding_2b{ padding:2%;}
+.padding_0_10b{ padding:0 10%;}
+.w_50{ width:50px}
+.w_50b{ width:50%}
+.w_100{ width:100px}
+.w_200{ width:200px}
+.w_300{ width:300px}
+.w_400{ width:400px}
+.w_500{ width:500px}
+.w_10b{width:10%;}
+.w_20b{width:20%;}
+.w_29b{width:29%;}
+.w_30b{width:30%;}
+.w_40b{width:40%;}
+.w_50b{width:50%;}
+.w_60b{width:60%;}
+.w_70b{width:70%;}
+.w_80b{width:80%;}
+.w_90b{width:90%;}
+.w_96b{width:96%;}
+.w_all{width:100%;}
+.c_green { color:#85c226; }
+.c_red { color:#f44337; }
+.c_red1 { color:#F00; }
+.c_yellow { color:#bf0000; }
+.c_blue { color:#69a6c3; }
+.c_fff { color:#fff; }
+.c_888 { color:#888; }
+.bc_f7{ background-color:#f7f7f7;}
+.bc_fff{ background-color:#fff;}
+.bc_ccc{ background-color:#ccc;}
+.bc_blue { background-color:#69a6c3; }
+.bc_blue { background-color:#69a6c3; }
+.bc_red{background-color: #f44337;}
+.header{width:100%;}
+.top{ position:fixed; top:0; z-index:19999999;}
+.opacity_0{filter: alpha(opacity:0); opacity: 0;}
+.btn{width:100%;height:32px; line-height:32px; border-radius:3px;}
+.green_btn{background-color: #1ab904;}
+.green_btn:active{ background:#149103;}
+.red_btn{background-color: #f44337;}
+.red_btn:active{ background:#8e0c04;}
+.orange_btn{background-color: #ff6600;}
+.orange_btn:active{ background:#a34100;}
+.blue_btn{background-color: #69a6c3;}
+.blue_btn:active{ background:#357796;}
+.bor_b_1f7{ border-bottom:1px #f7f7f7 solid;}
+hr{ border-top:1px #b4d3e1 solid; margin:5px 0;}
+body{ background:#efefef; color:#444;}
+.content{ width:99%; overflow:hidden; margin:0 auto;}
+.title{ font-size:16px; color:#444444; font-weight:100; padding:20px 0;}
+.chat_box{ width:98%;padding:10px 1% ; height:480px; background:#fff;overflow:auto;overflow-x:hidden;}
+.history{ width:100%; height:20px; padding:10px 0; text-align:right;}
+.page{width:50px;height:20px; line-height:20px; font-size:12px; color:#fff; margin-left:10px; background:#5aa7dd; display:inline-block; text-align:center;}
+a:hover{filter: alpha(opacity:0.8); opacity: 0.8;}
+a:active{ background:#2b8acd;}
+.send{background-color:#5aa7dd;width:125px;height:40px; line-height:40px; font-size:18px; color:#fff; float:right;text-align:center;}
+.text_box{width:100%; height:120px; background:#fff; margin-bottom:10px;}
+.text_box textarea{ width:98%; height:100px; margin-top:10px;padding:0 1% ; overflow:hidden;resize: none}
+.chat_ta,.chat_wo{ width:100%; overflow:hidden; margin-bottom:10px;}
+.chat_ta .chat_info{width:100%; overflow:hidden; background:#efefef;}
+.chat_wo .chat_info{width:100%; overflow:hidden; background:#9ccaeb;}
+.chat_info p{padding: 10px;word-break:break-all;}
+.time{ font-size:12px; color:#aaa; float:right;}
+.chat_ta .name{ background:#d3d3d3; width:50px;height:50px; line-height:50px; text-align:center; color:#fff; font-size:20px; font-weight:100; float:left; margin-right:10px;}
+.chat_wo .name{ background:#5aa7dd; width:50px;height:50px; line-height:50px; text-align:center; color:#fff; font-size:20px; font-weight:100; float:left; margin-right:10px;}

@@ -1,0 +1,650 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="/struts-tags" prefix="s" %>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,user-scalable=no">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>活动头条</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/ekpages/css/iconfont.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/ekpages/css/style.css">
+<script src="${pageContext.request.contextPath}/js/jquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/laypage/laypage.js"></script>
+<%--<script charset="utf-8" src="${pageContext.request.contextPath}/js/validate/jquery.validate.min.js"></script>
+<script charset="utf-8" src="${pageContext.request.contextPath}/js/validate/messages_zh.min.js"></script>--%>
+<script src="${pageContext.request.contextPath}/ekpages/js/ekActivityIndex.js" type="text/javascript"></script>
+	<script>
+		function forValidate(){
+			getDate();
+			getDate1();
+			getDate2();
+			$("#form").attr("action","${pageContext.request.contextPath }/basedata/ekey/EKActivityIndexAction!save.action");
+		}
+
+	</script>
+</head>
+<body style="overflow-x : hidden;">
+<form id="form" method="post">
+<img class=" m_cen block" style="margin-top:20px;" src="${pageContext.request.contextPath}/ekpages/images/phone_top.png" />
+<div class=" w_410 o_hidden bc_eee m_cen phone_border" >
+	<div class="w_all div_h40 l_h35 t_c f_16">活动首页</div>
+	<!-------------------------------------------------------------------------->
+	<input type="hidden" name="hide" id="hide"/>
+	<input type="hidden" name="headLine" id="headLines"/>
+	<input type="hidden" name="activityInfo" id="activityInfos"/>
+	<input type="hidden" name="activity" id="activity"/>
+	<!-------------------------------------------------------------------------->
+	<!--切换传图-->
+	<div class="comiis_wrapad f_l relative" id="slideContainer">
+		<!--活动头条添加  开始-->
+
+		<div class="cl">
+			<ul class="slideshow relative" id="slidesImgs">
+				<li class=" relative">
+					<a class="delete_cp absolute t_10 r_10 tc_liebiao" data-val="1"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+					<img name="uploadPreview_1" id="uploadPreview_1"  src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg2.jpg" />
+					<div style="display: none;">
+						<input id="cid_1" name="cid" value=""/>
+						<input id="eid_1" name="eid" value=""/>
+						<input id="name_1" name="name" value=""/>
+						<input id="type_1" name="type" value=""/>
+						<input id="logo_1" name="logo" value=""/>
+						<input id="order_1" name="order" value="1"/>
+					</div>
+				</li>
+				<li class=" relative">
+					<a class="delete_cp absolute t_10 r_10 tc_liebiao" data-val="2"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+					<img name="uploadPreview_2" id="uploadPreview_2"  src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg2.jpg" />
+					<div style="display: none;">
+						<input id="cid_2" name="cid"  value=""/>
+						<input id="eid_2" name="eid" value=""/>
+						<input id="name_2" name="name" value=""/>
+						<input id="type_2" name="type" value=""/>
+						<input id="logo_2" name="logo" value=""/>
+						<input id="order_2" name="order" value="2"/>
+					</div>
+				</li>
+				<li class=" relative">
+					<a class="delete_cp absolute t_10 r_10 tc_liebiao" data-val="3"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+					<img name="uploadPreview_3" id="uploadPreview_3"  src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg2.jpg" />
+					<div style="display: none;">
+						<input id="cid_3" name="cid"  value=""/>
+						<input id="eid_3" name="eid" value=""/>
+						<input id="name_3" name="name" value=""/>
+						<input id="type_3" name="type" value=""/>
+						<input id="logo_3" name="logo" value=""/>
+						<input id="order_3" name="order" value="3"/>
+					</div>
+				</li>
+				<li class=" relative">
+					<a class="delete_cp absolute t_10 r_10 tc_liebiao" data-val="4"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+					<img name="uploadPreview_4" id="uploadPreview_4"  src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg2.jpg" />
+					<div style="display: none;">
+						<input id="cid_4" name="cid"  value=""/>
+						<input id="eid_4" name="eid" value=""/>
+						<input id="name_4" name="name" value=""/>
+						<input id="type_4" name="type" value=""/>
+						<input id="logo_4" name="logo" value=""/>
+						<input id="order_4" name="order" value="4"/>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="slidebar" id="slideBar">
+			<ul>
+				<li class="on">1</li>
+				<li>2</li>
+				<li>3</li>
+				<li>4</li>
+			</ul>
+		</div>
+	</div>
+
+	<!--活动头条添加  结束-->
+
+	<!--活动分类添加  开始-->
+	<div class="w_all p_10_0 f_l o_hidden">
+		<ul class="hd_zt">
+			<li><div class="hd_ztbox relative"><a class="delete_cp absolute t_f5 r_f5 tc_liebiao1" data-val="5"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a></a>
+				 <img  name="uploadPreview_5" id="uploadPreview_5" src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg3.jpg" />
+			   </div><span id="title_5">全场五折</span>
+				<div style="display: none;">
+					<input id="cid_5" name="cid"  value=""/>
+					<input id="eid_5" name="eid" value=""/>
+					<input id="order_5" name="order" value="1"/>
+				</div>
+			</li>
+			<li><div class="hd_ztbox relative"><a class="delete_cp absolute t_f5 r_f5 tc_liebiao1" data-val="6"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a></a>
+				 <img  name="uploadPreview_6" id="uploadPreview_6" src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg3.jpg" />
+			    </div><span id="title_6">全民免费</span>
+				<div style="display: none;">
+					<input id="cid_6" name="cid"  value=""/>
+					<input id="eid_6" name="eid" value=""/>
+					<input id="order_6" name="order" value="2"/>
+				</div>
+			</li>
+			<li><div class="hd_ztbox relative"><a class="delete_cp absolute t_f5 r_f5 tc_liebiao1" data-val="7"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a></a>
+				  <img  name="uploadPreview_7" id="uploadPreview_7" src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg3.jpg" />
+			</div><span id="title_7">买一送一</span>
+				<div style="display: none;">
+					<input id="cid_7" name="cid"  value=""/>
+					<input id="eid_7" name="eid" value=""/>
+					<input id="order_7" name="order" value="3"/>
+				</div>
+			</li>
+			<li><div class="hd_ztbox relative"><a class="delete_cp absolute t_f5 r_f5 tc_liebiao1" data-val="8"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a></a>
+				  <img  name="uploadPreview_8" id="uploadPreview_8" src="${pageContext.request.contextPath}/ekpages/images/upload_img_bg3.jpg" />
+			    </div><span id="title_8">秒杀专区</span>
+				<div style="display: none;">
+					<input id="cid_8" name="cid"  value=""/>
+					<input id="eid_8" name="eid" value=""/>
+					<input id="order_8" name="order" value="4"/>
+				</div>
+			</li>
+		</ul>
+	</div>
+
+	<!--活动分类添加  结束-->
+	<div class="hd_tab o_hidden w_all">
+		<a id="hd_tab1" onclick="setTab('hd_tab',1,2)" class="hover">推荐</a>
+		<a id="hd_tab2" onclick="setTab('hd_tab',2,2)">最新</a></div>
+	    <!--推荐内容-->
+	<ul class = "cagetory">
+	   <div  id="con_hd_tab_1" class="w_all f_l o_hidden  hover">
+		<li>
+			<div class="cptj_box2 bc_upload relative">
+				<!--编辑按钮-->
+				<a class="delete_cp absolute t_10 r_10 tc_tjgd" data-val="9"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<!--角标-->
+				<img class="hd_jiaobiao" name="jiaobiao_9" id="jiaobiao_9" src="${pageContext.request.contextPath}/ekpages/images/ico_hot.png" />
+				<!--标题背景-->
+				<div class="hd_infobox"></div>
+				<!--标题信息-->
+				<div class="hd_info c_fff f_16 title_9">开年福利，全场6.9元起包邮！</div>
+				<!--浏览数量-->
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_9">123</span></div>
+				<!--图片-->
+				<img class="hd_img_chang" name="uploadPreview_9" id="uploadPreview_9" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+				<div style="display: none;">
+					<input id="cid_9" name="cid"  value=""/>
+					<input id="aid_9" name="aid" value=""/>
+					<input id="ccid_9" name="ccid" value="1"/>
+					<input id="tagid_9" name="tagid" value=""/>
+					<input id="order_9" name="order" value="1"/>
+				</div>
+			</div>
+		</li>
+
+		<li>
+			<div class="cptj_box2 bc_upload relative">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="10"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_10" id="jiaobiao_10"  src="${pageContext.request.contextPath}/ekpages/images/ico_new.png" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_10">国货精品，大宝洗面奶免费送！</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_10">123</span></div>
+				<img class="hd_img_chang" name="uploadPreview_10" id="uploadPreview_10" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+				<div style="display: none;">
+					<input id="cid_10" name="cid"  value=""/>
+					<input id="aid_10" name="aid" value=""/>
+					<input id="ccid_10" name="ccid" value="1"/>
+					<input id="tagid_10" name="tagid" value=""/>
+					<input id="order_10" name="order" value="2"/>
+				</div>
+			</div>
+		</li>
+
+		<li>
+			<div class="cptj_box bc_upload relative ">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="11"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_11" id="jiaobiao_11"  src="" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_11">开学就放假</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_11">123</span></div>
+				<img class="hd_img_duan" name="uploadPreview_11" id="uploadPreview_11" src="${pageContext.request.contextPath}/ekpages/images/cpimg.jpg" />
+				<div style="display: none;">
+					<input id="cid_11" name="cid"  value=""/>
+					<input id="aid_11" name="aid" value=""/>
+					<input id="ccid_11" name="ccid" value="1"/>
+					<input id="tagid_11" name="tagid" value=""/>
+					<input id="order_11" name="order" value="3"/>
+				</div>
+			</div>
+		</li>
+		<li>
+		   <div class="cptj_box bc_upload relative ">
+			<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="12"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+			   <img class="hd_jiaobiao" name="jiaobiao_12" id="jiaobiao_12"  src="" />
+			<div class="hd_infobox"></div>
+			<div class="hd_info c_fff f_16 title_12">开学就放假</div>
+			<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_12">123</span></div>
+		    <img class="hd_img_duan" name="uploadPreview_12" id="uploadPreview_12" src="${pageContext.request.contextPath}/ekpages/images/cpimg.jpg" />
+		    <div style="display: none;">
+			   <input id="cid_12" name="cid"  value=""/>
+			   <input id="aid_12" name="aid" value=""/>
+			   <input id="ccid_12" name="ccid" value="1"/>
+			   <input id="tagid_12" name="tagid" value=""/>
+			   <input id="order_12" name="order" value="4"/>
+		    </div>
+		    </div>
+		</li>
+
+		<li>
+			<div class="cptj_box bc_upload relative ">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="13"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_13" id="jiaobiao_13"  src="" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_13">开学就放假</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_13">123</span></div>
+				<img class="hd_img_duan" name="uploadPreview_13" id="uploadPreview_13" src="${pageContext.request.contextPath}/ekpages/images/cpimg.jpg" />
+				<div style="display: none;">
+					<input id="cid_13" name="cid"  value=""/>
+					<input id="aid_13" name="aid" value=""/>
+					<input id="ccid_13" name="ccid" value="1"/>
+					<input id="tagid_13" name="tagid" value=""/>
+					<input id="order_13" name="order" value="5"/>
+				</div>
+			</div>
+		</li>
+
+		<li>
+		   <div class="cptj_box bc_upload relative ">
+			<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="14"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+			<img class="hd_jiaobiao" name="jiaobiao_14" id="jiaobiao_14"  src="" />
+			<div class="hd_infobox"></div>
+			<div class="hd_info c_fff f_16 title_14">开学就放假</div>
+			<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_14">123</span></div>
+			<img class="hd_img_duan" name="uploadPreview_14" id="uploadPreview_14" src="${pageContext.request.contextPath}/ekpages/images/cpimg.jpg" />
+			<div style="display: none;">
+				<input id="cid_14" name="cid"  value=""/>
+				<input id="aid_14" name="aid" value=""/>
+				<input id="ccid_14" name="ccid" value="1"/>
+				<input id="tagid_14" name="tagid" value=""/>
+				<input id="order_14" name="order" value="6"/>
+			</div>
+		</div>
+		</li>
+
+		 <li>
+		   <div class="cptj_box2 bc_upload relative">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="15"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_15" id="jiaobiao_15" src="${pageContext.request.contextPath}/ekpages/images/ico_hot.png" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_15">开年福利，全场6.9元起包邮！</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_15">123</span></div>
+				<img class="hd_img_chang" name="uploadPreview_15" id="uploadPreview_15" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+			   <div style="display: none;">
+				   <input id="cid_15" name="cid"  value=""/>
+				   <input id="aid_15" name="aid" value=""/>
+				   <input id="ccid_15" name="ccid" value="1"/>
+				   <input id="tagid_15" name="tagid" value=""/>
+				   <input id="order_15" name="order" value="7"/>
+			   </div>
+		   </div>
+		 </li>
+
+		 <li>
+			<div class="cptj_box3 bc_upload relative ">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="16"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_16" id="jiaobiao_16" src="" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_16">新年快乐</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_16">123</span></div>
+				<img class="hd_img_duan2" name="uploadPreview_16" id="uploadPreview_16" src="${pageContext.request.contextPath}/ekpages/images/cpimg2.jpg" />
+				<div style="display: none;">
+					<input id="cid_16" name="cid"  value=""/>
+					<input id="aid_16" name="aid" value=""/>
+					<input id="ccid_16" name="ccid" value="1"/>
+					<input id="tagid_16" name="tagid" value=""/>
+					<input id="order_16" name="order" value="8"/>
+				</div>
+			</div>
+		 </li>
+
+		 <li>
+			 <div class="cptj_box3 bc_upload relative ">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="17"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_17" id="jiaobiao_17" src="" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_17">新年快乐</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_17">123</span></div>
+				<img class="hd_img_duan2" name="uploadPreview_17" id="uploadPreview_17" src="${pageContext.request.contextPath}/ekpages/images/cpimg2.jpg" />
+				 <div style="display: none;">
+					 <input id="cid_17" name="cid"  value=""/>
+					 <input id="aid_17" name="aid" value=""/>
+					 <input id="ccid_17" name="ccid" value="1"/>
+					 <input id="tagid_17" name="tagid" value=""/>
+					 <input id="order_17" name="order" value="9"/>
+				 </div>
+			 </div>
+		 </li>
+
+		<li>
+			<div class="cptj_box3 bc_upload relative ">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="18"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_18" id="jiaobiao_18" src="" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_18">新年快乐</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_18">123</span></div>
+				<img class="hd_img_duan2" name="uploadPreview_18" id="uploadPreview_18" src="${pageContext.request.contextPath}/ekpages/images/cpimg2.jpg" />
+				<div style="display: none;">
+					<input id="cid_18" name="cid"  value=""/>
+					<input id="aid_18" name="aid" value=""/>
+					<input id="ccid_18" name="ccid" value="1"/>
+					<input id="tagid_18" name="tagid" value=""/>
+					<input id="order_18" name="order" value="10"/>
+				</div>
+			</div>
+		</li>
+	</div>
+	   <!--最新内容-->
+	   <div  id="con_hd_tab_2" class="w_all f_l o_hidden" style="display:none;">
+		<li>
+			<div class="cptj_box2 bc_upload relative">
+				<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="19"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+				<img class="hd_jiaobiao" name="jiaobiao_19" id="jiaobiao_19" src="${pageContext.request.contextPath}/ekpages/images/ico_hot.png" />
+				<div class="hd_infobox"></div>
+				<div class="hd_info c_fff f_16 title_19">开年福利，全场6.9元起包邮！</div>
+				<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_19">123</span></div>
+				<img class="hd_img_chang" name="uploadPreview_19" id="uploadPreview_19" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+				<div style="display: none;">
+					<input id="cid_19" name="cid"  value=""/>
+					<input id="aid_19" name="aid" value=""/>
+					<input id="ccid_19" name="ccid" value="2"/>
+					<input id="tagid_19" name="tagid" value=""/>
+					<input id="order_19" name="order" value="11"/>
+				</div>
+			</div>
+		</li>
+
+		<li>
+		<div class="cptj_box3 bc_upload relative ">
+			<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="20"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+			<img class="hd_jiaobiao" name="jiaobiao_20" id="jiaobiao_20" src="" />
+			<div class="hd_infobox"></div>
+			<div class="hd_info c_fff f_16 title_20">新年快乐</div>
+			<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_20">123</span></div>
+			<img class="hd_img_duan2" name="uploadPreview_20" id="uploadPreview_20" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+			<div style="display: none;">
+				<input id="cid_20" name="cid"  value=""/>
+				<input id="aid_20" name="aid" value=""/>
+				<input id="ccid_20" name="ccid" value="2"/>
+				<input id="tagid_20" name="tagid" value=""/>
+				<input id="order_20" name="order" value="12"/>
+			</div>
+		</div>
+		</li>
+
+		<li>
+		<div class="cptj_box3 bc_upload relative ">
+			<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="21"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+			<img class="hd_jiaobiao" name="jiaobiao_21" id="jiaobiao_21" src="" />
+			<div class="hd_infobox"></div>
+			<div class="hd_info c_fff f_16 title_21">新年快乐</div>
+			<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_21">123</span></div>
+			<img class="hd_img_duan2" name="uploadPreview_21" id="uploadPreview_21" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+			<div style="display: none;">
+				<input id="cid_21" name="cid"  value=""/>
+				<input id="aid_21" name="aid" value=""/>
+				<input id="ccid_21" name="ccid" value="2"/>
+				<input id="tagid_21" name="tagid" value=""/>
+				<input id="order_21" name="order" value="13"/>
+			</div>
+		</div>
+		</li>
+
+		<li>
+		<div class="cptj_box3 bc_upload relative ">
+			<a class="delete_cp absolute t_10 r_10  tc_tjgd" data-val="22"><i class="icon iconfont icon-bianji f_20 c_fff"></i></a>
+			<img class="hd_jiaobiao" name="jiaobiao_22" id="jiaobiao_22" src="" />
+			<div class="hd_infobox"></div>
+			<div class="hd_info c_fff f_16 title_22">新年快乐</div>
+			<div class="hd_nub c_fff f_14"><i class="icon iconfont icon-yulan f_20"></i><span id="number_22">123</span></div>
+			<img class="hd_img_duan2" name="uploadPreview_22" id="uploadPreview_22" src="${pageContext.request.contextPath}/ekpages/images/xq_banner.jpg" />
+			<div style="display: none;">
+				<input id="cid_22" name="cid"  value=""/>
+				<input id="aid_22" name="aid" value=""/>
+				<input id="ccid_22" name="ccid" value="2"/>
+				<input id="tagid_22" name="tagid" value=""/>
+				<input id="order_22" name="order" value="14"/>
+			</div>
+		</div>
+		</li>
+	</div>
+	</ul>
+</div>
+<img class=" m_cen block" src="${pageContext.request.contextPath}/ekpages/images/phone_bottom.png" />
+
+<div class="w_all bc_f7 t_c p_20_0"><input type="submit" class="btn-orange-min m_r10" onclick="return forValidate()" value="保存"/></div>
+
+</form>
+<script src="${pageContext.request.contextPath}/ekpages/js/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/ekpages/js/jquery.page.js"></script>
+<script src="${pageContext.request.contextPath}/ekpages/layer/layer.js"></script>
+<script src="${pageContext.request.contextPath}/ekpages/js/jquery.raty.js"></script>
+<script src="${pageContext.request.contextPath}/ekpages/js/jquery.json.min.js" type="text/javascript"></script>
+<script>
+	//layer 打开  选择页面
+	$('.tc_liebiao').on('click', function(){
+		var _this = $(this);
+		$('#hide').val('');
+		$('#hide').val(_this.attr("data-val"));
+		//获取数据
+
+		getDate();
+		//alert($("#headLines").val());
+		var aa = $("#headLines").val();
+		$.post('${pageContext.request.contextPath}/basedata/ekey/EKActivityIndexAction!toEKActivityHeadLineList.action', {headLine:aa,flag:"1"}, function(){
+		layer.open({
+			type: 2,
+			title:['活动头条','color:#fff;background-color:#2f3948;text-align:center;height:40px;font-size:14px;line-height: 40px;'],
+			area: ['900px', '90%'],
+			shade: 0,//背景色
+			//btn: ['确定','取消'],
+			closeBtn: true,//右上角关闭按钮
+			shadeClose: false, //点击遮罩关闭
+			scrollbar: false,
+			content: '${pageContext.request.contextPath}/basedata/ekey/EKActivityIndexAction!toEKActivityHeadLineList.action'
+		});
+		});
+	});
+	//获取 已添加过的信息 eid  和  type
+	function getDate(){
+		var data = [];
+		$('#slidesImgs  li').each(function(i){
+			var _tr = $(this);
+			var item = {};
+			item.id = _tr.find("input[name='cid']").val().trim();
+			item.eid = _tr.find("input[name='eid']").val().trim();
+			item.name = _tr.find("input[name='name']").val().trim();
+			item.type = _tr.find("input[name='type']").val().trim();
+			item.logo = _tr.find("input[name='logo']").val().trim();
+			item.order = _tr.find("input[name='order']").val().trim();
+			if(item.eid!=''){
+				data.push(item);
+			}
+		});
+        $("#headLines").val($.toJSON(data));
+	}
+
+	/**
+	 * 赋值
+	 * @param option
+     */
+	function setMData(option){
+		var aa= $("#hide").val();//获取需要操作的序号
+		$("#uploadPreview_"+aa).attr("src",option.logo);
+		$("#eid_"+aa).attr("value",option.eid);
+		$("#name_"+aa).attr("value",option.title);
+		$("#type_"+aa).attr("value",option.type);
+		$("#logo_"+aa).attr("value",option.logo);
+		layer.closeAll();
+	}
+
+
+</script>
+<script>
+	//layer 打开  选择页面
+	$('.tc_liebiao1').on('click', function(){
+		var _this = $(this);
+		$('#hide').val('');
+		$('#hide').val(_this.attr("data-val"));
+		//获取数据
+
+		getDate1();
+		var aa = $("#activityInfos").val();
+		$.post('${pageContext.request.contextPath}/basedata/ekey/EKActivityIndexAction!toEKActivityCagetoryInfoList.action', {activityInfos:aa,flag:"1"}, function(){
+			layer.open({
+				type: 2,
+				title:['活动分类','color:#fff;background-color:#2f3948;text-align:center;height:40px;font-size:14px;line-height: 40px;'],
+				area: ['900px', '90%'],
+				shade: 0,//背景色
+				//btn: ['确定','取消'],
+				closeBtn: true,//右上角关闭按钮
+				shadeClose: false, //点击遮罩关闭
+				scrollbar: false,
+				content: '${pageContext.request.contextPath}/basedata/ekey/EKActivityIndexAction!toEKActivityCagetoryInfoList.action'
+			});
+		});
+	});
+	//获取 已添加过的信息 eid  和  type
+	function getDate1(){
+		var data = [];
+		$('.hd_zt  li').each(function(i){
+			var _tr = $(this);
+			var item = {};
+			item.id = _tr.find("input[name='cid']").val().trim();
+			item.eid = _tr.find("input[name='eid']").val().trim();
+			item.order = _tr.find("input[name='order']").val().trim();
+			if(item.eid!=''){
+				data.push(item);
+			}
+		});
+		$("#activityInfos").val($.toJSON(data));
+	}
+
+	/**
+	 * 赋值
+	 * @param option
+	 */
+	function setMData1(option){
+		var aa= $("#hide").val();//获取需要操作的序号
+		$("#uploadPreview_"+aa).attr("src",option.logo);
+		$("#eid_"+aa).attr("value",option.eid);
+		$("#title_"+aa).text(option.title);
+		layer.closeAll();
+	}
+
+
+</script>
+<script>
+	$('.tc_tjgd').on('click', function(){
+
+		var _this = $(this);
+		$('#hide').val('');
+		$('#hide').val(_this.attr("data-val"));
+		//获取数据
+
+		getDate2();
+		var aa = $("#activity").val();
+		$.post('${pageContext.request.contextPath}/basedata/ekey/EKActivityIndexAction!toEKActivityInfo.action', {activity:aa,flag:"1"}, function(){
+			layer.open({
+				type: 2,
+				title:['活动详情','color:#fff;background-color:#2f3948;text-align:center;height:40px;font-size:14px;line-height: 40px;'],
+				area: ['900px', '90%'],
+				shade: 0,//背景色
+				//btn: ['确定','取消'],
+				closeBtn: true,//右上角关闭按钮
+				shadeClose: false, //点击遮罩关闭
+				scrollbar: false,
+				content: '${pageContext.request.contextPath}/basedata/ekey/EKActivityIndexAction!toEKActivityInfo.action'
+			});
+		});
+	});
+	//获取 已添加过的信息 eid  和  type
+	function getDate2(){
+		var data = [];
+		$('.cagetory  li').each(function(i){
+			var _tr = $(this);
+			var item = {};
+			item.id = _tr.find("input[name='cid']").val().trim();//id
+			item.aid = _tr.find("input[name='aid']").val().trim();//活动id
+			item.ccid = _tr.find("input[name='ccid']").val().trim();//分类id
+			item.tagid = _tr.find("input[name='tagid']").val().trim();
+			item.order = _tr.find("input[name='order']").val().trim();
+			if(item.aid!=''){
+				data.push(item);
+			}
+		});
+		$("#activity").val($.toJSON(data));
+	}
+
+	/**
+	 * 赋值
+	 * @param option
+	 */
+	function setMData2(option){
+		var aa= $("#hide").val();//获取需要操作的序号
+		$("#uploadPreview_"+aa).attr("src",option.logo);//图片
+		$("#number_"+aa).text(option.number);//数量
+		$("#jiaobiao_"+aa).attr("src",option.jiaobiao);//角标
+		$(".title_"+aa).html(option.title);//名称
+		$("#aid_"+aa).attr("value",option.aid);//活动id
+		$("#tagid_"+aa).attr("value",option.tagid);//标签id
+		layer.closeAll();
+	}
+
+</script>
+
+<!--分页js-->
+<script>
+	$(".tcdPageCode").createPage({
+		pageCount:6,//pageCount：总页数
+		current:1,//current：当前页
+		backFn:function(p){//单击回调方法，p是当前页码
+			console.log(p);
+		}
+	});
+</script>
+<!--切换传图js-->
+<script src="${pageContext.request.contextPath}/ekpages/js/slideshow.js"></script>
+<script type="text/javascript">
+	SlideShow(100000);
+</script>
+<!--上传图片js-->
+<script type="text/javascript">
+	oFReader = new FileReader(), rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+
+
+	var checkPreviewId;
+	oFReader.onload = function (oFREvent) {
+		document.getElementById(checkPreviewId).src   =  oFREvent.target.result;
+		//checkPreview.src =  oFREvent.target.result;
+	};
+
+	function loadImageFile(obj) {
+		checkPreviewId = $(obj).prev().attr("id");
+		if (obj.files.length === 0) { return; }
+		var oFile = obj.files[0];
+		if (!rFilter.test(oFile.type)) { alert("You must select a valid image file!"); return; }
+		oFReader.readAsDataURL(oFile);
+	}
+</script>
+<!--标签切换js-->
+<script>
+	function setTab(name,cursel,n){
+		for(i=1;i<=n;i++){
+			var menu=document.getElementById(name+i);
+			var con=document.getElementById("con_"+name+"_"+i);
+			menu.className=i==cursel?"hover":"";
+			con.style.display=i==cursel?"block":"none";
+		}
+	}
+</script>
+<!--标签切换js END-->
+
+</body>
+</html>
+

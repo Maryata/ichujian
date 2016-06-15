@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="formCtrlDao" class="com.org.mokey.formdesign.dao.impl.FormCtrlDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="formctrlService" class="com.org.mokey.formdesign.service.impl.FormCtrlServiceImpl">
+		<property name="formCtrlDao">
+			<ref bean="formCtrlDao" />
+		</property>
+	</bean>
+
+	<bean id="formCtrlAction" class="com.org.mokey.formdesign.action.FormCtrlAction">
+		<property name="formctrlService">
+			<ref bean="formctrlService" />
+		</property>
+	</bean>
+	
+</beans>

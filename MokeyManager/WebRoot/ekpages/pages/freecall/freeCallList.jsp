@@ -1,0 +1,385 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="/struts-tags" prefix="s" %>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,user-scalable=no">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>免费通话</title>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/reCss.css" />
+<!--2015-4-29新样式，reCss.css样式一定要最后调用-->
+<script src="${pageContext.request.contextPath}/js/jquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/laypage/laypage.js"></script>
+<script src="${pageContext.request.contextPath}/ekpages/js/jquery.json.min.js" type="text/javascript"></script>
+<script src="${pageContext.request.contextPath}/ekpages/layer/layer.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/My97DatePicker/WdatePicker.js"></script>
+</head>
+<body >
+<table width="98%" height="35"  border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="62.7%" class="tz_crumbs"><img src="${pageContext.request.contextPath}/images/crumbs.jpg" width="9" height="9" /> 系统信息 -&gt; e键管理 -&gt; 免费通话 </td>
+  </tr>
+</table>
+<form id="form1" method="post" action="">
+	<table width="98%"  border="0" align="center" cellpadding="0" cellspacing="0" class="tbg">
+		<tr>
+			<td>
+				<table width="100%"  border="0" cellspacing="1" cellpadding="2">
+					<tr>
+						<td width="8%"  height="23" class="biaodan-top" align="left">飞语云账户ID</td>
+						<td width="15%" align="center" class="biaodan-q">
+							<input  type="text" style="border:none; width:100%; height:100%" id="fyAccountId" />
+						</td>
+						<td width="8%"  height="23" class="biaodan-top" align="left">手机号</td>
+						<td width="15%" align="center" class="biaodan-q">
+							<input  type="text" style="border:none; width:100%; height:100%" id="phone" />
+						</td>
+						<td width="8%"  height="23" class="biaodan-top" align="left">状态</td>
+						<td width="15%" align="center" class="biaodan-q">
+							<select style="width:100%;border:none;hight:100%;" id="status">
+								<option></option>
+								<option value="2">禁用</option>
+								<option value="1">启用</option>
+							</select>
+						</td>
+					</tr>
+						<tr>
+						<td width="8%"  height="23" class="biaodan-top" align="left">时间查询</td>
+						<td width="15%" align="center" class="biaodan-q">
+							<input type="text" style="border:none; width:100%; height:100%" id="sdate" name="sdate" class="Wdate"
+								   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'edate\')}'})"/>
+						</td>
+						<td width="15%" align="center" class="biaodan-q">
+							<hr style="width: 50px;">
+						</td>
+						<td width="15%" align="center" class="biaodan-q">
+							<input type="text" style="border:none; width:100%; height:100%" id="edate" name="edate" class="Wdate"
+								   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'sdate\')}'})"/>
+						</td>
+						<td rowspan="2" align="right" class="biaodan-q" colspan="2">
+							<input type="button" class="butt" value="查 询" onclick="infoList()" />
+							<input type="button" class="butt" value="在线状态" id="selectAllOnlineStatus" />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</form>
+<table width="98%" height="35"  border="0" align="center" cellpadding="1" >
+  <tr>
+	  <td width="8%"  height="23" class="biaodan-top" align="left" style="color: red">异常账号数量</td>
+	  <td width="15%" align="center" class="biaodan-q" ><h3><span id="yichang">0</span></h3></td>
+	  <td width="15%" align="center" class="biaodan-q" style="color: red">注意 ：点击"异常账号",查询异常账号数量！"添加"重新注册异常账号</td>
+	  <td width="15%" align="center" class="biaodan-q"><%--异常操作选项--%>
+		  <input type="button" class="butt" value="异常账号" onclick="selectAll()" />
+		  <input type="button" class="butt" id="addInfo" value="添加" onclick="addInfo()" />
+		  <input type="button" class="butt" value="未注册账号" onclick="noRegiter()" />
+	  </td>
+  </tr>
+</table>
+<form id="form2" method="post">
+<table width="98%"  border="0" align="center" cellpadding="0" cellspacing="1" class="tbg sortable">
+  <thead>
+  <input type="hidden" id="editId" name="editId"/>
+  <input type="hidden" id="fyAccountIds" name="fyAccountIds"/>
+	  <tr class="biaodan-top">
+		  <td width=""><input type="checkbox" name="checkbox" id="selectAll"> </td>
+		  <td width="5%">ID</td>
+	      <td width="10%">本地帐号</td>
+		  <td width="10%">飞语云账户ID</td>
+		  <td width="10%">创建时间</td>
+	      <td width="10%">状态</td>
+		  <td width="10%">手机号码</td>
+	    <td >操作</td>
+	  </tr>
+  </thead>
+  <tbody id="mytable"></tbody>
+</table>
+<input type="hidden" id="cateTotal" />
+<div id="page11"></div>
+</form>
+<script type="text/javascript">
+	$(function(){
+		infoList();
+	});
+	function infoList(){
+		// 查询应用总数
+		var fyAccountId = $("#fyAccountId").val();
+		var phone =$("#phone").val();
+		var status =$("#status").val();
+		var sdate = $("#sdate").val();
+		var edate = $("#edate").val();
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!freeCallList.action",{fyAccountId:fyAccountId,phone:phone,status:status,sdate:sdate,edate:edate},
+				function(data){
+					var json = $.parseJSON(data);
+					var count = json[0].count;// 数据总数
+					$("#page11").empty();
+					if(count != 0){
+						setTotal(count,"cateTotal");
+						// 分页显示活动详情
+						getCatePage("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!freeCallList.action",fyAccountId,phone,status,sdate,edate);
+					}
+				});
+		// 查询活动详情(第一页)
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!freeCallList.action",{fyAccountId:fyAccountId,phone:phone,status:status,sdate:sdate,edate:edate},
+				function(data){
+					var json = $.parseJSON(data);
+					var list = json[0].list;
+					$("#mytable").empty();
+					$(list).each(function(){
+						var _s = "<tr class='biaodan-q'><td align='center'><input type='checkbox' name='checkbox' id='check' data-id='"+this.C_FYACCOUNTID+"'/></td><td align='center'>"+this.C_ID+"</td>";
+						_s += "<td align='center'>"+(this.C_APPACCOUNTID||'')+"</td>";
+						_s += "<td align='center'>"+(this.C_FYACCOUNTID||'')+"</td>";
+						_s += "<td align='center'>"+(this.C_CREATEDATE||'')+"</td>";
+						_s += "<td align='center'>"+(this.STATUS||'')+"</td>";
+						_s += "<td align='center'>"+(this.C_GLOBALMOBILEPHONE||'')+"</td>";
+						_s += "<td align='center'>";
+						if(this.C_STATUS=="1"){
+							_s += "<input type='button' value='禁 用' class='butt' onClick='updateStatus("+this.C_ID+",\""+this.C_STATUS+"\")'/>";
+						}else{
+							_s += "<input type='button' value='启 用' class='butt' onClick='updateStatus("+this.C_ID+",\""+this.C_STATUS+"\")'/>";
+						}
+						/*_s += "<input type='button' value='在线状态' class='butt' onClick='selectOnlineStatus("+this.C_ID+",\""+this.C_FYACCOUNTID+"\")'/>";*/
+						_s += "<input type='button' value='飞语号查询' class='butt' style='width: 80px;' id='"+this.C_ID+"' onClick='selectOnline("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\","+1+")'/>";
+						_s += "<input type='button' value='e键号查询' class='butt' style='width: 80px;' id='"+this.C_ID+"' onClick='selectOnline("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\","+2+")'/>";
+						_s += "<input type='button' value='禁用并删除' class='butt' tyle='width: 100px;'  onClick='deleteFy("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\",\""+this.C_STATUS+"\")'/>";
+						/*_s += "<input type='button' value='手机号查询' class='butt' id='"+this.C_ID+"' onClick='selectOnline("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\","+3+")'/>";*/
+						_s += '</td></tr>';
+						$("#mytable").append(_s);
+					});
+				});
+	}
+	// 设置总页数
+	function setTotal(count,pageTotal){
+		var totalPage = 0;
+		var rows = 5;// 每页显示条数
+		totalPage = 1;
+		// 计算总页数
+		totalPage = parseInt((count - 1) / rows) + 1;
+		$("#"+pageTotal).val(totalPage);
+	}
+	// 分页显示活动详情
+	function getCatePage(url,fyAccountId,phone,status,sdate,edate) {
+		laypage({
+			cont: 'page11',
+			pages: document.getElementById("cateTotal").value,
+			curr: function(){ //通过url获取当前页，也可以同上（pages）方式获取
+				var page = location.search.match(/page=(\d+)/);
+				return page ? page[1] : 1;
+			}(),
+			jump: function(e, first){ //触发分页后的回调
+				if(!first){ //一定要加此判断，否则初始时会无限刷新
+					$.post(url,{page:e.curr,fyAccountId:fyAccountId,phone:phone,status:status,sdate:sdate,edate:edate},
+							function(data){
+								var json = $.parseJSON(data);
+								var list = json[0].list;
+								$("#mytable").empty();
+								$(list).each(function(){
+									var _s = "<tr class='biaodan-q'><td align='center'><input type='checkbox' name='checkbox' id='check' data-id='"+this.C_FYACCOUNTID+"'/></td><td align='center'>"+this.C_ID+"</td>";
+									_s += "<td align='center'>"+(this.C_APPACCOUNTID||'')+"</td>";
+									_s += "<td align='center'>"+(this.C_FYACCOUNTID||'')+"</td>";
+									_s += "<td align='center'>"+(this.C_CREATEDATE||'')+"</td>";
+									_s += "<td align='center'>"+(this.STATUS||'')+"</td>";
+									_s += "<td align='center'>"+(this.C_GLOBALMOBILEPHONE||'')+"</td>";
+									_s += "<td align='center'>";
+									if(this.C_STATUS=="1"){
+										_s += "<input type='button' value='禁 用' class='butt' onClick='updateStatus("+this.C_ID+",\""+this.C_STATUS+"\")'/>";
+									}else{
+										_s += "<input type='button' value='启 用' class='butt' onClick='updateStatus("+this.C_ID+",\""+this.C_STATUS+"\")'/>";
+									}
+									/*_s += "<input type='button' value='在线状态' class='butt' onClick='selectOnlineStatus("+this.C_ID+",\""+this.C_FYACCOUNTID+"\")'/>";*/
+									_s += "<input type='button' value='飞语号查询' class='butt' style='width: 80px;' id='"+this.C_ID+"' onClick='selectOnline("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\","+1+")'/>";
+									_s += "<input type='button' value='e键号查询' class='butt' style='width: 80px;' id='"+this.C_ID+"' onClick='selectOnline("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\","+2+")'/>";
+									_s += "<input type='button' value='禁用并删除' class='butt' tyle='width: 100px;' onClick='deleteFy("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\",\""+this.C_GLOBALMOBILEPHONE+"\",\""+this.C_STATUS+"\")'/>";
+									/*_s += "<input type='button' value='手机号查询' class='butt' id='"+this.C_ID+"' onClick='selectOnline("+this.C_ID+",\""+this.C_FYACCOUNTID+"\",\""+this.C_APPACCOUNTID+"\","+2+")'/>";*/
+									_s += '</td></tr>';
+									$("#mytable").append(_s);
+								});
+							});
+				}
+			}
+		});
+	}
+	//禁用  启用
+	function  updateStatus(cid,status){
+		var flag;
+      if(status=="1"){
+		  flag = confirm("您确定要禁用飞语账号？");
+	  }else{
+		  flag = confirm("您确定要启用飞语账号？");
+	  }
+	  if(flag){
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!updateStatus.action",
+				{cid:cid},function(data){
+					//window.location.reload();
+					var json = $.parseJSON(data);
+					var resultCode = json[0].resultCode;
+					var resultMsg = json[0].resultMsg;
+					if(resultCode==0){
+						alert(resultMsg);
+						window.location.reload();
+					}
+				});
+	  }
+	}
+
+	//查询单个在线状态
+	function selectOnlineStatus(id ,fyAccountIds){
+		//取消全选
+		$("[name='checkbox']").removeAttr("checked");//取消全选
+		var data = [];
+		if(fyAccountIds !=""){
+			var item = {};
+			item['fyAccountIds'] = fyAccountIds;
+			data.push(item);
+		}
+		$("#fyAccountIds").val($.toJSON(data));
+		getUrl();
+	}
+	//未注册账号
+	function noRegiter(){
+		layer.open({
+			type: 2,
+			title: '未注册账号',
+			shadeClose: true,
+			shade: 0.8,
+			area: ['90%', '90%'],
+			content: '${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!toRegiter.action'
+		});
+	}
+	//查询多个在线状态
+	$("#selectAllOnlineStatus").click(function(){
+		if($("input[name=checkbox]:checked").length == 0){
+			layer.alert('请选择要查看的飞语账户！');
+			return false;
+		}
+		if($("input[name=checkbox]:checked").length >10){
+			layer.alert('一次最多查询10个！');
+			return false;
+		}
+		var data = [];
+		$("input[name=checkbox]:checked").each(function(){
+			var _this = $(this);
+			var fyAccountIds = _this.attr('data-id');
+			if(fyAccountIds !="" &&　fyAccountIds!=undefined){
+				var item = {};
+				item['fyAccountIds'] = fyAccountIds;
+				data.push(item);
+			}
+		});
+		$("#fyAccountIds").val($.toJSON(data));
+		getUrl();
+	});
+
+	//全选按钮
+	  $("#selectAll").click(function(){
+		_this=$(this);
+		if(_this.is(':checked')){//选中
+			$("[name='checkbox']").prop("checked",'true');//全选
+		}else{//反选
+			$("[name='checkbox']").removeAttr("checked");//取消全选
+		}
+	});
+
+	function getUrl(){
+		layer.open({
+			type: 2,
+			title: '在线状态列表',
+			shadeClose: true,
+			shade: 0.8,
+			area: ['90%', '90%'],
+			content: '${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!toSelect.action'
+		});
+	}
+
+	function selectOnline(id ,fyAccountId,appId,phone,type){
+		var _info="";
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!getAccount.action",
+				{fyAccountId:fyAccountId,appId:appId,phone:phone,type:type},function(data){
+					//window.location.reload();
+					var json = $.parseJSON(data);
+					var resultCode = json[0].resultCode;
+					var resultMsg = json[0].resultMsg;
+					var result = json[0].result;
+					var status ="";
+					if(result.status==1){
+						status="启用";
+					}else if(result.status==2){
+						status="禁用";
+					}
+					if(resultCode==0){
+						_info+="<table >";
+						_info+="<thead><tr ><td width='250px;'>飞语云账户ID</td><td width='250px;'>密码</td><td width='250px;'>创建时间</td><td width='250px;'>状态</td></tr></thead>";
+						_info+="<tbody>";
+						_info+="<tr >";
+						_info+="<td width='250px;'>"+result.fyAccountId+"</td><td width='250px;'>"+result.fyAccountPwd+"</td><td width='250px;'>"+result.addDate+"</td><td width='250px;'>"+status+"</td>";
+						_info+="</tr>";
+						_info+="</tbody></table>";
+						_lay(_info,id);
+					}else{
+						_info+=resultMsg;
+						_lay(_info,id);
+					}
+				});
+	}
+	function _lay(info,id){
+		layer.tips(info, '#'+id, {
+			tips: [4, '#78BA32'],
+			area: ['500px', '60px']
+		});
+	}
+
+
+	function addInfo(){
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!addAccount.action",{type:"1"}
+				,function(data){
+					window.location.reload();
+				});
+	}
+
+	function addTime(){
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!addTime.action"
+				,function(data){
+
+				});
+	}
+
+
+	function selectAll(){
+		layer.load();
+		$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!selectAll.action"
+				,function(data){
+					layer.closeAll('loading');
+					var json = $.parseJSON(data);
+					var count = json[0].count;// 数据总数
+					if(count>0){
+					  $("#yichang").html(count)
+                      $("#addInfo").show();
+					}
+				});
+	}
+	//删除并禁用
+	function deleteFy(id,fyId,appId,phone,status){
+		flag = confirm("您确定要禁用并删除飞语账号？");
+		if(flag){
+			$.post("${pageContext.request.contextPath}/basedata/ekey/eKFreeCallAction!deleteFy.action",
+					{fyId:fyId,status:status},function(data){
+						var json = $.parseJSON(data);
+						var resultCode = json[0].resultCode;
+						var resultMsg = json[0].resultMsg;
+						if(resultCode==0){
+							alert(resultMsg);
+							window.location.reload();
+						}
+					});
+		}
+
+	}
+</script>
+</body>
+</html>
+

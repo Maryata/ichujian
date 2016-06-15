@@ -1,0 +1,63 @@
+/*banner*/
+.main_visual{
+	overflow: hidden;
+	width: 100%;
+	height: 201px;
+	position:relative;
+	/*
+	top:0;
+	z-index: 99999;*/
+}
+.main_image img{
+	height: 150px;
+	width: 100%;
+}
+.flicking_inner{
+	position: absolute;
+	z-index: 100;
+	left: 45%;
+	bottom:60px;
+}
+.flicking_inner a{
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #808385;
+	margin-right: 10px;
+}
+.flicking_inner .on{
+	background: #4285f4;
+}
+/*banner END*/
+body{ color:#000; font-size:16px; font-size:1rem; background:#fafafa;}
+a,a:hover,a:focus{ color:#888; font-size:16px; font-size:1rem;}
+.nav{ width:100%;height:50px; line-height:50px; border-bottom:1px #eee solid;margin-top: 150px; background:#fafafa; }
+.nav a{ width:32.5%; text-align:center; display:inline-block;cursor:pointer;}
+.nav a.hover{ color:#e16b2c; border-bottom:4px #e16b2c solid;height:47px;}
+.gamelist,.ranklist{width:95%;/*margin-top:200px;*/ float:right;  z-index: 1;}
+.ranklist{width:90%;}
+.gamelist dl,.ranklist dl{ height:100px; width:100%; border-bottom:1px #eee solid; margin-top:20px; float:right; position:relative;}
+
+.gamelist img,.ranklist img{ width:80px; height:80px;}
+.gamelist dl dt{ width:80px;height:80px; float:left;}
+.ranklist dl dt{ width:80px;height:80px; float:left;}
+.ranklist dl > span{width:25px; height:25px;margin-left:10px; color:#888;font-size:18px; font-size:1.125rem;display:block; text-align:center; line-height:25px; position:absolute; top:25px;left:-40px;}
+.ranklist dl span.first{ background:url(../img/ico1.png) center center no-repeat;background-size:100% 100%;}
+.ranklist dl span.second{background:url(../img/ico2.png) center center no-repeat;background-size:100% 100%;}
+.ranklist dl span.third{background:url(../img/ico3.png) center center no-repeat;background-size:100% 100%;}
+dl .play{ position:absolute; top:0px; right:20px; border:1px #e16b2c solid; border-radius:7px; color:#e16b2c; padding:5px 10px;font-size:18px; font-size:1.125rem; cursor:pointer; background:#fafafa;}
+dl dd{ width:70%; float:left;overflow: hidden; margin-left:10px; padding-top:8px}
+dl dd h1{width:60%; color:#000; font-size:18px; font-size:1.125rem;  overflow: hidden;  text-overflow: ellipsis;  white-space: nowrap; }
+dl dd span{width:100%; display:block;margin-top:6px;overflow: hidden;  text-overflow: ellipsis;  white-space: nowrap;}
+dl dd .online{ color:#888; font-size:14px; font-size:0.875rem;}
+dl dd .intr{ color:#000; font-size:16px; font-size:1rem;}
+
+/*攻略详情css*/
+.infobox{ width:90%; overflow:hidden; margin:10px auto;}
+.infobox h1{ color:#000; font-size:22px; font-size:1.375rem; }
+.infobox .time{ width:100%; border-bottom:1px #eee solid; height:40px; line-height:40px;color:#888; font-size:14px; font-size:0.875rem; text-align:center;margin-bottom:10px;}
+
+.ajax_loading{ text-align:center; width:100%; float:right;margin:10px auto;}
+.ajax_loading img{display: inline-block;margin-right: 6px; width:18px;}
+.ajax_loading span{font-size:16px; font-size:1rem; color:#888;}

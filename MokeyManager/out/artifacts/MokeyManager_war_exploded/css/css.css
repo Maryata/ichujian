@@ -1,0 +1,74 @@
+body {
+	font: normal 12px verdana;
+	
+	background-color: #F6F6F6;
+	margin:5px; 
+	line-height: 150%;
+	background-color: #F6F6F6;
+	scrollbar-face-color:#EEF2FD;
+	scrollbar-highlight-color: #EEF2FD;
+	scrollbar-shadow-color: #EEF2FD;
+	scrollbar-3dlight-color:#2F6068;
+	scrollbar-arrow-color:#2F6068;
+	scrollbar-track-color:#EEF2FD;
+	scrollbar-darkshadow-color:#2F6068;
+	scrollbar-base-color:#EEF2FD;
+}
+
+/**hbnw.css*/
+.tbg {
+	background-color: #3E591C;
+}
+
+.biaodan-top { 
+	/*background-image: url(../image/main_tt.jpg);  */
+	background-color:#DDF1FC;
+	text-align: center; 
+	font-weight: bold;
+	line-height: 190%;
+	white-space:nowrap;
+}
+.biaodan-q {
+	background-color: #FFFFFF;
+	line-height:170%;
+	padding-left:3px; 
+	padding-right:3px;  
+}
+table {
+	font-size: 12px;
+	line-height: 150%;
+	star:expression(this.align='center');
+	padding:0px;
+}
+.image {
+	vertical-align:absmiddle;
+	text-align:absmiddle;
+	cursor:hand;
+}
+.butt {
+	height: 21px;
+	font-size: 12px;
+	color: #FFFFFF;
+	line-height: 125%;
+	background-image: url(../image/buttonbg.jpg);
+	width: 70px;
+}
+button{border:0px;}
+.rdd {
+	color: #234378;
+	text-decoration: none;
+	font-weight: bold;
+}
+.red {
+	color: #FF0000;
+}
+.blue {
+	color: #0000FF;
+}
+.white {
+	color: #FFFFFF;
+}
+.green {
+	font-weight: bold;
+	color: #00FF00;
+}

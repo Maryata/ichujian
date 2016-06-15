@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link rel="stylesheet"
+	href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<!-- 可选的Bootstrap主题文件（一般不用引入） -->
+<link rel="stylesheet"
+	href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+<title>ECharts</title>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<button class="btn" onclick='_export();' type="button">导出</button>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>周一</th>
+							<th>周二</th>
+							<th>周三</th>
+							<th>周四</th>
+							<th>周五</th>
+							<th>周六</th>
+							<th>周日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>11</td>
+							<td>11</td>
+							<td>15</td>
+							<td>13</td>
+							<td>12</td>
+							<td>13</td>
+							<td>10</td>
+						</tr>
+						<tr class="success">
+							<td>1</td>
+							<td>-2</td>
+							<td>2</td>
+							<td>5</td>
+							<td>3</td>
+							<td>2</td>
+							<td>0</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+	<div id="main" style="height:400px"></div>
+	
+	<form id="myform" action="/IchujianManager/demo/exp.action" method="post">
+		<input type="hidden" name="list" id="list">
+		<input type="hidden" name="img" id="img">
+	</form>
+
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+	<!-- ECharts单文件引入 -->
+	<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+	<script type="text/javascript">
+		// 路径配置
+		require.config({
+			paths : {
+				echarts : 'http://echarts.baidu.com/build/dist'
+			}
+		});
+
+		// 使用
+		require([ 
+		          'echarts', 'echarts/chart/bar',
+		          'echarts', 'echarts/chart/line'
+		], function(ec) {
+			// 基于准备好的dom，初始化echarts图表
+			myChart = ec.init(document.getElementById('main'));
+
+			var option = {
+				    title : {
+				        text: '未来一周气温变化',
+				        subtext: '纯属虚构'
+				    },
+				    tooltip : {
+				        trigger: 'axis'
+				    },
+				    legend: {
+				        data:['最高气温','最低气温']
+				    },
+				    toolbox: {
+				        show : true,
+				        feature : {
+				            mark : {show: true},
+				            dataView : {show: true, readOnly: false},
+				            magicType : {show: true, type: ['line', 'bar']},
+				            restore : {show: true},
+				            saveAsImage : {show: true}
+				        }
+				    },
+				    calculable : true,
+				    xAxis : [
+				        {
+				            type : 'category',
+				            boundaryGap : false,
+				            data : ['周一','周二','周三','周四','周五','周六','周日']
+				        }
+				    ],
+				    yAxis : [
+				        {
+				            type : 'value',
+				            axisLabel : {
+				                formatter: '{value} °C'
+				            }
+				        }
+				    ],
+				    series : [
+				        {
+				            name:'最高气温',
+				            type:'line',
+				            data:[11, 11, 15, 13, 12, 13, 10],
+				            markPoint : {
+				                data : [
+				                    {type : 'max', name: '最大值'},
+				                    {type : 'min', name: '最小值'}
+				                ]
+				            },
+				            markLine : {
+				                data : [
+				                    {type : 'average', name: '平均值'}
+				                ]
+				            }
+				        },
+				        {
+				            name:'最低气温',
+				            type:'line',
+				            data:[1, -2, 2, 5, 3, 2, 0],
+				            markPoint : {
+				                data : [
+				                    {name : '周最低', value : -2, xAxis: 1, yAxis: -1.5}
+				                ]
+				            },
+				            markLine : {
+				                data : [
+				                    {type : 'average', name : '平均值'}
+				                ]
+				            }
+				        }
+				    ]
+				};
+
+			// 为echarts对象加载数据 
+			myChart.setOption(option);
+		});
+		
+		var myChart;
+		
+		function _export() {
+			var list = '[{name : "张三",age : 19},{name : "李四", age : 18}]';
+			var img = myChart.getDataURL();
+			
+			$('#list').val(list);
+			$('#img').val(img);
+			$('#myform').submit();
+			//document.getElementById('iframe').src = '/IchujianManager/demo/exp.action?list=' + list + '&img=' + img;
+			/*$.ajax({
+				type : 'post',
+				url : '/IchujianManager/demo/exp.action',
+				data : {
+					list : list,
+					img : img
+				},
+				success : function(data) {
+					
+				}
+			});*/
+			
+		}
+	</script>
+</body>

@@ -1,0 +1,320 @@
+package com.org.mokey.analyse.service.impl;
+
+import com.org.mokey.analyse.action.EkeyKeyUsingAction;
+import com.org.mokey.analyse.dao.EkeyKeyUsingDao;
+import com.org.mokey.analyse.dao.UserAnalyseDao;
+import com.org.mokey.analyse.service.EkeyKeyUsingService;
+import com.org.mokey.analyse.vo.EkeyKeyBean;
+import com.org.mokey.analyse.vo.EkeyKeyUsingBean;
+import com.org.mokey.common.util.ApDateTime;
+import com.org.mokey.util.StrUtils;
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/5.
+ */
+@Service
+public class EkeyKeyUsingServiceImpl implements EkeyKeyUsingService {
+
+    private static final Log LOGGER = LogFactory.getLog(EkeyKeyUsingServiceImpl.class);
+
+    @Autowired
+    private EkeyKeyUsingDao ekeyKeyUsingDao;
+
+    @Autowired
+    private UserAnalyseDao userAnalyseDao;
+
+    @Autowired
+    private UserAnalyseServiceImpl userAnalyseServiceImpl;
+
+    @Override
+    // 查询用户按键使用情况
+    public List<EkeyKeyUsingBean> keyUsingData(String timePattern, String userId, String timeType, String userType, String supCode, String sDate, String eDate) {
+        List<EkeyKeyUsingBean> initData = new ArrayList<>();
+        try {
+            /** 初始化数据 */
+            List<String> timeBetween = new ArrayList<>();
+            if (EkeyKeyUsingAction.TIMETYPE_DAY.equals(timeType)) {
+                timeBetween = ApDateTime.getDayBetween(sDate, eDate);
+            } else if (EkeyKeyUsingAction.TIMETYPE_MONTH.equals(timeType)) {
+                timeBetween = ApDateTime.getMonthBetween(sDate, eDate);
+            }
+            if (timeBetween.size() > 0) {
+                for (int i = 0; i < timeBetween.size(); i++) {
+                    EkeyKeyUsingBean keyUsingBean = new EkeyKeyUsingBean();
+                    keyUsingBean.setTimeStr(timeBetween.get(i));
+                    initData.add(keyUsingBean);
+                }
+            }
+
+            List<Map<String, Object>> countOfActiveUser;// 激活用户数
+            List<Map<String, Object>> countOfUsingUser;// 使用用户数
+            List<Map<String, Object>> timesOfUsingUser;// 使用次数
+            /** 1.查询激活用户数 */
+            List<String> supCodes = new ArrayList<>();
+            if (StrUtils.isEmpty(supCode)) {
+                // 查询当前用户可见的供应商
+                List<Map<String, Object>> visibleSupplier = userAnalyseDao.visibleSupplier(userId, "0");
+                supCodes = userAnalyseServiceImpl.getSupCodeList(visibleSupplier);
+            } else {
+                supCodes.add(supCode);
+            }
+            // 查询指定时间段每天/每月的激活用户数
+            countOfActiveUser = ekeyKeyUsingDao.countOfActiveUsers(timePattern, supCodes, sDate, eDate);
+
+            long countOfActiveUsersUtilSDate = 0L;
+            // 如果userType=2，则查询截至sDate这一时间之前激活用户数
+            if (EkeyKeyUsingAction.USERTYPE_ALL.equals(userType)) {
+                // 查询截至sDate这一时间之前激活用户数
+                countOfActiveUsersUtilSDate = ekeyKeyUsingDao.countOfActiveUsersUtilSDate(timePattern, supCodes, sDate);
+            }
+
+            /** 2.查询使用人数 */
+            countOfUsingUser = ekeyKeyUsingDao.countOfUsingUser(timePattern, supCodes, sDate, eDate);
+
+            /** 3.查询使用次数 */
+            timesOfUsingUser = ekeyKeyUsingDao.timesOfUsingUser(timePattern, supCodes, sDate, eDate);
+
+            /** 组装每一行的数据 */
+            getKeyUsingData(timeType, initData, countOfActiveUser, timeBetween, countOfActiveUsersUtilSDate, countOfUsingUser, timesOfUsingUser);
+
+            /** “合计行”数据 */
+            getSumData(initData, userType);
+        } catch (Exception e) {
+            LOGGER.error("EkeyKeyUsingServiceImpl.keyUsingData failed ! e : ", e);
+        }
+        return initData;
+    }
+
+    /**
+     * 组装最终数据（按键使用情况）
+     *
+     * @param timeType                    时间类型
+     * @param initData                    初始化的数据
+     * @param countOfActiveUser           每天的激活用户数
+     * @param timeBetween                 日期集合
+     * @param countOfActiveUsersUtilSDate 第一天之前的所有激活用户数
+     * @param countOfUsingUser            每天每个键的使用人数
+     * @param timesOfUsingUser            每天每个键的使用次数
+     * @return
+     */
+    private void getKeyUsingData(
+            String timeType, List<EkeyKeyUsingBean> initData, List<Map<String, Object>> countOfActiveUser,
+            List<String> timeBetween, long countOfActiveUsersUtilSDate, List<Map<String, Object>> countOfUsingUser,
+            List<Map<String, Object>> timesOfUsingUser) {
+        // 如果获取的是所有激活用户，封装一个以每个时间节点为key,该时间节点之前的激活数为value的map
+        Map<String, Long> timeCountMap = new LinkedMap();
+        if (countOfActiveUsersUtilSDate != 0 && timeBetween.size() > 0) {
+            for (int i = 0; i < timeBetween.size(); i++) {
+                String time = timeBetween.get(i);
+                long countOfEachTime = 0L;
+                if (i == 0) {
+                    timeCountMap.put(time, countOfActiveUsersUtilSDate);
+                } else {
+                    // timeCountMap当前时间的前一天/前一月
+                    String timeBef = "";
+                    if (EkeyKeyUsingAction.TIMETYPE_DAY.equals(timeType)) {
+                        timeBef = ApDateTime.dateAdd("d", -1, time, ApDateTime.DATE_TIME_YMD);
+                    } else if (EkeyKeyUsingAction.TIMETYPE_MONTH.equals(timeType)) {
+                        timeBef = ApDateTime.dateAdd("m", -1, time, ApDateTime.DATE_TIME_YM);
+                    }
+                    if (countOfActiveUser.size() > 0) {
+                        for (int j = 0; j < countOfActiveUser.size(); j++) {
+                            Map<String, Object> map = countOfActiveUser.get(j);// 时间
+                            String day = StrUtils.emptyOrString(map.get("DAY"));// 激活人数
+                            if (!"".equals(timeBef) && timeBef.equals(day)) {
+                                countOfEachTime = StrUtils.zeroOrInt(map.get("TOTAL"));
+                                break;
+                            }
+                        }
+                    }
+                    timeCountMap.put(time, timeCountMap.get(timeBef) + countOfEachTime);
+                }
+            }
+        }
+        if (initData.size() > 0) {
+            for (EkeyKeyUsingBean keyUsingBean : initData) {
+                String timeStr = keyUsingBean.getTimeStr();// 时间
+                /** 激活人数 */
+                if (countOfActiveUser.size() > 0) {
+                    for (int i = 0; i < countOfActiveUser.size(); i++) {
+                        Map<String, Object> map = countOfActiveUser.get(i);// 时间
+                        String day = StrUtils.emptyOrString(map.get("DAY"));// 激活人数
+                        // 当天激活人数 OR 截至当天的所有激活人数
+                        long total = StrUtils.zeroOrInt(map.get("TOTAL"));
+//                        long total = StrUtils.zeroOrInt(map.get("TOTAL")) + countOfActiveUsersUtilSDate;
+                        if (timeStr.equals(day)) {
+                            if (countOfActiveUsersUtilSDate != 0) {
+                                keyUsingBean.setActCount(total + timeCountMap.get(day));
+                            } else {
+                                keyUsingBean.setActCount(total);
+                            }
+                            break;
+                        }
+                    }
+                }
+                /** 使用人数 */
+                setCountOfKeyUsing(keyUsingBean, timeStr, countOfUsingUser, "1");
+                /** 使用次数 */
+                setCountOfKeyUsing(keyUsingBean, timeStr, timesOfUsingUser, "2");
+                /** 当天的合计使用人数和合计使用次数 */
+                setSumCount(keyUsingBean);
+                /** 补全没有激活的时间的总激活人数 */
+                if (countOfActiveUsersUtilSDate != 0 && keyUsingBean.getActCount()==0) {
+                    keyUsingBean.setActCount(timeCountMap.get(timeStr));
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置按键使用人数/次数
+     *
+     * @param keyUsingBean 数据实例
+     * @param timeStr      时间
+     * @param list         数据集合
+     * @param s            数据类型 1.使用人数，2.使用次数
+     */
+    private void setCountOfKeyUsing(EkeyKeyUsingBean keyUsingBean, String timeStr, List<Map<String, Object>> list, String s) {
+        if (list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> map = list.get(i);
+                String day = StrUtils.emptyOrString(map.get("DAY"));// 时间
+                String key = StrUtils.emptyOrString(map.get("KEY"));// 键位
+                long total = StrUtils.zeroOrInt(map.get("TOTAL"));// 总数
+                if (timeStr.equals(day)) {
+                    switch (key) {
+                        case "0":
+                            EkeyKeyBean keyBean_start = keyUsingBean.getKeyBean_start();
+                            setVariableValue(s, keyBean_start, total);
+                            break;
+                        case "1":
+                            EkeyKeyBean keyBean_1st = keyUsingBean.getKeyBean_1st();
+                            setVariableValue(s, keyBean_1st, total);
+                            keyUsingBean.setKeyBean_1st(keyBean_1st);
+                            break;
+                        case "2":
+                            EkeyKeyBean keyBean_2nd = keyUsingBean.getKeyBean_2nd();
+                            setVariableValue(s, keyBean_2nd, total);
+                            keyUsingBean.setKeyBean_2nd(keyBean_2nd);
+                            break;
+                        case "3":
+                            EkeyKeyBean keyBean_3rd = keyUsingBean.getKeyBean_3rd();
+                            setVariableValue(s, keyBean_3rd, total);
+                            keyUsingBean.setKeyBean_3rd(keyBean_3rd);
+                            break;
+                        case "4":
+                            EkeyKeyBean keyBean_4th = keyUsingBean.getKeyBean_4th();
+                            setVariableValue(s, keyBean_4th, total);
+                            keyUsingBean.setKeyBean_4th(keyBean_4th);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置不同的变量值
+     *
+     * @param s       数据类型 1.使用人数，2.使用次数
+     * @param keyBean 按键对象
+     * @param total   数量
+     */
+    private void setVariableValue(String s, EkeyKeyBean keyBean, long total) {
+        if ("1".equals(s)) {
+            keyBean.setUsingUser(total);
+        } else if ("2".equals(s)) {
+            keyBean.setUsingTimes(total);
+        }
+    }
+
+    /**
+     * “合计”行的数据
+     *
+     * @param initData 真实数据
+     * @param userType
+     */
+    private void getSumData(List<EkeyKeyUsingBean> initData, String userType) {
+        EkeyKeyUsingBean totalkeyUsingBean = new EkeyKeyUsingBean();
+        totalkeyUsingBean.setTimeStr("合计");
+        if (initData.size() > 0) {
+            EkeyKeyBean keyBean_start = totalkeyUsingBean.getKeyBean_start();
+            EkeyKeyBean keyBean_1st = totalkeyUsingBean.getKeyBean_1st();
+            EkeyKeyBean keyBean_2nd = totalkeyUsingBean.getKeyBean_2nd();
+            EkeyKeyBean keyBean_3rd = totalkeyUsingBean.getKeyBean_3rd();
+            EkeyKeyBean keyBean_4th = totalkeyUsingBean.getKeyBean_4th();
+            EkeyKeyBean keyBean_sum = totalkeyUsingBean.getKeyBean_sum();
+            for (EkeyKeyUsingBean bean : initData) {
+                // 合计激活数
+                if (EkeyKeyUsingAction.USERTYPE_ACT.equals(userType)) {
+                    totalkeyUsingBean.setActCount(totalkeyUsingBean.getActCount() + bean.getActCount());
+                }
+                // 0号键合计使用人数、使用次数
+                EkeyKeyBean bean_start = bean.getKeyBean_start();
+                keyBean_start.setUsingUser(keyBean_start.getUsingUser() + bean_start.getUsingUser());
+                keyBean_start.setUsingTimes(keyBean_start.getUsingTimes() + bean_start.getUsingTimes());
+                // 1号键合计使用人数、使用次数
+                EkeyKeyBean bean_1st = bean.getKeyBean_1st();
+                keyBean_1st.setUsingUser(keyBean_1st.getUsingUser() + bean_1st.getUsingUser());
+                keyBean_1st.setUsingTimes(keyBean_1st.getUsingTimes() + bean_1st.getUsingTimes());
+                // 2号键合计使用人数、使用次数
+                EkeyKeyBean bean_2nd = bean.getKeyBean_2nd();
+                keyBean_2nd.setUsingUser(keyBean_2nd.getUsingUser() + bean_2nd.getUsingUser());
+                keyBean_2nd.setUsingTimes(keyBean_2nd.getUsingTimes() + bean_2nd.getUsingTimes());
+                // 3号键合计使用人数、使用次数
+                EkeyKeyBean bean_3rd = bean.getKeyBean_3rd();
+                keyBean_3rd.setUsingUser(keyBean_3rd.getUsingUser() + bean_3rd.getUsingUser());
+                keyBean_3rd.setUsingTimes(keyBean_3rd.getUsingTimes() + bean_3rd.getUsingTimes());
+                // 4号键合计使用人数、使用次数
+                EkeyKeyBean bean_4th = bean.getKeyBean_1st();
+                keyBean_4th.setUsingUser(keyBean_4th.getUsingUser() + bean_4th.getUsingUser());
+                keyBean_4th.setUsingTimes(keyBean_4th.getUsingTimes() + bean_4th.getUsingTimes());
+                // 合计使用人数、使用次数
+                EkeyKeyBean bean_sum = bean.getKeyBean_sum();
+                keyBean_sum.setUsingUser(keyBean_sum.getUsingUser() + bean_sum.getUsingUser());
+                keyBean_sum.setUsingTimes(keyBean_sum.getUsingTimes() + bean_sum.getUsingTimes());
+            }
+        }
+        initData.add(totalkeyUsingBean);
+        // 如果是查询所有激活用户，在设置“合计”行的合计激活人数的值为最后一个时间节点的激活人数
+        if (EkeyKeyUsingAction.USERTYPE_ALL.equals(userType)) {
+            totalkeyUsingBean.setActCount(initData.get(initData.size()-2).getActCount());
+        }
+    }
+
+
+    /**
+     * 设置当天的合计使用人数和合计使用次数
+     *
+     * @param keyUsingBean
+     */
+    private void setSumCount(EkeyKeyUsingBean keyUsingBean) {
+        EkeyKeyBean keyBean_sum = keyUsingBean.getKeyBean_sum();
+        EkeyKeyBean keyBean_start = keyUsingBean.getKeyBean_start();
+        EkeyKeyBean keyBean_1st = keyUsingBean.getKeyBean_1st();
+        EkeyKeyBean keyBean_2nd = keyUsingBean.getKeyBean_2nd();
+        EkeyKeyBean keyBean_3rd = keyUsingBean.getKeyBean_3rd();
+        EkeyKeyBean keyBean_4th = keyUsingBean.getKeyBean_4th();
+        keyBean_sum.setUsingUser(keyBean_start.getUsingUser()
+                                + keyBean_1st.getUsingUser()
+                                + keyBean_2nd.getUsingUser()
+                                + keyBean_3rd.getUsingUser()
+                                + keyBean_4th.getUsingUser());
+        keyBean_sum.setUsingTimes(keyBean_start.getUsingTimes()
+                                + keyBean_1st.getUsingTimes()
+                                + keyBean_2nd.getUsingTimes()
+                                + keyBean_3rd.getUsingTimes()
+                                + keyBean_4th.getUsingTimes());
+
+    }
+
+}

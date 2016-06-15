@@ -1,0 +1,36 @@
+package com.org.mokey.analyse.action;
+
+import com.org.mokey.analyse.entiy.CallingBill;
+import com.org.mokey.analyse.service.FreeCallService;
+import com.org.mokey.common.AbstractAction;
+import com.org.mokey.common.util.ApDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import java.util.List;
+
+/**
+ * Created by Maryn on 2016/6/7.
+ */
+@Controller
+public class FreeCallAction extends AbstractAction {
+
+    @Autowired
+    private FreeCallService freeCallService;
+
+    public String getCallingBill() {
+        // 默认时间是当前时间往前推6天
+        String sDate = ApDateTime.dateAdd("d", -6, new java.util.Date(), ApDateTime.DATE_TIME_YMD);// 起始时间
+        String eDate = ApDateTime.getNowDateTime(ApDateTime.DATE_TIME_YMD);// 截止时间
+
+        sDate = "2016-06-06";
+        eDate = "2016-06-07";
+
+        getRequest().setAttribute("sDate", sDate);
+        getRequest().setAttribute("eDate", eDate);
+
+        List<CallingBill> bills = freeCallService.getCallingBill(sDate, eDate);
+
+        return "toList";
+    }
+}

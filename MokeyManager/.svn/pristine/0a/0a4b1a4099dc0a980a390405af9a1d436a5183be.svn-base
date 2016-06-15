@@ -1,0 +1,73 @@
+package com.org.mokey.analyse.dao;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/5.
+ */
+public interface EkeyKeyUsingDao {
+
+    /**
+     * 查询激活用户数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfActiveUsers(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 查询指定时间段每个按键每天的使用人数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 查询截至sDate这一时间之前激活用户数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @return
+     */
+    long countOfActiveUsersUtilSDate(String timePattern, List<String> supCodes, String sDate);
+
+    /**
+     * 查询指定时间段每个按键每天的使用次数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> timesOfUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 查询该时间段所有启动过的用户
+     *
+     * @param supCode 供应商
+     * @param sDate   起始时间
+     * @param eDate   截止时间
+     * @return
+     */
+    List<Map<String, Object>> allUsingUser(String supCode, String sDate, String eDate);
+
+    /**
+     * 查询该时间段所有启动过的用户
+     *
+     * @param supCode 供应商
+     * @param sDate   起始时间
+     * @param eDate   截止时间
+     * @return
+     */
+    List<Map<String,Object>> countOfAllUsingUser(String supCode, String sDate, String eDate);
+}

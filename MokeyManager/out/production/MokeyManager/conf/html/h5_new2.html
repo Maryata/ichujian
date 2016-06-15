@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet"
+			href="http://www.ichujian.com/static/game/h5/css/reset.css">
+		<link rel="stylesheet"
+			href="http://www.ichujian.com/static/game/h5/css/commom.css">
+		<script src="http://www.ichujian.com/static/game/h5/js/jquery.min.js">
+</script>
+	</head>
+	<body>
+		<div class="gamelist">
+			###dl###
+			<div class='after_div'></div>
+		</div>
+		<div class="ajax_loading"><span style="display:none;" class="loading" ><img src="http://www.ichujian.com/static/game/h5/img/loading.gif"><span>正在加载...</span></span></div>
+		<script src="http://www.ichujian.com/static/game/h5/js/base64.min.js">
+</script>
+		<script type="text/javascript">
+(function(global, $) {
+	var H5Game = {};
+	H5Game.load = function(page, i, url,callback) {
+		$.ajax( {
+			type : "GET",
+			url : url,
+			data : {
+				cid : i,
+				pageindex : page
+			},
+			dataType : 'jsonp',
+			crossDomain : true,
+			jsonpCallback:callback,
+			beforeSend : function() {
+				$('.loading').show(); //显示加载时候的提示
+			},
+			success : function(ret) {
+				$('.loading').hide(); //请求成功,隐藏加载提示
+			}
+		});
+	};
+	
+	global.H5Game = H5Game;
+})(window, jQuery);
+</script>
+		<!--滑动底部加载js-->
+		<script type="text/javascript">
+var page = 1;
+//var url = 'http://192.168.8.221/AppService/game/h5Gamecollection.action';
+var url = 'http://www.ichujian.com/AppService/game/h5Gamecollection.action';
+$(document).ready(
+		function() {
+			$(window).scroll(
+					function() {
+						if ($(document).scrollTop() >= $(document).height()
+								- $(window).height()) {
+							H5Game.load(Base64.encode(++page),
+								Base64.encode(2), url,Base64.encode('flightHandler'));
+						}
+					})
+		});
+function startH5Game(url,gid, logourl,name){
+	window.someThing.setSmething(url,gid,logourl,name);
+}
+var flightHandler = function(data) {
+	//data = {"games":[{"startCnts":"7","C_JARNAME":"com.mechanist.crystal.sy360","C_NAME":"盗梦英雄","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t0136ffea24fb354192.png","C_ID":"2","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.mechanist.crystal.sy360_2015052101.apk","C_TITLE":"踏上梦境征程，战出英雄梦！"},{"startCnts":"5","C_JARNAME":"com.supercell.boombeach.qihoo","C_NAME":"海岛奇兵","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t010990390111173d3c.png","C_ID":"4","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.supercell.boombeach.qihoo_21166.apk","C_TITLE":"向沙滩开火，赢取胜利！"},{"startCnts":"4","C_JARNAME":"com.netease.my.qihoo","C_NAME":"梦幻西游","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t01b07201c3ac68dc48.png","C_ID":"7","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.netease.my.qihoo_10220.apk","C_TITLE":"《梦幻西游》手游由梦幻西游团队倾力打造"},{"startCnts":"3","C_JARNAME":"sh.lilith.dgame.s360","C_NAME":"刀塔传奇(亿万玩家实时PK)","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t016b0d949bb6b4675d.png","C_ID":"9","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/sh.lilith.dgame.s360_44943.apk","C_TITLE":"一直被模仿，从未被超越的国民动作卡牌手游"}],"status":"Y"};
+	if(data && data.status == 'Y') {
+		var games = data.games;
+		var len = games.length;
+		var $div = $(".after_div");
+		var sb_dl = '';
+		for(var i = 0; i < len; ++i) {
+			var game = games[i];
+					sb_dl += "<dl>";
+					sb_dl += "<a href=\""; 
+					sb_dl += game['C_APPURL'];
+					sb_dl += "\" target='_parent' class='play'>开始玩</a><dt><img width='100%' src='";
+					sb_dl +=game["C_LOGOURL"];
+					sb_dl +="'></dt><dd><h1>";
+					sb_dl +=game["C_NAME"];
+					sb_dl +="</h1><span class='online'>";
+					sb_dl += game["startCnts"];
+					sb_dl += "人已玩过</span><span class='intr'>";
+					sb_dl += game["C_TITLE"]||'';
+					sb_dl +="</span></dd></dl>";
+					
+					$div.before(sb_dl);
+					sb_dl = '';
+		}
+		
+	}
+	$('.loading').hide(); //请求成功,隐藏加载提示
+}
+</script>
+	</body>
+</html>

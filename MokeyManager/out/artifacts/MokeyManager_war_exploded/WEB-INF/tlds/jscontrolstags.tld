@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE taglib
+  PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
+  "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<taglib>
+  <tlib-version>1.0</tlib-version>
+  <jsp-version>1.2</jsp-version>
+  <short-name>jscontrolstags</short-name>
+  <uri>http://kevon.com/tag</uri>
+  <display-name>JS Controls Taglib</display-name>
+  <description>Javascript controls library</description>
+
+  <tag>
+    <name>autocomplete</name>
+    <tag-class>net.sourceforge.jscontrolstags.tags.AutocompleteTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+    	This taglib generate Javascript control autocomplete (Local, NOT AJAX).
+    	It uses scriptaculous autocompleter base javascript.
+    </description>
+	<attribute>
+	   <name>var</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Name of the JavaScript object created</description>
+	</attribute>
+	
+	<attribute>
+	   <name>attachTo</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>
+	     Name of the JavaScript object to which autocompleter will attach.  You must define 'var'
+	     for this to work.
+	   </description>
+	</attribute>
+    
+    <attribute>
+      <name>source</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+        Text field where label of autocomplete selection will be populated; also the field in which
+        the user types out the search string
+      </description>
+    </attribute>
+
+	<attribute>
+	   <name>varItems</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Name of the JavaScript object created for Items JSON</description>
+	</attribute>
+	    
+    <attribute>
+      <name>items</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Javascript Array of item.
+      </description>
+    </attribute>  
+
+    <attribute>
+      <name>onSelectedItem</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Function to execute after a selection of an item found. 
+        If this function return false, the selection of the item is stopped.
+      </description>
+    </attribute> 
+      
+    <attribute>
+      <name>className</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>CSS class name to apply to the popup autocomplete dropdown</description>
+    </attribute> 
+    
+	<attribute>
+	   <name>fadeDuration</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>fade duration if fade must be lauched to show/hide autocomplete list </description>
+	</attribute>
+
+	<attribute>
+	   <name>maxItems</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Max items to displayed into the list. 
+	   				If number of items found is more greater than maxItems,
+	   				scrollbar appears on left of the list.</description>
+	</attribute>
+
+	<attribute>
+	   <name>choices</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>How many autocompletion choices to offer.</description>
+	</attribute>
+
+	<attribute>
+	   <name>partialSearch</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>If false, the autocompleter will match entered
+                    text only at the beginning of strings in the 
+                    autocomplete array. Defaults to true, which will
+                    match text at the beginning of any *word* in the
+                    strings in the autocomplete array. If you want to
+                    search anywhere in the string, additionally set
+                    the option fullSearch to true (default: off).
+		</description>
+	</attribute>
+
+	<attribute>
+	   <name>partialChars</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>How many characters to enter before triggering
+                   a partial match (unlike minChars, which defines
+                   how many characters are required to do any match
+                   at all). Defaults to 2.
+       </description>
+	</attribute>
+
+	<attribute>
+	   <name>ignoreCase</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Whether to ignore case when autocompleting.
+                 Defaults to true.
+		</description>
+	</attribute>
+
+	<attribute>
+	   <name>fullSearch</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Search anywhere in autocomplete array strings.</description>
+	</attribute>
+					
+	<attribute>
+	   <name>tokens</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Tokens (new Array('+','-'))</description>
+	</attribute>
+
+	<attribute>
+	   <name>frequency</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Frequency to launch search when user type a character.</description>
+	</attribute>
+
+	<attribute>
+	   <name>minChars</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Minimum number of characters needed before autocomplete is executed.</description>
+	</attribute>
+				       
+  </tag>
+
+  <tag>
+    <name>slider</name>
+    <tag-class>net.sourceforge.jscontrolstags.tags.SliderTag</tag-class>
+    <description>
+      Builds the JavaScript required to launch event onChange slider
+    </description>
+
+    <attribute>
+      <name>var</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name of the JavaScript object created</description>
+    </attribute>
+
+    <attribute>
+      <name>attachTo</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Name of the JavaScript object to which select box will attach.  You must define 'var'
+        for this to work.
+      </description>
+    </attribute>
+
+    <attribute>
+      <name>source</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        HTML Div slider container 
+      </description>
+    </attribute>
+
+    <attribute>
+      <name>trackWidth</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Slider track width
+      </description>
+    </attribute>
+    
+    <attribute>
+      <name>trackHeight</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Slider track height
+      </description>
+    </attribute>
+            
+    <attribute>
+      <name>trackClassName</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Class name for DIV track slider
+      </description>
+    </attribute>
+
+    <attribute>
+      <name>trackClassName2</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Class name for DIV track slider (when you want manage 2 pictures)
+      </description>
+    </attribute> 
+
+    <attribute>
+      <name>handlesClassName</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Class name for DIV handle slider. If there are several class name 
+        (separated with ,), there will be serveral handle.
+      </description>
+    </attribute>
+
+    <attribute>
+      <name>handlesWidth</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Slider handles width
+      </description>
+    </attribute>
+    
+    <attribute>
+      <name>handlesHeight</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        Slider handles height
+      </description>
+    </attribute>
+            
+    <attribute>
+      <name>sliderValue</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       Set value for slider, if defaultValue is a valid double.
+       If there is several handle 'see attribute handlesClassName)
+       construct a Array with value like this : [0.1,0.4]
+      </description>
+    </attribute>        
+
+	<attribute>
+      <name>textBox</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       If textBox is not null, Slider is attached to textBox. 
+      </description>
+    </attribute>        
+
+	<attribute>
+      <name>onChange</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       Event on change launched when slider has changed (when onSlide is ended)
+      </description>
+    </attribute>  
+
+	<attribute>
+      <name>onSlide</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       Event on slide launched when slider is sliding.
+      </description>
+    </attribute>       
+    
+	<attribute>
+      <name>axis</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       Axis 'horizontal' or 'vertical'
+      </description>
+    </attribute> 
+
+	<attribute>
+      <name>sliderValues</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       eg : [2,4,6,8]
+      </description>
+    </attribute> 
+
+	<attribute>
+      <name>range</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+       eg : $R(2,15)
+      </description>
+    </attribute>  
+
+	<attribute>
+      <name>increment</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+
+      </description>
+    </attribute> 
+    
+	<attribute>
+      <name>step</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+
+      </description>
+    </attribute>    
+    
+	<attribute>
+      <name>maximum</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+
+      </description>
+    </attribute>  
+    
+	<attribute>
+      <name>minimum</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+
+      </description>
+    </attribute>  
+    
+	<attribute>
+      <name>restricted</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+			// true or false
+      </description>
+    </attribute>               
+	              
+  </tag>
+
+
+ <tag>
+    <name>swap</name>
+    <tag-class>net.sourceforge.jscontrolstags.tags.swap.SwapTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+    	This taglib generate Javascript control swap (Local, NOT AJAX).
+    </description>
+    
+	<attribute>
+	   <name>var</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Name of the JavaScript object created</description>
+	</attribute>
+    
+    <attribute>
+      <name>source</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       Div HTML container with contains items (LI).
+      </description>
+    </attribute>   
+
+    <attribute>
+      <name>items</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       HTML Select source.
+      </description>
+    </attribute>   
+
+    <attribute>
+      <name>styleClassList</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       Style class for the list.
+      </description>
+    </attribute>           
+
+    <attribute>
+      <name>enabled</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.Boolean</type>
+      <description>
+       True if swap list must be enabled (stop Drag/Drop and selection of items)
+       and false otherwise. By default swap list is enabled.
+      </description>
+    </attribute> 
+
+    <attribute>
+      <name>onEnable</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       Event launched when swap control is disabled/enabled.
+      </description>
+    </attribute>
+
+    <attribute>
+      <name>dragDropEnabled</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.Boolean</type>
+      <description>
+       True if drag/drop is enabled and false otherwise. By default drag/drop is enabled.
+      </description>
+    </attribute> 
+
+    <attribute>
+      <name>onSwapComplete</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       Event launched when swap items is finished.
+      </description>
+    </attribute>      
+        
+    <attribute>
+      <name>selectAllListAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       HTML item (HTML href, button ...) used to select all items of the list on click event.
+      </description>
+    </attribute> 
+       
+    <attribute>
+      <name>selectNoneListAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       HTML item (HTML href, button ...) used to select none items of the list on click event.
+      </description>
+    </attribute> 
+   
+ 	<attribute>
+      <name>acceptDrop</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+      	Custom function for acceptDrop.
+      </description>
+    </attribute>
+       
+   </tag>
+ 
+  <tag>
+    <name>accept</name>
+    <tag-class>net.sourceforge.jscontrolstags.tags.swap.AcceptTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+    	Accept source list.
+    </description>
+    
+    <attribute>
+      <name>source</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+        HTML ID of target (DIV ID).
+      </description>
+    </attribute>    
+    
+	<attribute>
+      <name>swapAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+       HTML item (HTML href, button ...) used to swap items of the first list to second.
+      </description>
+     </attribute>       
+
+ </tag> 
+ 
+  <tag>
+    <name>tableWrapper</name>
+    <tag-class>net.sourceforge.jscontrolstags.tags.TableWrapperTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+    	This taglib generate Javascript control table wrapper.
+    </description>
+    
+	<attribute>
+	   <name>var</name>
+	   <required>false</required>
+	   <rtexprvalue>true</rtexprvalue>
+	   <type>java.lang.String</type>
+	   <description>Name of the JavaScript object created</description>
+	</attribute>
+    
+    <attribute>
+      <name>source</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		ID of HTML table.
+      </description>
+    </attribute>
+    
+    <attribute>
+      <name>moveDownAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>
+    
+    <attribute>
+      <name>moveUpAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+
+      </description>
+    </attribute>
+    
+    <attribute>
+      <name>styleClass</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+
+      </description>
+    </attribute>
+        
+    <attribute>
+      <name>excludeColumns</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		Javascript array of index column to exclude after move rows.
+      </description>
+    </attribute>        
+
+    <attribute>
+      <name>sourceState</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>  
+    
+    <attribute>
+      <name>insertRowAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>  
+    
+	<attribute>
+      <name>onInsertedRow</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>  
+    
+	<attribute>
+      <name>deleteRowAction</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>  
+        
+	<attribute>
+      <name>onDeletedRow</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>  
+	
+    <attribute>
+      <name>sourceState</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+      <description>
+		
+      </description>
+    </attribute>  
+            
+ </tag>   
+</taglib>

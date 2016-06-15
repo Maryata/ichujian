@@ -1,0 +1,21 @@
+﻿* { word-wrap: break-word; }
+body { font: 12px/1.5 Tahoma,'Microsoft Yahei','Simsun'; color: #444; }
+body, ul, li { margin: 0; padding: 0; }
+    ul li { list-style: none; }
+a { color: #000; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a img { border: none; }
+
+
+#frameHlicAe { margin: 0px !important; border: 0px !important; }
+.comiis_wrapad { margin: 0 auto; width: 400px;overflow: hidden; }
+.comiis_wrapad img { float: left; margin-top: 0px; width:400px;height:230px; }
+#slidesImgs li { width: 400px; height: 230px; display: none; }
+.slideshow li { position: relative; overflow: hidden; } 
+.slidebar { float:right;}
+.slidebar li { float: left; margin-right: 5px; width: 30px; height: 25px; line-height: 20px; text-align: center; font-size: 16px; cursor: pointer; border-bottom-right-radius:5px;border-bottom-left-radius:5px;}
+.slidebar li { background:#2f3948;  color: #fff; overflow: hidden; }
+.slidebar li.on { background:#fc8a2d;color: #fff;}
+
+
+

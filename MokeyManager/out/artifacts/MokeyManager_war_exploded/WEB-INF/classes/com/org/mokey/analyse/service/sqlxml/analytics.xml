@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="analytics">
+
+
+	<!-- APP设置 -->
+	<select id="SetList"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from (
+SELECT count(t.c_app_name) as count,t.c_app_name FROM t_Set_Click_His t 
+where t.c_newest=1 and t.c_key=1 and t.c_actiondate>=TO_DATE(#date1#,'YYYY-MM') and t.c_actiondate<TO_DATE(#date2#,'YYYY-MM')
+group by t.c_app_name order by count(t.c_app_name) desc 
+) where ROWNUM<=#topnumber#
+		]]> 
+	</select>
+	
+		<!-- 设置详细   按月 -->
+	<select id="SetListInfo"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+SELECT count(t.c_app_name) as count,t.c_app_name FROM t_Set_Click_His t 
+where t.c_newest=1 and t.c_key=1 and t.c_app_name=#appname# and t.c_actiondate>=TO_DATE(#date11#,'YYYY-MM') and t.c_actiondate<TO_DATE(#date12#,'YYYY-MM')
+group by t.c_app_name order by count(t.c_app_name) desc 
+		]]> 
+	</select>
+	
+		<!-- 长按设置 -->
+	<select id="HoldList"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+select holdinfo.count,info.c_name,info.c_id from (
+SELECT count(t.c_holdtype) as count,t.c_holdtype FROM T_SET_HOLD_HIS t
+where  t.c_key=1 and t.c_actiondate>=TO_DATE(#date1#,'YYYY-MM') and t.c_actiondate<TO_DATE(#date2#,'YYYY-MM')
+group by t.c_holdtype order by count(t.c_holdtype) desc ) holdinfo ,
+t_base_holdtype_info info where holdinfo.c_holdtype(+)=info.c_id and info.c_islive=1
+		]]> 
+	</select>
+	
+		<!-- 长按设置详细   按月 -->
+	<select id="HoldListInfo"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+select holdinfo.count,info.c_name from(
+SELECT count(t.c_holdtype) as count,t.c_holdtype FROM T_SET_HOLD_HIS t
+where  t.c_key=1 and t.c_holdtype=#holdtype# and t.c_actiondate>=TO_DATE(#date11#,'YYYY-MM') and t.c_actiondate<TO_DATE(#date12#,'YYYY-MM')
+group by t.c_holdtype order by count(t.c_holdtype) desc)  holdinfo , t_base_holdtype_info info where holdinfo.c_holdtype=info.c_id
+		]]> 
+	</select>
+	
+		<!-- 新闻使用 -->
+	<select id="NewsList"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from (
+SELECT count(t.c_app_name) as count,t.c_app_name FROM T_ACTION_USEAPP t 
+where t.c_key=2 and t.c_type=0 and t.c_actiondate>=TO_DATE(#date1#,'YYYY-MM') and t.c_actiondate<TO_DATE(#date2#,'YYYY-MM')
+group by t.c_app_name order by count(t.c_app_name) desc 
+) where ROWNUM<=#topnumber#
+		]]> 
+	</select>
+	
+		<!-- 新闻使用详细   按月 -->
+	<select id="NewsListInfo"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+SELECT count(t.c_app_name) as count,t.c_app_name FROM T_ACTION_USEAPP t 
+where t.c_key=2 and t.c_type=0 and t.c_app_name=#appname# and t.c_actiondate>=TO_DATE(#date11#,'YYYY-MM') and t.c_actiondate<TO_DATE(#date12#,'YYYY-MM')
+group by t.c_app_name order by count(t.c_app_name) desc 
+		]]> 
+	</select>
+	
+	
+			<!-- 一鍵APP使用 -->
+	<select id="AppList"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from (
+SELECT count(t.c_app_name) as count,t.c_app_name FROM T_ACTION_USEAPP t 
+where t.c_key=1 and TO_CHAR(t.c_actiondate,'YYYY-MM')>=#date1# and TO_CHAR(t.c_actiondate,'YYYY-MM')<#date2#
+group by t.c_app_name order by count(t.c_app_name) desc 
+) where ROWNUM<=#topnumber#
+		]]> 
+	</select>
+	
+		<!-- APP使用详细   按月 -->
+	<select id="AppListInfo"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from (
+SELECT count(t.c_app_name) as count,t.c_app_name FROM T_ACTION_USEAPP t 
+where t.c_key=1 and t.c_app_name=#appname# and TO_CHAR(t.c_actiondate,'YYYY-MM')>=#date11# and TO_CHAR(t.c_actiondate,'YYYY-MM')<#date12#
+group by t.c_app_name order by count(t.c_app_name) desc 
+) where ROWNUM<=#topnumber#
+		]]> 
+	</select>
+ </sqlMap>
+

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- admin -->
+	<!-- <bean id="adminService" class="com.org.mokey.system.service.AdminServiceImpl"/> 
+		<bean id="AdminAction" class="com.org.mokey.system.action.AdminAction"> <property 
+		name="adminService"> <ref bean="adminService"/> </property> </bean> -->
+	
+	
+	<bean id="sysUserDao" class="com.org.mokey.system.dao.impl.SysUserDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="sysUserService" class="com.org.mokey.system.service.impl.SysUserServiceImpl">
+		<property name="sysUserDao">
+			<ref bean="sysUserDao" />
+		</property>
+	</bean>
+
+	<bean id="sysUserAction" class="com.org.mokey.system.action.SysUserAction">
+		<property name="sysUserService">
+			<ref bean="sysUserService" />
+		</property>
+	</bean>
+	<bean id="loginAction" class="com.org.mokey.system.action.LoginAction">
+		<property name="sysUserService">
+			<ref bean="sysUserService" />
+		</property>
+	</bean>
+	
+	<bean id="functionDao" class="com.org.mokey.system.dao.impl.FunctionDaoImpl">
+	    <property name="jdbcTemplate">
+	        <ref bean="jdbcTemplate"/>
+	    </property>
+	</bean>
+	
+	<bean id="functionService" class="com.org.mokey.system.service.impl.FunctionServiceImpl">
+		<property name="functionDao">
+	        <ref bean="functionDao"/>
+	    </property>
+	</bean>
+
+	<bean id="functionAction" class="com.org.mokey.system.action.FunctionAction">
+		<property name="functionService">
+	        <ref bean="functionService"/>
+	    </property>
+	</bean>
+
+	<bean id="sysRoleDao" class="com.org.mokey.system.dao.impl.SysRoleDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="sysRoleService" class="com.org.mokey.system.service.impl.SysRoleServiceImpl">
+		<property name="sysRoleDao">
+			<ref bean="sysRoleDao" />
+		</property>
+	</bean>
+
+	<bean id="sysRoleAction" class="com.org.mokey.system.action.SysRoleAction">
+		<property name="sysRoleService">
+			<ref bean="sysRoleService" />
+		</property>
+	</bean>
+
+    <!-- 数据权限 -->
+    <bean id="dataPermissionDao" class="com.org.mokey.system.dao.impl.DataPermissionDaoImpl">
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate" />
+        </property>
+    </bean>
+
+    <bean id="dataPermissionService" class="com.org.mokey.system.service.impl.DataPermissionServiceImpl">
+        <property name="dataPermissionDao">
+            <ref bean="dataPermissionDao" />
+        </property>
+    </bean>
+
+    <bean id="dataPermissionAction" class="com.org.mokey.system.action.DataPermissionAction">
+        <property name="dataPermissionService">
+            <ref bean="dataPermissionService" />
+        </property>
+    </bean>
+	
+</beans>

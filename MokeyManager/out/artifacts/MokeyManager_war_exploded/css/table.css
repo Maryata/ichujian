@@ -1,0 +1,72 @@
+@charset "utf-8";
+/* 2016-1-26 后台内容样式 */
+body,button,input,select{ font-family:"微软雅黑", "宋体";}
+
+.box_w{width:96%; margin:0px 2% 10px; overflow:hidden;}
+.m_0_10{ margin:0 10px;}
+.w_100b{ width:100%;}
+.p_5_0{ padding:5px 0;}
+.p_10{ padding:10px;}
+.p_td_10 td{ padding:2px;}
+/*居上右下左20px*/
+.m_t_20{ margin-top:20px;}
+.m_r_20{ margin-right:20px;}
+.m_b_20{ margin-bottom:20px;}
+.m_l_20{ margin-left:20px;}
+/*居上右下左10px*/
+.m_t_10{ margin-top:10px;}
+.m_r_10{ margin-right:10px;}
+.m_b_10{ margin-bottom:10px;}
+.m_l_10{ margin-left:10px;}
+/*宽度*/
+.w_100{ width:100px}
+.w_200{ width:200px}
+.w_300{ width:300px}
+.w_400{ width:400px}
+.w_500{ width:500px}
+/*当前元素左右对齐*/
+.f_l { float:left; }
+.f_r { float:right; }
+/*内部字体左中右*/
+.t_l { text-align:left; }
+.t_c { text-align:center; }
+.t_r { text-align:right; }
+/*文字字号*/
+.f_10 { font-size:10px; font-size:0.625rem; }
+.f_11 { font-size:11px;  font-size:0.688rem;}
+.f_12 { font-size:12px; font-size:0.75rem; }
+.f_13 { font-size:13px; font-size:0.813rem; }
+.f_14 { font-size:14px; font-size:0.875rem; }
+.f_15 { font-size:15px; font-size:0.938rem; }
+.f_16 { font-size:16px; font-size:1rem; }
+.f_18 { font-size:18px; font-size:1.125rem; }
+.f_20 { font-size:20px; font-size:1.25rem; }
+.f_22 { font-size:22px; font-size:1.375rem; }
+.f_24 { font-size:24px; font-size:1.5rem;}
+.f_36 { font-size:36px; }
+/*文字加粗*/
+.f_b{ font-weight:bold;}
+/*文字颜色*/
+.c_gray{ color:#b3b3b3;}
+.c_white{ color:#fff;}
+.c_orange{ color:#f60;}
+a.c_orange{ text-decoration:none;}
+a.c_orange:hover{ text-decoration:underline;}
+/*背景颜色*/
+.bc_gray1{ background-color:#c9c9c9;}
+.bc_gray2{ background-color:#ececec;}
+.bc_orange{ background-color:#fc8f31;}
+/*边框设置*/
+.border_b {  border-right:1px #b3b3b3 solid; border-bottom:1px #b3b3b3 solid;}
+.border_b td{ border-left:1px #b3b3b3 solid; border-top:1px #b3b3b3 solid;}
+/*输入框样式*/
+.input_bor1{ border:1px #a9a9a9 solid; padding:3px; background-color:#fff;}
+.input_bor2{border:1px #fff solid;padding:3px;background-color:#fff;}
+/*按钮样式*/
+.btn_orange{ width:80px; background-color:#fc8f31; border-radius:5px; border:none; text-align:center; color:#fff;padding:5px; cursor:pointer;}
+.btn_orange:hover{background-color:#f60;}
+.btn_green{ width:80px; background-color:#00b404; border-radius:5px; border:none; text-align:center; color:#fff;padding:5px; cursor:pointer;}
+.btn_green:hover{background-color:#008103;}
+.btn_gray{background-color:#c9c9c9;text-align:center;color:#fff;padding:10px;cursor:pointer; margin-right:-1px; border:1px #b3b3b3 solid;}
+.btn_gray:hover{ background:#bbb;}
+.btn_orange2{background-color:#fc8f31;text-align:center;color:#fff;padding:10px;cursor:pointer;border:1px #fc8f31 solid;}

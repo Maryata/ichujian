@@ -1,0 +1,30 @@
+package com.org.mokey.basedata.sysinfo.util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/3/9.
+ */
+public class Singleton {
+    private static Singleton instance;
+    private Singleton (){}
+    public static Singleton getInstance() {
+    if (instance == null) {
+        instance = new Singleton();
+         }
+     return instance;
+       }
+
+
+    public Map<String, String> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, String> map) {
+        this.map = map;
+    }
+
+    private Map<String,String> map = new HashMap<String,String>();
+
+}

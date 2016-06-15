@@ -1,0 +1,1114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- demo -->
+	<bean id="ZingChartDemo" class="com.org.mokey.basedata.sysinfo.action.ZingChartDemo" scope="prototype">
+	</bean>
+
+	<bean id="appInfoService"
+		class="com.org.mokey.basedata.sysinfo.service.impl.AppInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="appInfoAction" class="com.org.mokey.basedata.sysinfo.action.AppInfoAction" scope="prototype">
+		<property name="appInfoService">
+			<ref bean="appInfoService" />
+		</property>
+	</bean>
+	
+	<bean id="advertInfoService"
+		class="com.org.mokey.basedata.sysinfo.service.impl.AdvertInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="advertInfoAction" class="com.org.mokey.basedata.sysinfo.action.AdvertInfoAction" scope="prototype">
+		<property name="advertInfoService">
+			<ref bean="advertInfoService" />
+		</property>
+	</bean>
+
+
+	<bean id="actionActiveService" 
+		class="com.org.mokey.basedata.baseinfo.service.impl.ActionActiveServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="actionActiveAction"
+		class="com.org.mokey.basedata.baseinfo.action.ActionActiveAction" scope="prototype">
+		<property name="actionActiveService">
+			<ref bean="actionActiveService" />
+		</property>
+	</bean>
+
+	<bean id="actionFeedbackService"
+		class="com.org.mokey.basedata.baseinfo.service.impl.ActionFeedbackServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="actionFeedbackAction"
+		class="com.org.mokey.basedata.baseinfo.action.ActionFeedbackAction" scope="prototype">
+		<property name="actionFeedbackService">
+			<ref bean="actionFeedbackService" />
+		</property>
+	</bean>
+
+
+	<bean id="actionDeviceInfoService"
+		class="com.org.mokey.basedata.baseinfo.service.impl.ActionDeviceInfoServiceImpl" scope="prototype"/>
+	<bean id="actionDeviceInfoAction"
+		class="com.org.mokey.basedata.baseinfo.action.ActionDeviceInfoAction" scope="prototype">
+		<property name="actionDeviceInfoService">
+			<ref bean="actionDeviceInfoService" />
+		</property>
+	</bean>
+
+
+	<bean id="holdTypeService"
+		class="com.org.mokey.basedata.sysinfo.service.impl.HoldTypeInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="holdtypeInfoAction"
+		class="com.org.mokey.basedata.sysinfo.action.HoldTypeInfoAction" scope="prototype">
+		<property name="holdTypeService">
+			<ref bean="holdTypeService" />
+		</property>
+	</bean>
+
+	<bean id="supplierdao" class="com.org.mokey.basedata.sysinfo.dao.impl.SupplierDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="supplierservice"
+		class="com.org.mokey.basedata.sysinfo.service.impl.SupplierServiceImpl" scope="prototype">
+		<property name="supplierdao">
+			<ref bean="supplierdao" />
+		</property>
+	</bean>
+
+	<bean id="supplieraction" class="com.org.mokey.basedata.sysinfo.action.SupplierAction" scope="prototype">
+		<property name="supplierservice">
+			<ref bean="supplierservice" />
+		</property>
+	</bean>
+	
+	<bean id="actionLogInfoService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionLogInfoServiceImpl" scope="prototype">
+	    <property name="jdbcTemplate">
+	        <ref bean="jdbcTemplate"/>
+	    </property>
+	</bean>
+	<bean id="actionLogInfoAction" class="com.org.mokey.basedata.baseinfo.action.ActionLogInfoAction" scope="prototype">
+	    <property name="actionLogInfoService">
+	       <ref bean="actionLogInfoService"/>
+	    </property>
+	</bean>
+	
+	<bean id="phoneBrandDao" class="com.org.mokey.basedata.sysinfo.dao.impl.PhoneBrandDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="phoneBrandService" class="com.org.mokey.basedata.sysinfo.service.impl.PhoneBrandServiceImpl" scope="prototype">
+		<property name="phoneBrandDao">
+			<ref bean="phoneBrandDao" />
+		</property>
+	</bean>
+
+	<bean id="phoneBrandAction" class="com.org.mokey.basedata.sysinfo.action.PhoneBrandAction" scope="prototype">
+		<property name="phoneBrandService">
+			<ref bean="phoneBrandService" />
+		</property>
+	</bean>
+	
+	<bean id="activeCodeDao" class="com.org.mokey.basedata.baseinfo.dao.impl.ActiveCodeDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="activeCodeService" class="com.org.mokey.basedata.baseinfo.service.impl.ActiveCodeServiceImpl" scope="prototype">
+		<property name="activeCodeDao">
+			<ref bean="activeCodeDao" />
+		</property>
+	</bean>
+	<bean id="activeCodeAction" class="com.org.mokey.basedata.baseinfo.action.ActiveCodeAction" scope="prototype">
+		<property name="activeCodeService">
+			<ref bean="activeCodeService" />
+		</property>
+	</bean>
+	
+	<!-- 创建激活码 -->
+	<bean id="activeCreateCodeDao" class="com.org.mokey.basedata.baseinfo.dao.impl.ActiveCreateCodeDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="activeCreateCodeService" class="com.org.mokey.basedata.baseinfo.service.impl.ActiveCreateCodeServiceImpl" scope="prototype">
+		<property name="activeCreateCodeDao">
+			<ref bean="activeCreateCodeDao" />
+		</property>
+	</bean>
+	<bean id="activeCreateCodeAction" class="com.org.mokey.basedata.baseinfo.action.ActiveCreateCodeAction" scope="prototype">
+		<property name="activeCreateCodeService">
+			<ref bean="activeCreateCodeService" />
+		</property>
+	</bean>
+	
+
+	<!-- 消息推送 begin -->
+	<bean id="miPushService" class="com.org.mokey.basedata.sysinfo.service.impl.MiPushServiceImpl" scope="prototype">
+	</bean>
+	<bean id="pushDao" class="com.org.mokey.basedata.sysinfo.dao.impl.PushDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="pushService" class="com.org.mokey.basedata.sysinfo.service.impl.PushServiceImpl" scope="prototype">
+		<property name="pushDao">
+			<ref bean="pushDao" />
+		</property>
+		<property name="miPushService">
+			<ref bean="miPushService" />
+		</property>
+	</bean>
+	<bean id="pushAction" class="com.org.mokey.basedata.sysinfo.action.PushAction" scope="prototype">
+		<property name="pushService">
+			<ref bean="pushService" />
+		</property>
+	</bean>
+	<!-- 消息推送 end -->
+	
+	<bean id="actionIndustryTypeService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionIndustryTypeServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	
+	<bean id="actionIndustryAction" class="com.org.mokey.basedata.baseinfo.action.ActionIndustryTypeAction" scope="prototype">
+		<property name="actionIndustryTypeService">
+			<ref bean="actionIndustryTypeService"/>
+		</property>
+	</bean>
+	
+	<bean id="actionEareInfoService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionEareInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="actionEareInfoAction" class="com.org.mokey.basedata.baseinfo.action.ActionEareInfoAction" scope="prototype">
+		<property name="actionEareInfoService">
+			<ref bean="actionEareInfoService"/>
+		</property>
+	</bean>
+	
+	<bean id="actionPackageInfoService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionPackageInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="actionPackageInfoAction" class="com.org.mokey.basedata.baseinfo.action.ActionPackageInfoAction" scope="prototype">
+		<property name="actionPackageInfoService">
+			<ref bean="actionPackageInfoService"/>
+		</property>
+	</bean>
+	
+	<bean id="actionCanalDicInfoService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionCanalDicInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="actionCanalDicInfoAction" class="com.org.mokey.basedata.baseinfo.action.ActionCanalDicInfoAction" scope="prototype">
+		<property name="actionCanalDicInfoService">
+			<ref bean="actionCanalDicInfoService"/>
+		</property>
+	</bean>
+	
+	<bean id="actionIntegralTypeService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionIntegralTypeServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="actionIntegralTypeAction" class="com.org.mokey.basedata.baseinfo.action.ActionIntegralTypeAction" scope="prototype">
+		<property name="actionIntegralTypeService">
+			<ref bean="actionIntegralTypeService"/>
+		</property>
+	</bean>
+	
+	
+	<bean  id="actionSendDemoQueryService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionSendDemoQueryServiceImpl" scope="prototype">
+	<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+		</bean>
+	<bean  id="actionSendDemoService"  class="com.org.mokey.basedata.baseinfo.service.impl.ActionSendDemoServiceImpl" scope="prototype">
+	<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>	
+	</bean>
+	
+		
+	<bean id="sendDemoQuery"  class="com.org.mokey.basedata.baseinfo.action.SendDemoQuery" scope="prototype">
+	<property name="actionSendDemoQueryService">
+			<ref bean="actionSendDemoQueryService"/>
+		</property>
+	<property name="actionSendDemoService">
+			<ref bean="actionSendDemoService"/>  
+		</property>
+	</bean>	
+	
+	
+	
+	<bean  id="actionMainTainAdAction" class="com.org.mokey.basedata.baseinfo.service.impl.ActionFourMainTainAdServiceImpl" scope="prototype">
+	<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+		</bean>
+		
+		
+	
+	
+	<bean id="fourKeyMainTainAd" class="com.org.mokey.basedata.baseinfo.action.ActionMainTainAdAction" scope="prototype">
+	<property name="actionMainTainAdAction">
+			<ref bean="actionMainTainAdAction"/>
+		</property>
+		</bean>
+	
+	<bean id="activityBrandInfoService" class="com.org.mokey.basedata.baseinfo.service.impl.ActivityBrandInfoServiceImpl" scope="prototype"> 
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activityBrandInfoAction" class="com.org.mokey.basedata.baseinfo.action.ActivityBrandInfoAction" scope="prototype">
+		<property name="activityBrandInfoService">
+			<ref bean="activityBrandInfoService"/>
+		</property>
+	</bean>	
+	<bean id="activityFollowSchemeService" class="com.org.mokey.basedata.baseinfo.service.impl.ActivityFollowSchemeServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="activityFollowSchemeAction" class="com.org.mokey.basedata.baseinfo.action.ActivityFollowSchemeAction" scope="prototype">
+		<property name="activityFollowSchemeService">
+			<ref bean="activityFollowSchemeService"/>
+		</property>
+	</bean>
+	
+	<bean id="activitySchemeDetailService" class="com.org.mokey.basedata.baseinfo.service.impl.ActivitySchemeDetailServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<bean id="activitySchemeDetailAction" class="com.org.mokey.basedata.baseinfo.action.ActivitySchemeDetailAction" scope="prototype">
+		<property name="activitySchemeDetailService">
+			<ref bean="activitySchemeDetailService"/>
+		</property>
+	</bean>
+	
+	<bean id="actionCityInfoService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionCityInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activityCityInfoAction" class="com.org.mokey.basedata.baseinfo.action.ActivityCityInfoAction" scope="prototype">
+		<property name="actionCityInfoService">
+			<ref bean="actionCityInfoService"/>
+		</property>
+	</bean>
+	
+	
+	<bean id="actionSearchRecardService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionSearchRecardServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activitySearchRecardAction" class="com.org.mokey.basedata.baseinfo.action.ActivitySearchRecardAction" scope="prototype">
+		<property name="actionSearchRecardService">
+			<ref bean="actionSearchRecardService"/>
+		</property>
+	</bean>
+	<!-- 商圈维护 -->
+	<bean id="activityBusinessZoneDao" class="com.org.mokey.basedata.sysinfo.dao.impl.ActivityBusinessZoneDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activityBusinessZoneService" class="com.org.mokey.basedata.sysinfo.service.impl.ActivityBusinessZoneServiceImpl" scope="prototype">
+		<property name="activityBusinessZoneDao">
+			<ref bean="activityBusinessZoneDao"/>
+		</property>
+	</bean>
+	<bean id="activityBusinessZoneAction" class="com.org.mokey.basedata.sysinfo.action.ActivityBusinessZoneAction" scope="prototype">
+		<property name="activityBusinessZoneService">
+			<ref bean="activityBusinessZoneService"/>
+		</property>
+	</bean>
+	<!-- 菜单项维护 -->
+	<bean id="activityMenuInfoDao" class="com.org.mokey.basedata.sysinfo.dao.impl.ActivityMenuInfoDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activityMenuInfoService" class="com.org.mokey.basedata.sysinfo.service.impl.ActivityMenuInfoServiceImpl" scope="prototype">
+		<property name="activityMenuInfoDao">
+			<ref bean="activityMenuInfoDao"/>
+		</property>
+	</bean>
+	<bean id="activityMenuInfoAction" class="com.org.mokey.basedata.sysinfo.action.ActivityMenuInfoAction" scope="prototype">
+		<property name="activityMenuInfoService">
+			<ref bean="activityMenuInfoService"/>
+		</property>
+	</bean>
+	
+	<!-- 类容类别维护 -->
+	<bean id="activityContentTypeDao" class="com.org.mokey.basedata.sysinfo.dao.impl.ActivityContentTypeDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activityContentTypeService" class="com.org.mokey.basedata.sysinfo.service.impl.ActivityContentTypeServiceImpl" scope="prototype">
+		<property name="activityContentTypeDao">
+			<ref bean="activityContentTypeDao"/>
+		</property>
+	</bean>
+	<bean id="activityContentTypeAction" class="com.org.mokey.basedata.sysinfo.action.ActivityContentTypeAction" scope="prototype">
+		<property name="activityContentTypeService">
+			<ref bean="activityContentTypeService"/>
+		</property>
+	</bean>
+	
+	<bean id="actionCityandActType" class="com.org.mokey.basedata.baseinfo.service.impl.ActionCityandActTypeServiceImpl" scope="prototype">
+	
+	
+	<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	<property name="simpleJdbcTemplate">
+			<ref bean="simpleJdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="cityandActTypeAction" class="com.org.mokey.basedata.baseinfo.action.ActionCityandActTypeAction" scope="prototype">
+		<property name="actionCityandActType">
+			<ref bean="actionCityandActType"/>
+		</property>
+	</bean>
+	<!-- 方案维护 -->
+	<bean id="actionRecommendSchemeService" class="com.org.mokey.basedata.baseinfo.service.impl.ActionRecommendSchemeImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="activityRecommendSchemeAction" class="com.org.mokey.basedata.baseinfo.action.ActivityRecommendSchemeAction" scope="prototype">
+		<property name="actionRecommendSchemeService">
+			<ref bean="actionRecommendSchemeService"/>
+		</property>
+	</bean>
+	<!-- 活动专题 -->
+	<bean  id="actionActThemeService"  class="com.org.mokey.basedata.baseinfo.service.impl.ActionActThemeServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="actionActThemeAction" class="com.org.mokey.basedata.baseinfo.action.ActionActThemeAction" scope="prototype">
+		<property name="actionActThemeService">
+			<ref bean="actionActThemeService"/>
+		</property>
+	</bean>
+	<bean  id="actionBaseActivityInfoService"  class="com.org.mokey.basedata.baseinfo.service.impl.ActionBaseActivityInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="actionBaseActivityInfo" class="com.org.mokey.basedata.baseinfo.action.ActionBaseActivityInfo" scope="prototype">
+		<property name="actionBaseActivityInfoService">
+			<ref bean="actionBaseActivityInfoService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏合集 -->
+	<bean id="gameCollectionDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameCollectionDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameCollectionService" class="com.org.mokey.basedata.sysinfo.service.impl.GameCollectionServiceImpl" scope="prototype">
+		<property name="gameCollectionDao">
+			<ref bean="gameCollectionDao"/>
+		</property>
+	</bean>
+	<bean id="gameCollectionAction" class="com.org.mokey.basedata.sysinfo.action.GameCollectionAction" scope="prototype">
+		<property name="gameCollectionService">
+			<ref bean="gameCollectionService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏提示 -->
+	<bean id="gameCueDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameCueDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameCueService" class="com.org.mokey.basedata.sysinfo.service.impl.GameCueServiceImpl" scope="prototype">
+		<property name="gameCueDao">
+			<ref bean="gameCueDao"/>
+		</property>
+	</bean>
+	<bean id="gameCueAction" class="com.org.mokey.basedata.sysinfo.action.GameCueAction" scope="prototype">
+		<property name="gameCueService">
+			<ref bean="gameCueService"/>
+		</property>
+	</bean>
+	
+	<!-- H5游戏管理 -->
+	<bean id="h5GameDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="h5GameService"
+		class="com.org.mokey.basedata.sysinfo.service.impl.H5GameServiceImpl">
+		<property name="h5GameDao">
+			<ref bean="h5GameDao" />
+		</property>
+	</bean>
+	<bean id="h5GameAction" class="com.org.mokey.basedata.sysinfo.action.H5GameAction">
+		<property name="h5GameService">
+			<ref bean="h5GameService"/>
+		</property>
+	</bean>
+	<!-- H5游戏管理结束 -->
+
+    <!-- 任务维护 -->
+    <bean id="gameTaskDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameTaskDaoImpl">
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate" />
+        </property>
+    </bean>
+    <bean id="gameTaskService"
+          class="com.org.mokey.basedata.sysinfo.service.impl.GameTaskServiceImpl">
+        <property name="gameTaskDao">
+            <ref bean="gameTaskDao" />
+        </property>
+    </bean>
+    <bean id="gameTaskAction" class="com.org.mokey.basedata.sysinfo.action.GameTaskAction">
+        <property name="gameTaskService">
+            <ref bean="gameTaskService"/>
+        </property>
+    </bean>
+    <!-- 任务维护结束 -->
+    <!-- 留言管理 -->
+    <bean id="messageDao" class="com.org.mokey.basedata.sysinfo.dao.impl.MessageDaoImpl">
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate" />
+        </property>
+    </bean>
+    <bean id="messageService"
+          class="com.org.mokey.basedata.sysinfo.service.impl.MessageServiceImpl">
+        <property name="messageDao">
+            <ref bean="messageDao" />
+        </property>
+    </bean>
+    <bean id="messageAction" class="com.org.mokey.basedata.sysinfo.action.MessageAction">
+        <property name="messageService">
+            <ref bean="messageService"/>
+        </property>
+    </bean>
+    <!-- 留言管理 -->
+
+    <!-- 商城产品管理 -->
+    <bean id="mallProductDao" class="com.org.mokey.basedata.sysinfo.dao.impl.MallProductDaoImpl">
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate" />
+        </property>
+    </bean>
+    <bean id="mallProductService"
+          class="com.org.mokey.basedata.sysinfo.service.impl.MallProductServiceImpl">
+        <property name="mallProductDao">
+            <ref bean="mallProductDao" />
+        </property>
+    </bean>
+    <bean id="mallProductAction" class="com.org.mokey.basedata.sysinfo.action.MallProductAction">
+        <property name="mallProductService">
+            <ref bean="mallProductService"/>
+        </property>
+    </bean>
+    <!-- 商城产品管理结束 -->
+
+	
+	<!-- 测试机管理 -->
+	<bean id="testingMachineManagementDao" class="com.org.mokey.basedata.sysinfo.dao.impl.TestingMachineManagementDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="testingMachineManagementService"
+		class="com.org.mokey.basedata.sysinfo.service.impl.TestingMachineManagementServiceImpl" scope="prototype">
+		<property name="testingMachineManagementDao">
+			<ref bean="testingMachineManagementDao" />
+		</property>
+	</bean>
+
+	<bean id="testingMachineManagementAction" class="com.org.mokey.basedata.sysinfo.action.TestingMachineManagementAction" scope="prototype">
+		<property name="testingMachineManagementService">
+			<ref bean="testingMachineManagementService" />
+		</property>
+	</bean>
+	<!-- 测试机管理结束 -->
+	
+	<!-- 游戏帮：精品分类分类 -->
+	<bean id="gameBoutiqueCateDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameBoutiqueCategoryDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameBoutiqueCategoryService" class="com.org.mokey.basedata.sysinfo.service.impl.GameBoutiqueCateServiceImpl" scope="prototype">
+		<property name="gameBoutiqueCateDao">
+			<ref bean="gameBoutiqueCateDao"/>
+		</property>
+	</bean>
+	<bean id="gameBoutiqueCategoryAction" class="com.org.mokey.basedata.sysinfo.action.GameBoutiqueCategoryAction" scope="prototype">
+		<property name="gameBoutiqueCategoryService">
+			<ref bean="gameBoutiqueCategoryService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：热门搜索 -->
+	<bean id="gameHotSearchDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameHotSearchDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameHotSearchService" class="com.org.mokey.basedata.sysinfo.service.impl.GameHotSearchServiceImpl" scope="prototype">
+		<property name="gameHotSearchDao">
+			<ref bean="gameHotSearchDao"/>
+		</property>
+	</bean>
+	<bean id="gameSearchAction" class="com.org.mokey.basedata.sysinfo.action.GameSearchAction" scope="prototype">
+		<property name="gameHotSearchService">
+			<ref bean="gameHotSearchService"/>
+		</property>
+		<property name="gameCategoryService">
+			<ref bean="gameCategoryService"/>
+		</property>
+	</bean>
+	<!-- 游戏帮：h5精品分类分类 -->
+	<bean id="h5GameBoutiqueCategoryDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameBoutiqueCategoryDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="h5GameBoutiqueCategoryService" class="com.org.mokey.basedata.sysinfo.service.impl.H5GameBoutiqueCategoryServiceImpl" scope="prototype">
+		<property name="h5GameBoutiqueCategoryDao">
+			<ref bean="h5GameBoutiqueCategoryDao"/>
+		</property>
+	</bean>
+	<bean id="h5GameBoutiqueCategoryAction" class="com.org.mokey.basedata.sysinfo.action.H5GameBoutiqueCategoryAction" scope="prototype">
+		<property name="h5GameBoutiqueCategoryService">
+			<ref bean="h5GameBoutiqueCategoryService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：h5热门搜索 -->
+	<bean id="h5GameHotSearchDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameHotSearchDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="h5GameHotSearchService" class="com.org.mokey.basedata.sysinfo.service.impl.H5GameHotSearchServiceImpl" scope="prototype">
+		<property name="h5GameHotSearchDao">
+			<ref bean="h5GameHotSearchDao"/>
+		</property>
+	</bean>
+	<bean id="h5GameSearchAction" class="com.org.mokey.basedata.sysinfo.action.H5GameSearchAction" scope="prototype">
+		<property name="h5GameHotSearchService">
+			<ref bean="h5GameHotSearchService"/>
+		</property>
+		<property name="gameCategoryService">
+			<ref bean="gameCategoryService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：H5游戏合集 -->
+	<bean id="h5GameCollectionDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameCollectionDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="h5GameCollectionService" class="com.org.mokey.basedata.sysinfo.service.impl.H5GameCollectionServiceImpl" scope="prototype">
+		<property name="h5GameCollectionDao">
+			<ref bean="h5GameCollectionDao"/>
+		</property>
+	</bean>
+	<bean id="h5GameCollectionAction" class="com.org.mokey.basedata.sysinfo.action.H5GameCollectionAction" scope="prototype">
+		<property name="h5GameCollectionService">
+			<ref bean="h5GameCollectionService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏资讯 -->
+	<bean id="gameInfoDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameInfoDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="GameInfoService" class="com.org.mokey.basedata.sysinfo.service.impl.GameInfoServiceImpl" scope="prototype">
+		<property name="gameInfoDao">
+			<ref bean="gameInfoDao"/>
+		</property>
+	</bean>
+	<bean id="gameInfoAction" class="com.org.mokey.basedata.sysinfo.action.GameInfoAction" scope="prototype">
+		<property name="GameInfoService">
+			<ref bean="GameInfoService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏活动 -->
+	<bean id="gameActDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameActDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="GameActService" class="com.org.mokey.basedata.sysinfo.service.impl.GameActServiceImpl" scope="prototype">
+		<property name="gameActDao">
+			<ref bean="gameActDao"/>
+		</property>
+	</bean>
+	<bean id="gameActAction" class="com.org.mokey.basedata.sysinfo.action.GameActAction" scope="prototype">
+		<property name="GameActService">
+			<ref bean="GameActService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏攻略 -->
+	<bean id="gameStrategyDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameStrategyDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameStrategyService" class="com.org.mokey.basedata.sysinfo.service.impl.GameStrategyServiceImpl" scope="prototype">
+		<property name="gameStrategyDao">
+			<ref bean="gameStrategyDao"/>
+		</property>
+	</bean>
+	<bean id="gameStrategyAction" class="com.org.mokey.basedata.sysinfo.action.GameStrategyAction" scope="prototype">
+		<property name="gameStrategyService">
+			<ref bean="gameStrategyService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<!-- H5游戏的广告 -->
+	<bean id="h5AdvertInfoService"
+		class="com.org.mokey.basedata.sysinfo.service.impl.H5AdvertInfoServiceImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="h5AdvertInfoAction" class="com.org.mokey.basedata.sysinfo.action.H5AdvertInfoAction" scope="prototype">
+		<property name="h5AdvertInfoService">
+			<ref bean="h5AdvertInfoService" />
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏礼包 -->
+	<bean id="gameGiftDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameGiftDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameGiftService" class="com.org.mokey.basedata.sysinfo.service.impl.GameGiftServiceImpl" scope="prototype">
+		<property name="gameGiftDao">
+			<ref bean="gameGiftDao"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="gameGiftAction" class="com.org.mokey.basedata.sysinfo.action.GameGiftAction" scope="prototype">
+		<property name="gameGiftService">
+			<ref bean="gameGiftService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<!-- 微用帮：应用合集 -->
+	<bean id="mcrAppColDao" class="com.org.mokey.basedata.sysinfo.dao.impl.McrAppColDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="mcrAppColService" class="com.org.mokey.basedata.sysinfo.service.impl.McrAppColServiceImpl" scope="prototype">
+		<property name="mcrAppColDao">
+			<ref bean="mcrAppColDao"/>
+		</property>
+	</bean>
+	<bean id="mcrAppColAction" class="com.org.mokey.basedata.sysinfo.action.McrAppColAction" scope="prototype">
+		<property name="mcrAppColService">
+			<ref bean="mcrAppColService"/>
+		</property>
+	</bean>
+	
+	<!-- 微用帮：应用分类 -->
+	<bean id="mcrAppCateDao" class="com.org.mokey.basedata.sysinfo.dao.impl.McrAppCateDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="mcrAppCateService" class="com.org.mokey.basedata.sysinfo.service.impl.McrAppCateServiceImpl" scope="prototype">
+		<property name="mcrAppCateDao">
+			<ref bean="mcrAppCateDao"/>
+		</property>
+	</bean>
+	<bean id="mcrAppCateAction" class="com.org.mokey.basedata.sysinfo.action.McrAppCateAction" scope="prototype">
+		<property name="mcrAppCateService">
+			<ref bean="mcrAppCateService"/>
+		</property>
+	</bean>
+	
+	<!-- 微用帮：首页排版 -->
+	<bean id="mcrAppIndexDao" class="com.org.mokey.basedata.sysinfo.dao.impl.McrAppIndexDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="mcrAppIndexService" class="com.org.mokey.basedata.sysinfo.service.impl.McrAppIndexServiceImpl" scope="prototype">
+		<property name="mcrAppIndexDao">
+			<ref bean="mcrAppIndexDao"/>
+		</property>
+	</bean>
+	<bean id="mcrAppIndexAction" class="com.org.mokey.basedata.sysinfo.action.McrAppIndexAction" scope="prototype">
+		<property name="mcrAppIndexService">
+			<ref bean="mcrAppIndexService"/>
+		</property>
+	</bean>
+	
+	<!-- 微用帮：应用 -->
+	<bean id="mcrAppDao" class="com.org.mokey.basedata.sysinfo.dao.impl.McrAppDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="mcrAppService" class="com.org.mokey.basedata.sysinfo.service.impl.McrAppServiceImpl" scope="prototype">
+		<property name="mcrAppDao">
+			<ref bean="mcrAppDao"/>
+		</property>
+	</bean>
+	<bean id="mcrAppAction" class="com.org.mokey.basedata.sysinfo.action.McrAppAction" scope="prototype">
+		<property name="mcrAppService">
+			<ref bean="mcrAppService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：礼包分类 -->
+	<bean id="gameGiftCateDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameGiftCateDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameGiftCateService" class="com.org.mokey.basedata.sysinfo.service.impl.GameGiftCateServiceImpl" scope="prototype">
+		<property name="gameGiftCateDao">
+			<ref bean="gameGiftCateDao"/>
+		</property>
+	</bean>
+	<bean id="gameGiftCateAction" class="com.org.mokey.basedata.sysinfo.action.GameGiftCateAction" scope="prototype">
+		<property name="gameGiftCateService">
+			<ref bean="gameGiftCateService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：礼包推荐 -->
+	<bean id="gameGiftRecommendDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameGiftRecommendDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameGiftRecommendService" class="com.org.mokey.basedata.sysinfo.service.impl.GameGiftRecommendServiceImpl" scope="prototype">
+		<property name="gameGiftRecommendDao">
+			<ref bean="gameGiftRecommendDao"/>
+		</property>
+	</bean>
+	<bean id="gameGiftRecommendAction" class="com.org.mokey.basedata.sysinfo.action.GameGiftRecommendAction" scope="prototype">
+		<property name="gameGiftRecommendService">
+			<ref bean="gameGiftRecommendService"/>
+		</property>
+		<property name="gameGiftCateService">
+			<ref bean="gameGiftCateService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏分类 -->
+	<bean id="gameCategoryDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameCategoryDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameCategoryService" class="com.org.mokey.basedata.sysinfo.service.impl.GameCategoryServiceImpl" scope="prototype">
+		<property name="gameCategoryDao">
+			<ref bean="gameCategoryDao"/>
+		</property>
+	</bean>
+	<bean id="gameCategoryAction" class="com.org.mokey.basedata.sysinfo.action.GameCategoryAction" scope="prototype">
+		<property name="gameCategoryService">
+			<ref bean="gameCategoryService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏推荐 -->
+	<bean id="gameRecommendDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameRecommendDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameRecommendService" class="com.org.mokey.basedata.sysinfo.service.impl.GameRecommendServiceImpl" scope="prototype">
+		<property name="gameRecommendDao">
+			<ref bean="gameRecommendDao"/>
+		</property>
+	</bean>
+	<bean id="gameRecommendAction" class="com.org.mokey.basedata.sysinfo.action.GameRecommendAction" scope="prototype">
+		<property name="gameRecommendService">
+			<ref bean="gameRecommendService"/>
+		</property>
+		<property name="gameCategoryService">
+			<ref bean="gameCategoryService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：h5游戏分类 -->
+	<bean id="h5GameCategoryDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameCategoryDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="h5GameCategoryService" class="com.org.mokey.basedata.sysinfo.service.impl.H5GameCategoryServiceImpl" scope="prototype">
+		<property name="h5GameCategoryDao">
+			<ref bean="h5GameCategoryDao"/>
+		</property>
+	</bean>
+	<bean id="h5GameCategoryAction" class="com.org.mokey.basedata.sysinfo.action.H5GameCategoryAction" scope="prototype">
+		<property name="h5GameCategoryService">
+			<ref bean="h5GameCategoryService"/>
+		</property>
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：H5游戏推荐 -->
+	<bean id="h5GameRecommendDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameRecommendDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="h5GameRecommendService" class="com.org.mokey.basedata.sysinfo.service.impl.H5GameRecommendServiceImpl" scope="prototype">
+		<property name="h5GameRecommendDao">
+			<ref bean="h5GameRecommendDao"/>
+		</property>
+	</bean>
+	<bean id="h5GameRecommendAction" class="com.org.mokey.basedata.sysinfo.action.H5GameRecommendAction" scope="prototype">
+		<property name="h5GameRecommendService">
+			<ref bean="h5GameRecommendService"/>
+		</property>
+		<property name="h5GameCategoryService">
+			<ref bean="h5GameCategoryService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：精品游戏首页排版 -->
+	<bean id="gameBoutiqueIndexDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameBoutiqueIndexDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameBoutiqueIndexService" class="com.org.mokey.basedata.sysinfo.service.impl.GameBoutiqueIndexServiceImpl" scope="prototype">
+		<property name="gameBoutiqueIndexDao">
+			<ref bean="gameBoutiqueIndexDao"/>
+		</property>
+	</bean>
+	<bean id="gameBoutiqueIndexAction" class="com.org.mokey.basedata.sysinfo.action.GameBoutiqueIndexAction" scope="prototype">
+		<property name="gameBoutiqueIndexService">
+			<ref bean="gameBoutiqueIndexService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：H5精品游戏首页排版 -->
+	<bean id="h5GameBoutiqueIndexDao" class="com.org.mokey.basedata.sysinfo.dao.impl.H5GameBoutiqueIndexDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="h5GameBoutiqueIndexService" class="com.org.mokey.basedata.sysinfo.service.impl.H5GameBoutiqueIndexServiceImpl" scope="prototype">
+		<property name="h5GameBoutiqueIndexDao">
+			<ref bean="h5GameBoutiqueIndexDao"/>
+		</property>
+	</bean>
+	<bean id="h5GameBoutiqueIndexAction" class="com.org.mokey.basedata.sysinfo.action.H5GameBoutiqueIndexAction" scope="prototype">
+		<property name="h5GameBoutiqueIndexService">
+			<ref bean="h5GameBoutiqueIndexService"/>
+		</property>
+	</bean>
+	
+	<!-- 游戏帮：游戏礼包首页排版 -->
+	<bean id="gameGiftIndexDao" class="com.org.mokey.basedata.sysinfo.dao.impl.GameGiftIndexDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="gameGiftIndexService" class="com.org.mokey.basedata.sysinfo.service.impl.GameGiftIndexServiceImpl" scope="prototype">
+		<property name="gameGiftIndexDao">
+			<ref bean="gameGiftIndexDao"/>
+		</property>
+	</bean>
+	<bean id="gameGiftIndexAction" class="com.org.mokey.basedata.sysinfo.action.GameGiftIndexAction" scope="prototype">
+		<property name="gameGiftIndexService">
+			<ref bean="gameGiftIndexService"/>
+		</property>
+	</bean>
+
+    <!-- 商城产品兑换 -->
+    <bean id="exchangeDao" class="com.org.mokey.basedata.sysinfo.dao.impl.ExchangeDaoImpl" scope="prototype">
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate"/>
+        </property>
+    </bean>
+    <bean id="exchangeService" class="com.org.mokey.basedata.sysinfo.service.impl.ExchangeServiceImpl" scope="prototype">
+        <property name="exchangeDao">
+            <ref bean="exchangeDao"/>
+        </property>
+    </bean>
+    <bean id="exchangeAction" class="com.org.mokey.basedata.sysinfo.action.ExchangeAction" scope="prototype">
+        <property name="exchangeService">
+            <ref bean="exchangeService"/>
+        </property>
+    </bean>
+
+	<!-- e键 ： 活动分类 -->
+	<bean id="ekActivityCategoryInfoDao" class="com.org.mokey.basedata.sysinfo.dao.impl.EKActivityCategoryInfoDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="ekActivityCategoryInfoService" class="com.org.mokey.basedata.sysinfo.service.impl.EKActivityCategoryInfoServiceImpl" scope="prototype">
+		<property name="ekActivityCategoryInfoDao">
+			<ref bean="ekActivityCategoryInfoDao"/>
+		</property>
+	</bean>
+	<bean id="ekActivityCategoryInfoAction" class="com.org.mokey.basedata.sysinfo.action.EKActivityCategoryInfoAction" scope="prototype">
+		<property name="ekActivityCategoryInfoService">
+			<ref bean="ekActivityCategoryInfoService"/>
+		</property>
+	</bean>
+
+	<!-- e键 ： 活动标签 -->
+	<bean id="ekActivityCategoryTagDao" class="com.org.mokey.basedata.sysinfo.dao.impl.EKActivityCategoryTagDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="ekActivityCategoryTagService" class="com.org.mokey.basedata.sysinfo.service.impl.EKActivityCategoryTagServiceImpl" scope="prototype">
+		<property name="ekActivityCategoryTagDao">
+			<ref bean="ekActivityCategoryTagDao"/>
+		</property>
+	</bean>
+	<bean id="ekActivityCategoryTagAction" class="com.org.mokey.basedata.sysinfo.action.EKActivityCategoryTagAction" scope="prototype">
+		<property name="ekActivityCategoryTagService">
+			<ref bean="ekActivityCategoryTagService"/>
+		</property>
+	</bean>
+
+	<!-- e键 ： 活动注意事项 -->
+	<bean id="ekActivityNoticeDao" class="com.org.mokey.basedata.sysinfo.dao.impl.EKActivityNoticeDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="ekActivityNoticeService" class="com.org.mokey.basedata.sysinfo.service.impl.EKActivityNoticeServiceImpl" scope="prototype">
+		<property name="ekActivityNoticeDao">
+			<ref bean="ekActivityNoticeDao"/>
+		</property>
+	</bean>
+	<bean id="ekActivityNoticeAction" class="com.org.mokey.basedata.sysinfo.action.EKActivityNoticeAction" scope="prototype">
+		<property name="ekActivityNoticeService">
+			<ref bean="ekActivityNoticeService"/>
+		</property>
+	</bean>
+
+	<!-- e键 ： 活动详情 -->
+	<bean id="ekActivityDao" class="com.org.mokey.basedata.sysinfo.dao.impl.EKActivityDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="ekActivityService" class="com.org.mokey.basedata.sysinfo.service.impl.EKActivityServiceImpl" scope="prototype">
+		<property name="ekActivityDao">
+			<ref bean="ekActivityDao"/>
+		</property>
+	</bean>
+	<bean id="ekActivityAction" class="com.org.mokey.basedata.sysinfo.action.EKActivityAction" scope="prototype">
+		<property name="ekActivityService">
+			<ref bean="ekActivityService"/>
+		</property>
+	</bean>
+
+	<!-- e键 ： 活动首页 -->
+	<bean id="ekActivityIndexDao" class="com.org.mokey.basedata.sysinfo.dao.impl.EKActivityIndexDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate"/>
+		</property>
+	</bean>
+	<bean id="ekActivityIndexService" class="com.org.mokey.basedata.sysinfo.service.impl.EKActivityIndexServiceImpl" scope="prototype">
+		<property name="ekActivityIndexDao">
+			<ref bean="ekActivityIndexDao"/>
+		</property>
+	</bean>
+	<bean id="ekActivityIndexAction" class="com.org.mokey.basedata.sysinfo.action.EKActivityIndexAction" scope="prototype">
+		<property name="ekActivityIndexService">
+			<ref bean="ekActivityIndexService"/>
+		</property>
+	</bean>
+</beans>

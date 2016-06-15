@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- jsp页面简单主题 -->
+	<constant name="struts.ui.theme" value="simple" />
+	<constant name="struts.objectFactory.spring.autoWire" value="type" />
+	<constant name="struts.objectFactory" value="spring" />
+	<constant name="struts.action.extension" value="action,xlsx" />
+	<include file="struts-default.xml" />
+	<!-- value="204857600" -->
+	<constant name="struts.multipart.maxSize" value="1490823609" />
+	
+	<package name="default" extends="struts-default">
+		<action name="index">
+			<result type="redirect">/menu/index.jsp</result>
+		</action>  
+		<action name="login!*" method="{1}" class="loginAction">
+			<result name="loginpage">/login.jsp</result>
+			<!-- /menu/index.jsp -->
+			<result type="redirect" name="success">main.jsp</result>
+			<result type="redirect" name="logOutpage">/login.jsp</result>
+		</action>
+	</package>
+	
+	<!-- include struts config files -->
+	
+	<include file="conf/struts/struts_analyse.xml"/>
+	<include file="conf/struts/struts_basedata.xml"/>
+	<include file="conf/struts/struts_basedata_ekey_index.xml"/>
+	<include file="conf/struts/struts_basedata_ekey_activity.xml"/>
+	<include file="conf/struts/struts_basedata_ekey_game.xml"/>
+	<include file="conf/struts/struts_basedata_ekey_freecall.xml"/>
+	<include file="conf/struts/struts_basedata_ekey_shop.xml"/>
+	<include file="conf/struts/struts_menu.xml"/>
+	<include file="conf/struts/struts_report.xml"/>
+	<include file="conf/struts/struts_system.xml"/>
+	<include file="conf/struts/struts_formdesign.xml"/>
+	<include file="conf/struts/struts_activity.xml"/>
+	
+	<include file="conf/struts/struts_demo.xml"/>
+	
+</struts>

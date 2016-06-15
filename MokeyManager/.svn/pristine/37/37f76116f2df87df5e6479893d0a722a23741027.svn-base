@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="basedata" extends="struts-default" namespace="/basedata">
+		<!-- demo -->
+		<action name="zingchartDemo" method="demo" class="ZingChartDemo">
+			<result name="success">/basedata/zingchartDemo.jsp</result>
+		</action>
+
+		<action name="appInfo!*" method="{1}" class="appInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<action name="tools!*" method="{1}" class="toolsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<action name="advertInfo!*" method="{1}" class="advertInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<action name="actionActive!*" method="{1}" class="actionActiveAction">
+			<result name="input">/JsontData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<action name="actionFeedback!*" method="{1}" class="actionFeedbackAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<action name="deviceInfo!*" method="{1}" class="actionDeviceInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="holdTypeInfo!*" method="{1}" class="holdtypeInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="supplierInfo!*" method="{1}" class="supplieraction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="logInfo!*" method="{1}" class="actionLogInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="phoneBrand!*" method="{1}" class="phoneBrandAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="activeCode!*" method="{1}" class="activeCodeAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="activeCreateCode!*" method="{1}" class="activeCreateCodeAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="push!*" method="{1}" class="pushAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="actionIndustryType!*" method="{1}" class="actionIndustryAction">
+		</action>
+		
+		<action name="actionEareInfo!*" method="{1}" class="actionEareInfoAction">
+		</action>
+		
+		<action name="actionPackageInfo!*" method="{1}" class="actionPackageInfoAction">
+		</action>
+		
+		<action name="actionCanalDicInfo!*" method="{1}" class="actionCanalDicInfoAction">
+		</action>
+		
+		<action name="actionIntegralType!*" method="{1}" class="actionIntegralTypeAction">
+		</action>
+		
+		<action name="sendDemoQuery!*" method="{1}" class="sendDemoQuery">
+		</action>
+		
+		<action name="activityBrandInfo!*" method="{1}" class="activityBrandInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="activityFollowScheme!*" method="{1}" class="activityFollowSchemeAction">
+		</action>
+		
+		<action name="activitySchemeDetail!*" method="{1}" class="activitySchemeDetailAction">
+		</action>
+		
+		<action name="fourKeyMainTainAd!*" method="{1}" class="fourKeyMainTainAd">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+				
+		<action name="activityCityInfo!*" method="{1}" class="activityCityInfoAction">
+		</action>
+		
+		<action name="activitySearchRecard!*" method="{1}" class="activitySearchRecardAction">
+		</action>
+		<action name="cityandActTypeAction!*" method="{1}" class="cityandActTypeAction">
+		</action> 
+		<action name="actionActTheme!*" method="{1}" class="actionActThemeAction">
+		</action> 
+		
+		<action name="business_zone!*" method="{1}" class="activityBusinessZoneAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="menuinfo!*" method="{1}" class="activityMenuInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="contenttype!*" method="{1}" class="activityContentTypeAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="activityRecommendScheme!*" method="{1}" class="activityRecommendSchemeAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<action name="actionBaseActivityInfoService!*" method="{1}" class="actionBaseActivityInfo">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="gameColAction!*" method="{1}" class="gameCollectionAction">
+			<result name="gameCol">/basedata/pages/gameCol.jsp</result>
+			<result name="addCol" type="redirectAction">
+        		<param name="actionName">gameColAction!gameCol</param>  
+			</result>
+			<result name="deleteCol" type="redirectAction">
+				<param name="actionName">gameColAction!gameCol</param>
+			</result>
+			<result name="toModify">/basedata/pages/gameCol-modify.jsp</result>
+			<result name="modifyCol" type="redirectAction">
+				<param name="actionName">gameColAction!gameCol</param>
+			</result>
+			<result name="isvalid" type="redirectAction">
+				<param name="actionName">gameColAction!gameCol</param>
+			</result>
+			<result name="toHandle">/basedata/pages/gameCol-handle.jsp</result>
+		</action>
+		
+		<action name="gameCueAction!*" method="{1}" class="gameCueAction">
+			<result name="gameCue">/basedata/pages/gameCue.jsp</result>
+		</action>
+		
+		<!-- H5游戏 -->
+		<action name="h5GameAction!*" method="{1}" class="h5GameAction">
+		</action>
+		<!-- H5游戏结束 -->
+
+        <!--任务维护-->
+        <action name="gameTaskAction!*" method="{1}" class="gameTaskAction">
+        	<result name="toReward">/basedata/pages/reward.jsp</result>
+        	<result name="toHandle">/basedata/pages/reward-handle.jsp</result>
+        	<result name="handleReward" type="redirectAction">
+				<param name="actionName">gameTaskAction!toReward</param>
+			</result>
+        </action>
+
+        <!-- 商城产品兑换 -->
+        <action name="exchangeAction!*" method="{1}" class="exchangeAction">
+            <result name="toHandle">/basedata/pages/exchangeList.jsp</result>
+        </action>
+
+		<!--任务维护结束-->
+        <!--商城产品-->
+        <action name="mallProductAction!*" method="{1}" class="mallProductAction"></action>
+		<!--商城产品-->
+        <!--留言管理-->
+        <action name="messageAction!*" method="{1}" class="messageAction">
+            <result name="input">/basedata/pages/editMessage.jsp</result>
+        </action>
+        <!--留言管理-->
+
+		<!-- 测试机 -->
+		<action name="testingMachineManagementAction!*" method="{1}" class="testingMachineManagementAction">
+		</action>
+		<!-- 测试机结束 -->
+		
+		<!-- 游戏帮：热门搜索 -->
+		<action name="gameSearchAction!*" method="{1}" class="gameSearchAction">
+			<result name="toGameSearch">/basedata/pages/gameHotSearch.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：精品分类 -->
+		<action name="gameBoutiqueCategoryAction!*" method="{1}" class="gameBoutiqueCategoryAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+			<result name="toGameBoutiqueCategoryList">/basedata/pages/gameBoutiqueCate.jsp</result>
+			<result name="toUpdate">/basedata/pages/gameBoutiqueCate-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">gameBoutiqueCategoryAction!toGameBoutiqueCategoryList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/gameBoutiqueCate-handle.jsp</result>
+		</action>
+		<!-- 游戏帮：H5热门搜索 -->
+		<action name="h5GameSearchAction!*" method="{1}" class="h5GameSearchAction">
+			<result name="toH5GameSearch">/basedata/pages/gameH5HotSearch.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：H5精品分类 -->
+		<action name="h5GameBoutiqueCategoryAction!*" method="{1}" class="h5GameBoutiqueCategoryAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+			<result name="toGameH5BoutiqueCategoryList">/basedata/pages/gameH5BoutiqueCate.jsp</result>
+			<result name="toUpdate">/basedata/pages/gameH5BoutiqueCate-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">h5GameBoutiqueCategoryAction!toGameH5BoutiqueCategoryList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/gameH5BoutiqueCate-handle.jsp</result>
+		</action>
+		
+		<!-- H5游戏合集 -->
+		<action name="h5GameColAction!*" method="{1}" class="h5GameCollectionAction">
+			<result name="h5GameCol">/basedata/pages/h5GameCol.jsp</result>
+		</action>
+		
+		<!-- 游戏资讯 -->
+		<action name="gameInfoAction!*" method="{1}" class="gameInfoAction">
+			<result name="gameInfoList">/basedata/pages/gameInfoList.jsp</result>
+			<result name="toGameInfoAdd">/basedata/pages/gameInfoAdd.jsp</result>
+			<result name="saveGameInfo" type="redirectAction">
+				<param name="actionName">gameInfoAction!toInfoList</param>
+			</result>
+		</action>
+		
+		<!-- 游戏活动 -->
+		<action name="gameActAction!*" method="{1}" class="gameActAction">
+			<result name="gameActList">/basedata/pages/gameActList.jsp</result>
+			<result name="toGameActAdd">/basedata/pages/gameActAdd.jsp</result>
+			<result name="saveGameAct" type="redirectAction">
+				<param name="actionName">gameActAction!toActList</param>
+			</result>
+			<result name="users">/basedata/pages/gameActUsers.jsp</result>
+		</action>
+		
+		<!-- 游戏攻略 -->
+		<action name="gameStrategyAction!*" method="{1}" class="gameStrategyAction">
+			<result name="gameStrategyList">/basedata/pages/gameStrategyList.jsp</result>
+			<result name="toGameStrategyAdd">/basedata/pages/gameStrategyAdd.jsp</result>
+			<result name="saveGameStrategy" type="redirectAction">
+				<param name="actionName">gameStrategyAction!toStrategyList</param>
+			</result>
+		</action>
+		
+		<!-- H5游戏广告 -->
+		<action name="h5AdvertInfo!*" method="{1}" class="h5AdvertInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 游戏礼包 -->
+		<action name="gameGiftAction!*" method="{1}" class="gameGiftAction">
+			<result name="gameGiftList">/basedata/pages/gameGiftList.jsp</result>
+			<result name="toGameGiftAdd">/basedata/pages/gameGiftAdd.jsp</result>
+			<result name="saveGameGift" type="redirectAction">
+				<param name="actionName">gameGiftAction!toGiftList</param>
+			</result>
+			<result name="toGiftCodesList">/basedata/pages/gameGiftCodesList.jsp</result>
+		</action>
+		
+		<!-- 微用帮：应用合集 -->
+		<action name="mcrAppColAction!*" method="{1}" class="mcrAppColAction">
+			<result name="mcrAppColList">/basedata/pages/mcrAppCol-list.jsp</result>
+			<result name="toUpdate">/basedata/pages/mcrAppCol-update.jsp</result>
+			<result name="update" type="redirectAction">
+				<param name="actionName">mcrAppColAction!mcrAppColList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/mcrAppCol-handle.jsp</result>
+		</action>
+		
+		<!-- 微用帮：应用分类 -->
+		<action name="mcrAppCateAction!*" method="{1}" class="mcrAppCateAction">
+			<result name="mcrAppCateList">/basedata/pages/mcrAppCate-list.jsp</result>
+			<result name="toUpdate">/basedata/pages/mcrAppCate-update.jsp</result>
+			<result name="update" type="redirectAction">
+				<param name="actionName">mcrAppCateAction!toCateList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/mcrAppCate-handle.jsp</result>
+		</action>
+		
+		<!-- 微用帮：首页排版 -->
+		<action name="mcrAppIndexAction!*" method="{1}" class="mcrAppIndexAction">
+			<result name="mcrAppIndex">/basedata/pages/mcrAppIndex.jsp</result>
+		</action>
+		
+		<!-- 微用帮：应用 -->
+		<action name="mcrAppInfo!*" method="{1}" class="mcrAppAction"></action>
+		
+		<!-- 游戏帮：礼包分类 -->
+		<action name="gameGiftCateAction!*" method="{1}" class="gameGiftCateAction">
+			<result name="toGameGiftCateList">/basedata/pages/gameGiftCate.jsp</result>
+			<result name="toUpdate">/basedata/pages/gameGiftCate-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">gameGiftCateAction!toGameGiftCateList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/gameGiftCate-handle.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：礼包推荐 -->
+		<action name="gameGiftRecommendAction!*" method="{1}" class="gameGiftRecommendAction">
+			<result name="toGameGiftRecommend">/basedata/pages/gameGiftRecommend.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：游戏分类 -->
+		<action name="gameCategoryAction!*" method="{1}" class="gameCategoryAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+			<result name="toGameCategoryList">/basedata/pages/gameCategory.jsp</result>
+			<result name="toUpdate">/basedata/pages/gameCategory-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">gameCategoryAction!toGameCategoryList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/gameCategory-handle.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：游戏推荐 -->
+		<action name="gameRecommendAction!*" method="{1}" class="gameRecommendAction">
+			<result name="toGameRecommend">/basedata/pages/gameRecommend.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：h5游戏分类 -->
+		<action name="h5GameCategoryAction!*" method="{1}" class="h5GameCategoryAction">
+			<result name="toH5GameCategoryList">/basedata/pages/h5GameCategory.jsp</result>
+			<result name="toUpdate">/basedata/pages/h5GameCategory-update.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">h5GameCategoryAction!toH5GameCategoryList</param>
+			</result>
+			<result name="toHandle">/basedata/pages/h5GameCategory-handle.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：H5游戏推荐 -->
+		<action name="h5GameRecommendAction!*" method="{1}" class="h5GameRecommendAction">
+			<result name="toH5GameRecommend">/basedata/pages/h5GameRecommend.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：精品游戏首页排版 -->
+		<action name="gameBoutiqueIndexAction!*" method="{1}" class="gameBoutiqueIndexAction">
+			<result name="gameBoutiqueIndex">/basedata/pages/gameBoutiqueIndex.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：H5精品游戏首页排版 -->
+		<action name="h5GameBoutiqueIndexAction!*" method="{1}" class="h5GameBoutiqueIndexAction">
+			<result name="h5GameBoutiqueIndex">/basedata/pages/h5GameBoutiqueIndex.jsp</result>
+		</action>
+		
+		<!-- 游戏帮：游戏礼包首页排版 -->
+		<action name="gameGiftIndexAction!*" method="{1}" class="gameGiftIndexAction">
+			<result name="gameGiftIndex">/basedata/pages/gameGiftIndex.jsp</result>
+		</action>
+
+		<!-- 免费购膜：手机型号管理 -->
+		<action name="phoneModelAction!*" method="{1}" class="phoneModelAction">
+			<result name="toBrandList">/basedata/pages/phoneBrand-list.jsp</result>
+			<result name="toBrandAdd">/basedata/pages/phoneBrand-update.jsp</result>
+			<result name="toModelList">/basedata/pages/phoneModel-list.jsp</result>
+			<result name="toModelAdd">/basedata/pages/phoneModel-update.jsp</result>
+			<result name="addModelSuccess" type="redirectAction">
+				<param name="actionName">phoneModelAction!toModelList?brandId=${brandId}</param>
+			</result>
+		</action>
+	</package>
+
+</struts>

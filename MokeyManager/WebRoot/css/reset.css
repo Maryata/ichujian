@@ -1,0 +1,139 @@
+@charset "utf-8";
+/* ====================================================================================================
+ * Author : amyliu
+ * Date : 2015-11-25
+ * ==================================================================================================== */
+
+
+/* global */
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: "Microsoft YaHei",arial;
+	background: #f8f8f8;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0
+}
+fieldset,
+img {
+	border: 0
+}
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+	font-style: normal;
+	font-weight: normal
+}
+ol,
+ul {
+	list-style: none
+}
+caption,
+th {
+	text-align: left
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: 100%;
+	font-weight: normal;
+	color: #fff;
+}
+q:before,
+q:after {
+	content: ''
+}
+abbr,
+acronym {
+	border: 0;
+	font-variant: normal
+}
+input,
+textarea,
+select {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit
+}
+input,
+textarea,
+select {
+	*font-size: 100%
+}
+.clearFix:after {
+	clear: both;
+	content: ".";
+	display: block;
+	font-size: 0;
+	height: 0;
+	line-height: 0;
+	visibility: hidden
+}
+.clearFix {
+	clear: both;
+	zoom: 1
+}
+.fl {
+	float: left;
+}
+.fr {
+	float: right;
+}
+a {
+	text-decoration: none;
+	color: #fff;
+}
+a:focus,
+p {
+	color: #fff;
+}
+div {
+	margin: 0 auto;
+}
+.none{
+	display: none;
+}
+.opacity{
+	opacity: 0;
+}
+nav ul,ul,li {
+    list-style:none;
+}

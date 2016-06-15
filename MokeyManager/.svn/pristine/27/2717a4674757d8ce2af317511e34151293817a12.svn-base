@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="ekeyFreeCall" extends="struts-default" namespace="/basedata/ekey">
+		<!--定制App管理-->
+		<action name="eKFreeCallAction!*" method="{1}" class="eKFreeCallAction">
+			<result name="toList">/ekpages/pages/freecall/freeCallList.jsp</result>
+			<result name="toSelect">/ekpages/pages/freecall/OnlineStatueList.jsp</result>
+			<result name="toAuth">/ekpages/pages/freecall/authList.jsp</result>
+			<result name="toCallHis">/ekpages/pages/freecall/callHisList.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKFreeCallAction!toList</param>
+			</result>
+		</action>
+
+	</package>
+
+</struts>

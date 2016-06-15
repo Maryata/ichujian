@@ -1,0 +1,160 @@
+package com.org.mokey.analyse.service;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/1/18.
+ */
+public interface UserAnalyseService {
+
+    /**
+     * 活跃用户
+     *
+     * @param userId   当前用户id
+     * @param sup      供应商
+     * @param sDate    开始时间
+     * @param eDate    结束时间
+     * @param timeType 时间类型：1:日、2:周、3:月
+     * @param year     年份
+     * @param dataType 数据类型
+     * @return
+     */
+    Map<String, Object> activeUser(String userId, String sup,
+                                   String sDate, String eDate,
+                                   String timeType, String year, String dataType);
+
+    /**
+     * 留存用户
+     *
+     * @param userId   当前用户id
+     * @param sup      供应商
+     * @param sDate    开始时间
+     * @param eDate    结束时间
+     * @param timeType 时间类型：1:日、2:周、3:月
+     * @param year     年份
+     * @param dataType 数据类型
+     * @return
+     */
+    Map<String, Object> stayingUser(String userId, String sup,
+                                    String sDate, String eDate,
+                                    String timeType, String year, String dataType);
+
+    /**
+     * 下载用户
+     * @param userId 当前用户ID
+     * @param sup 供应商
+     * @param sDate 开始时间
+     * @param eDate 结束时间
+     * @param timeType 时间类型： 1:日、2:周、3:月
+     * @param year 年份
+     * @param dataType 
+     * @return
+     */
+    Map<String, Object> downloadUser(String userId, String sup,
+                                    String sDate, String eDate,
+                                    String timeType, String year, String dataType);
+
+    /**
+     * 激活用户
+     * @param userId 当前用户ID
+     * @param sup 供应商
+     * @param sDate 开始时间
+     * @param eDate 结束时间
+     * @param timeType 时间类型： 1:日、2:周、3:月
+     * @param year 年份
+     * @param dataType 
+     * @return
+     */
+    Map<String, Object> activationUser(String userId, String sup,
+                                     String sDate, String eDate,
+                                     String timeType, String year, String dataType);
+    /**
+     * 注册用户
+     * @param userId 当前用户ID
+     * @param sup 供应商
+     * @param sDate 开始时间
+     * @param eDate 结束时间
+     * @param timeType 时间类型： 1:日、2:周、3:月
+     * @param year 年份
+     * @param dataType 
+     * @return
+     */
+    Map<String, Object> registerUser(String userId, String sup,
+                                     String sDate, String eDate,
+                                     String timeType, String year, String dataType);
+
+    /**
+     * 综合统计
+     * @param userId 当前用户ID
+     * @param sup 供应商代码
+     * @param sDate 开始时间
+     * @param eDate 结束时间
+     * @param timeType 时间类型： 1:日、2:周、3:月
+     * @param year 年份
+     * @return
+     */
+    Map<String, Object> complexStatistics (String userId, String sup,
+                                           String sDate, String eDate,
+                                           String timeType, String year);
+
+
+
+
+
+
+    /**
+     * 最新综合统计
+     * @param userId 当前用户ID
+     * @param sup 供应商代码
+     * @param sDate 开始时间
+     * @param eDate 结束时间
+     * @param timeType 时间类型： 1:日、2:周、3:月
+
+     * @return
+     */
+    List<List<Object>>  allcomplexStatistics (String userId, String sup,
+                                              String sDate, String eDate,
+                                              String timeType);
+
+
+
+
+
+
+
+
+    /**
+     * 当前用户可见的供应商
+     * @param userId 用户id
+     * @param sup 查询的供应商
+     * @return
+     */
+    List<Map<String, Object>> visibleSupplier(String userId, String sup);
+
+    /**
+     * 查询用户可见的供应商
+     * @param userId
+     * @return
+     */
+	List<Map<String, Object>> getSuppliers(String userId);
+
+
+    Map<String, Map<String, Integer>> stayingUserData(List<Map<String, Object>> suppliers,
+                                                      String sDate, String eDate, String timeType);
+
+    Map<String, Map<String, Integer>> stayingUserDataOfDay(
+            Map<String, Map<String, Integer>> reqMap, List<Map<String, Object>> suppliers,
+            String sDate, String eDate);
+
+    List<Map<String, Object>> processStayingUserData(Map<String, Map<String, Integer>> m_stayingUser);
+
+    Map<String, Map<String, List<String>>> getEmeiDayMap(List<String> sup, List<Map<String, Object>> data);
+
+    Map<String, List<Integer>> countListOfSup(
+            List<Map<String, Object>> suppliers, Map<String, List<String>> timeMap, Map<String,
+            Map<String, List<String>>> dataMap);
+
+    Long _processUserCountByTimeAndSupCode(List<Map<String, Object>> mapList,
+                                           Long initCount, String supCode, String time);
+}

@@ -1,0 +1,351 @@
+package com.org.mokey.basedata.sysinfo.dao.impl;
+
+import com.org.mokey.basedata.sysinfo.dao.EKActivityDao;
+import com.org.mokey.common.util.ApDateTime;
+import com.org.mokey.common.util.DaoUtil;
+import com.org.mokey.common.util.JdbcTemplateUtils;
+import com.org.mokey.util.StrUtils;
+import org.apache.log4j.Logger;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.*;
+
+/**
+ * Created by vpc on 2016/3/3.
+ * e键 ：活动详情
+ */
+public class EKActivityDaoImpl implements EKActivityDao {
+
+    private static final Logger LOGGER = Logger.getLogger(EKActivityDaoImpl.class);
+
+    private static final String ROLE_AUDITOR = "ywsh";// 运维审核人员
+
+    private JdbcTemplate jdbcTemplate;
+
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public Map<String, Object> ekActivityList(String title, String ccid, String status, int page) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1)" + " FROM T_EK_ACTIVITY_INFO T" +
+                        " LEFT JOIN T_EK_ACTIVITY_CATEGORY_INFO TC ON T.C_CID = TC.C_ID" +
+                        " WHERE T.C_ISLIVE = 1");
+                List<Object> args = new ArrayList<Object>();
+
+                if (StrUtils.isNotEmpty(title)) {
+                    sql.append(" AND T.C_TITLE LIKE ?");
+                    args.add("%" + title + "%");
+                }
+                if (StrUtils.isNotEmpty(ccid)) {
+                    sql.append(" AND T.C_CID = ?");
+                    args.add(ccid);
+                }
+                if (StrUtils.isNotEmpty(status)) {
+                    sql.append(" AND T.C_AUDIT_STATUS = ?");
+                    args.add(status);
+                }
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY C_AUDIT_STATUS ASC, C_CTIME DESC");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "CASE WHEN T.C_AUDIT_STATUS = '0' THEN '未审核' ELSE '已审核' END AS STATUS ,TC.C_NAME AS NAME ," +
+                        "T.C_ID,T.C_TITLE,T.C_SDATE,T.C_EDATE,T.C_SUBTITLE,T.C_URL,T.C_URL_SHARE,T.C_IMG,T.C_WEBVIEWURL," +
+                        "T.C_VIEW,T.C_VOTE,T.C_FAVORITE,T.C_REASON,T.C_DETAIL,T.C_TIP,T.C_AUDITOR,C_AUDIT_STATUS,T.C_AUDIT_TIME,T.C_CTIME,T.C_CREATOR,T.C_CID,C_FULL_DETAIL,C_PUBLISHER,C_IMG_THIN,C_IMG_LONG,C_HREF");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.ekActivityList failed, e : " + e);
+        }
+        return ret;
+    }
+
+    @Override
+    public void addActivity(String id, String logo, String sdate, String edate, String title, String subTitle, String url, String urlShare, String webViewUrl, String view, String vote, String favorite, String reason, String tip, String ccid, String detail, String publisher, String fullDetail, String longImg, String thinImg,String indexImg, String modifier, String href,String halfImg,String titleImg) {
+        try {
+            //ApDateTime.getDate(sdate, ApDateTime.DATE_TIME_Sec);
+            String sql = "INSERT INTO T_EK_ACTIVITY_INFO" +
+                    " (C_ID,C_TITLE,C_SDATE,C_EDATE,C_PUBLISHER,C_SUBTITLE,C_URL," +
+                    "C_URL_SHARE,C_IMG,C_WEBVIEWURL,C_VIEW,C_VOTE,C_FAVORITE," +
+                    "C_REASON,C_DETAIL,C_TIP,C_CREATOR,C_AUDIT_STATUS,C_CTIME," +
+                    "C_ISLIVE,C_CID,C_FULL_DETAIL,C_IMG_THIN,C_IMG_LONG,C_HREF," +
+                    "C_IMG_INDEX_LONG,C_IMG_THIN_HALF,C_IMG_TITLE)" +
+                    " VALUES(?, ? , ? , ? , ? , ?,?," +
+                    " ? , ? , ?,?, ? , ? ," +
+                    " ? , ? , ?, ?,?, ? ," +
+                    "?,?,?,?,?,?," +
+                    "?,?,?)";
+            List<Object> args = new ArrayList<Object>();
+            args.add(id);
+            args.add(title);
+            args.add(ApDateTime.getDate(sdate, ApDateTime.DATE_TIME_HM));
+            args.add(ApDateTime.getDate(edate, ApDateTime.DATE_TIME_HM));
+            args.add(publisher);
+            args.add(subTitle);
+
+            args.add(url);
+            args.add(urlShare);
+            args.add(logo);
+            args.add(webViewUrl);
+            args.add(view);
+            args.add(vote);
+
+            args.add(favorite);
+            args.add(reason);
+            args.add(detail);
+            args.add(tip);
+            args.add(modifier);
+            args.add(0);
+
+            args.add(new Date());
+            args.add(1);
+            args.add(ccid);
+            args.add(fullDetail);
+            args.add(thinImg);
+            args.add(longImg);
+
+            args.add(href);
+            args.add(indexImg);
+            args.add(halfImg);
+            args.add(titleImg);
+            this.jdbcTemplate.update(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.addActivity failed, e : " , e);
+        }
+    }
+
+    @Override
+    public void auditActivity(String id, String modifier, String value) {
+        try {
+            String sql = "UPDATE T_EK_ACTIVITY_INFO SET C_AUDITOR = ?,C_AUDIT_TIME=?,C_AUDIT_STATUS=?" + " WHERE C_ID = ?";
+            List<Object> args = new ArrayList<Object>();
+            args.add(modifier);
+            args.add(new Date());
+            args.add(value);
+            args.add(id);
+            this.jdbcTemplate.update(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.updateActivity failed, e : " + e);
+        }
+    }
+
+    /**
+     * 活动首页  : 活动详情
+     *
+     * @param title
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> ekActivityInfoList(String title, int page, List ids) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM T_EK_ACTIVITY_INFO T" +
+                        " WHERE T.C_ISLIVE=1 AND T.C_AUDIT_STATUS ='1'" +
+                        " AND NOT EXISTS(SELECT TC.C_EID FROM T_EK_ACTIVITY_HEADLINE TC WHERE TC.C_EID = T.C_ID AND TC.C_TYPE='1')");
+                List<Object> args = new ArrayList<Object>();
+
+                if (StrUtils.isNotEmpty(title)) {
+                    sql.append(" AND T.C_TITLE LIKE ?");
+                    args.add("%" + title + "%");
+                }
+                if (StrUtils.isNotEmpty(ids)) {
+                    sql.append(" AND  T.C_ID NOT IN" + DaoUtil.buildInCaseAsQ(ids, true));
+                    args.addAll(ids);
+                }
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY T.C_ID DESC");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "T.C_ID ,T.C_TITLE,T.C_IMG");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.ekActivityInfoList failed, e : " + e);
+        }
+        return ret;
+    }
+
+    @Override
+    public Map<String, Object> ekActivityLists(String title, int page, List ids) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM T_EK_ACTIVITY_INFO T" +
+                        " WHERE T.C_ISLIVE=1 AND T.C_AUDIT_STATUS ='1'" +
+                        " AND NOT EXISTS(SELECT TC.C_AID FROM T_EK_ACTIVITY_CATEGORY_ACTIVIT TC WHERE TC.C_AID = T.C_ID AND (TC.C_CID='1' or TC.C_CID = '2' ))");
+                List<Object> args = new ArrayList<Object>();
+
+                if (StrUtils.isNotEmpty(title)) {
+                    sql.append(" AND T.C_TITLE LIKE ?");
+                    args.add("%" + title + "%");
+                }
+                if (StrUtils.isNotEmpty(ids)) {
+                    sql.append(" AND  T.C_ID NOT IN" + DaoUtil.buildInCaseAsQ(ids, true));
+                    args.addAll(ids);
+                }
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY T.C_ID DESC");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "T.C_ID ,T.C_TITLE,T.C_IMG,T.C_VIEW");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.ekActivityLists failed, e : " + e);
+        }
+        return ret;
+    }
+
+    @Override
+    public List<Map<String, Object>> getFullDetail(String id) {
+        String sql = "SELECT  T.C_ID,T.C_TITLE,TO_CHAR(T.C_SDATE,'YYYY-MM-DD HH24:MI')AS C_SDATE,TO_CHAR(T.C_EDATE,'YYYY-MM-DD HH24:MI')AS C_EDATE,T.C_SUBTITLE,T.C_URL,T.C_URL_SHARE,T.C_IMG,T.C_WEBVIEWURL," +
+                "T.C_VIEW,T.C_VOTE,T.C_FAVORITE,T.C_REASON,T.C_DETAIL,T.C_TIP,T.C_AUDITOR,C_AUDIT_STATUS," +
+                "T.C_AUDIT_TIME,T.C_CTIME,T.C_CREATOR,T.C_CID,C_FULL_DETAIL,C_PUBLISHER,C_IMG_THIN,C_IMG_LONG,C_HREF,C_IMG_INDEX_LONG,C_IMG_THIN_HALF,C_IMG_TITLE" +
+                "  FROM T_EK_ACTIVITY_INFO T WHERE T.C_ID =?";
+        List<Object> args = new ArrayList<Object>();
+        args.add(id);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, args.toArray());
+        return list;
+    }
+
+    @Override
+    public void toDel(String id) {
+        try {
+            String sql = "DELETE FROM T_EK_ACTIVITY_INFO WHERE C_ID = ?";
+            this.jdbcTemplate.update(sql, new Object[]{id});
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.toDel failed, e : " + e);
+        }
+    }
+
+    @Override
+    public void updateActivity(String id, String logo, String sdate, String edate, String title, String subTitle, String url, String urlShare, String webViewUrl, String view, String vote, String favorite, String reason, String tip, String ccid, String detail, String publisher, String fullDetail, String longImg, String thinImg,String indexImg, String modifier, String href,String halfImg,String titleImg) {
+        try {
+            String sql = "UPDATE T_EK_ACTIVITY_INFO SET C_TITLE = ?,C_SDATE=?,C_EDATE=?,C_SUBTITLE=?,C_URL=?," +
+                    "C_URL_SHARE=?, C_IMG = ?,C_WEBVIEWURL=?,C_VIEW=?,C_VOTE=?," +
+                    "C_FAVORITE=?,C_REASON=?,C_DETAIL=?,C_TIP=?,C_CID=?," +
+                    "C_ETIME=?,C_EDITOR=?,C_FULL_DETAIL=?,C_IMG_LONG=?,C_IMG_THIN=?," +
+                    "C_PUBLISHER=?,C_HREF=?,C_IMG_INDEX_LONG=?,C_IMG_THIN_HALF,C_IMG_TITLE WHERE C_ID = ?";
+            List<Object> args = new ArrayList<Object>();
+            args.add(title);
+            args.add(ApDateTime.getDate(sdate, ApDateTime.DATE_TIME_HM));
+            args.add(ApDateTime.getDate(edate, ApDateTime.DATE_TIME_HM));
+            args.add(subTitle);
+            args.add(url);
+
+            args.add(urlShare);
+            args.add(logo);
+            args.add(webViewUrl);
+            args.add(view);
+            args.add(vote);
+
+            args.add(favorite);
+            args.add(reason);
+            args.add(detail);
+            args.add(tip);
+            args.add(Integer.parseInt(ccid));
+
+            args.add(new Date());
+            args.add(modifier);
+            args.add(fullDetail);
+            args.add(longImg);
+            args.add(thinImg);
+
+            args.add(publisher);
+            args.add(href);
+            args.add(indexImg);
+            args.add(halfImg);
+            args.add(titleImg);
+            args.add(Integer.parseInt(id));
+            this.jdbcTemplate.update(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKActivityDaoImpl.updateActivity failed, e : " + e);
+        }
+    }
+
+
+    @Override
+    // 查询当前登陆人的角色
+    public int getAuthority(String userId) {
+        int role = 0;
+        try {
+            if (StrUtils.isNotEmpty(userId)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM" +
+                        " T_SYS_USER_ROLE T, T_SYS_ROLE R WHERE T.C_ROLE_ID = R.C_ID" +
+                        " AND T.C_USERID = ? AND R.C_ROLE_CODE = ?");
+                role = jdbcTemplate.queryForObject(sql.toString(), new Object[]{userId, ROLE_AUDITOR}, Integer.class);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKActivityCategoryInfoDaoImpl.getAuthority failed, e : " + e);
+        }
+        return role;
+    }
+
+    @Override
+    // 查询所有“注意事项”
+    public List<Map<String, Object>> getNoticeList() {
+        List<Map<String, Object>> list = new ArrayList();
+        try {
+            StringBuffer sql = new StringBuffer("SELECT C_ID, C_NAME FROM T_EK_ACTIVITY_NOTICE_BASE" + " WHERE C_ISLIVE = '1' ORDER BY C_ID");
+            list = this.jdbcTemplate.queryForList(sql.toString());
+        } catch (Exception e) {
+            LOGGER.error("EKActivityCategoryInfoDaoImpl.getNoticeList failed, e : " + e);
+        }
+        return list;
+    }
+
+    @Override
+    // 查询已有的注意事项
+    public List<Map<String, Object>> getNoticeBef(String id) {
+        List<Map<String, Object>> list = new ArrayList();
+        try {
+            StringBuffer sql = new StringBuffer("SELECT T.C_NID, T.C_ORDER FROM T_EK_ACTIVITY_NOTICE_ACTIVITY T WHERE T.C_AID = ? ORDER BY T.C_ORDER");
+            list = this.jdbcTemplate.queryForList(sql.toString(), new Object[]{id});
+        } catch (Exception e) {
+            LOGGER.error("EKActivityCategoryInfoDaoImpl.getNoticeBef failed, e : " + e);
+        }
+        return list;
+    }
+
+    @Override
+    // 删除原有的所有“注意事项”
+    public void delNoticeBef(String id) {
+        try {
+            StringBuffer sql = new StringBuffer("DELETE FROM T_EK_ACTIVITY_NOTICE_ACTIVITY WHERE C_AID = ?");
+            this.jdbcTemplate.update(sql.toString(), new Object[]{id});
+        } catch (Exception e) {
+            LOGGER.error("EKActivityCategoryInfoDaoImpl.delNoticeBef failed, e : " + e);
+        }
+    }
+
+    @Override
+    // 更新活动的“注意事项”
+    public void updateNotice(String[] args) {
+        try {
+            List<String> newList = new ArrayList<>();
+            /** Arrays的asList方法返回的不是ArrayList, 所以不能使用add、remove方法，需要转成一个ArrayList之后再操作 */
+            newList.addAll(Arrays.asList(args));
+
+            newList.add(0, JdbcTemplateUtils.getSeqId(jdbcTemplate, "SEQ_EK_ACTIVITY_NOTICE_ACT"));
+            StringBuffer sql = new StringBuffer("INSERT INTO T_EK_ACTIVITY_NOTICE_ACTIVITY" +
+                    " (C_ID, C_AID, C_NID, C_ORDER) VALUES" +
+                    " (?, ?, ?, ?)");
+            this.jdbcTemplate.update(sql.toString(), newList.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKActivityCategoryInfoDaoImpl.updateNotice failed, e : " + e);
+        }
+    }
+
+}

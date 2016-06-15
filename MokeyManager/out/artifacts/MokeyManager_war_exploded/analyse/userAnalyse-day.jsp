@@ -1,0 +1,738 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>日用户分析</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<script type="text/javascript" charset="utf-8" src="${pageContext.request.contextPath}/js/jquery/jquery-1.11.1.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/table.css">
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/My97DatePicker/WdatePicker.js"></script>
+<%@ include file="../pages/chart.Inc.jsp"%>
+</head>
+
+<body >
+<div class="box_w"> 
+  <!--面包屑-->
+  <table width="100%" height="35"  border="0" align="center" cellpadding="0" cellspacing="0">
+    <tr>
+      <td class="c_gray">数据分析 <img class="m_0_10" src="${pageContext.request.contextPath}/image/dian2.jpg" width="9" height="9" />日用户分析 </td>
+    </tr>
+  </table>
+  <!--表格1-->
+  	<div class="w_100b bc_gray2  p_10 f_14" > 供应商
+    <select id="sup" name="sup" class="input_bor2 m_l_10"></select>
+    <span class="m_l_20"></span>
+    <span class="m_l_20">时间</span>
+    <span class="m_l_20">开始时间</span>
+    <input class="input_bor2 m_l_10" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="sDate" name="sDate" /> 
+    <span class="m_l_20">结束时间</span>
+    <input class="input_bor2 m_l_10" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="eDate" name="eDate" /> 
+    <button type="button" class="btn_orange f_r m_r_20" onclick="expForm();">导出报表</button>
+  </div>
+  <!--表格2-->
+  <div class="w_100b f_14 m_t_20" >
+	  <a data-type="1" name="dataTypeBut" class="btn_gray w_100" onclick="formData(1, this);">下载情况</a>
+	  <a data-type="2" name="dataTypeBut" class="btn_gray w_100" onclick="formData(2, this);">激活情况</a>
+	  <a data-type="3" name="dataTypeBut" class="btn_gray w_100" onclick="formData(3, this);">注册情况</a>
+	  <a data-type="4" name="dataTypeBut" class="btn_gray w_100" onclick="formData(4, this);">活跃情况</a>
+	  <a data-type="5" name="dataTypeBut" class="btn_gray w_100" onclick="formData(5, this);">留存情况</a>
+  </div>
+  <!--标题-->
+  <div class="w_100b t_c f_18 f_b m_t_20" id="dataTitle"></div>
+  <!--表格3-->
+  <table class="w_100b border_b t_c p_td_10 m_t_20" cellspacing="0" cellpadding="0">
+    <tbody id="dataTable"></tbody>
+  </table>
+</div>
+<!-- 图 -->
+<div id="highChartsGraph"></div>
+<form id="expForm" action="${pageContext.request.contextPath}/analyse/userAnalyseAction!exp.action" method="post">
+	<input type="hidden" id="title" name="title">
+	<input type="hidden" id="dataStr" name="dataStr">
+	<input type="hidden" id="exp_svg" name="svg">
+</form>
+<script type="text/javascript">
+$(function(){
+	getSuppliers();
+	formData(1);
+});
+function expForm() {
+	var flag = true;
+	$("a[name='dataTypeBut']").each(function(){
+		var _class = $(this).attr("class");
+		if (_class.indexOf('btn_orange2')>=0) {
+			flag = false;
+			var dataStr = "";
+			if ("1" == $(this).attr("data-type")) {
+				dataStr = "用户下载情况数据分析（日）";
+			} else if ("2" == $(this).attr("data-type")) {
+				dataStr = "用户激活情况数据分析（日）";
+			} else if ("3" == $(this).attr("data-type")) {
+				dataStr = "用户注册情况数据分析（日）";
+			} else if ("4" == $(this).attr("data-type")) {
+				dataStr = "用户活跃情况数据分析（日）";
+			} else {
+				dataStr = "用户留存情况数据分析（日）";
+			}
+			var sDate = $("#sDate").val();// 起始时间 2016-01-01
+			var eDate = $("#eDate").val();// 结束时间
+			var title = sDate + "至" + eDate + dataStr;
+			$("#title").val(title);
+			$("#dataStr").val(dataStr);
+			$("#expForm").submit();
+			return false;
+		}
+	});
+	if (flag) {
+		alert("查询后即可导出报表");
+		return;
+	}
+}
+// 设置点击的颜色为橙色，其他的为灰色
+function setDataTypeStyle(obj){
+	$("a[name='dataTypeBut']").each(function(){
+		$(this).attr("class","btn_gray w_100");
+	});
+	if (obj != null) {
+		$(obj).attr("class","btn_orange2 w_100");
+	} else {
+		$("a[name='dataTypeBut']").each(function(){
+			if ("1" == $(this).attr("data-type")) {
+				$(this).attr("class","btn_orange2 w_100");
+				return false;// return false相当于break, true相当于continue.(只写return相当于return false)
+			}
+		});
+	}
+}
+function getSuppliers(){
+	$.post("${pageContext.request.contextPath}/analyse/userAnalyseAction!getSuppliers.action", 
+		function(data){
+		var suppliers = data[0].suppliers;
+		var supStr = "";
+		if (suppliers.length > 1) {
+			supStr += "<option value='0'>全部</option>"
+		}
+		for (i = 0; i < suppliers.length; i++) {
+			supStr += "<option value='" + suppliers[i].C_SUPPLIER_CODE + "'>" + suppliers[i].C_SUPPLIER_NAME + "</option>";
+		}
+		$("#sup").append(supStr);	
+	},"json");
+}
+
+
+function formData(dataType, obj){
+	var url = "${pageContext.request.contextPath}/analyse/userAnalyseAction!analyse.action";
+	var sup = "";// 供应商
+	var sDate = "";// 起始时间
+	var eDate = "";// 结束时间
+	if (obj != null) {
+		sup = $("#sup").val();
+		sDate = $("#sDate").val();
+		eDate = $("#eDate").val();
+
+		if (sDate==null || sDate=="" || sDate=="undefined") {
+			alert("起始时间不能为空");
+			$("#sDate").focus();
+			return;
+		}
+		if (eDate==null || eDate=="" || eDate=="undefined") {
+			alert("结束时间不能为空");
+			$("#eDate").focus();
+			return;
+		} else {
+			var sTime = Date.parse(sDate);
+			var eTime = Date.parse(eDate);
+			if(sTime > eTime) {
+				alert("起始时间不能大于结束时间");
+				$("#sDate").focus();
+				return ;
+			}
+		}
+	} else {
+		sup = '0';
+
+		var date = new Date();
+		var _ym = date.getFullYear() + "-" + ((date.getMonth()+1)>=10 ? date.getMonth()+1 : "0"+(date.getMonth()+1).toString());
+		var _date = date.getDate();
+
+		eDate = _ym + "-" + _date;// 获取当前日
+
+		if (_date >= 3) {// 当前日的3天前
+			date.setDate(date.getDate()-2);
+			sDate = _ym + "-" + date.getDate();
+		} else {
+			sDate = _ym + "-01";
+		}
+	}
+	$("#sup").val(sup);
+	$("#sDate").val(sDate);
+	$("#eDate").val(eDate);
+
+	// 数据类型标签设置样式
+	setDataTypeStyle(obj);
+	
+	var timeType = "1";// 时间类型 1:日、2:周、3:月
+	$.post(url, {sup:sup,sDate:sDate,eDate:eDate,dataType:dataType,timeType:timeType}, function(data){
+		
+		var times = data[0].timeList;// 时间
+		var dataMap = data[0].dataMap;// 数据
+		var sup_cnt = dataMap.length;// 供应商的数量
+		var sup = times.shift();// 去除第一个元素"供应商"后剩余的元素
+		var tb_cnt = 0;// 表的数量
+		if (times.length <=3) {
+			tb_cnt = 1;
+		} else {
+			tb_cnt = (times.length % 3)==0 ? (times.length / 3) : parseInt(times.length / 3) + 1;// 共有几个表（时间/3）
+			
+		}
+		var headLine = "";
+		for (i=0; i<tb_cnt; i++) {
+			headLine += "<table class='w_100b border_b t_c p_td_10 m_t_20 f_14' cellspacing='0' cellpadding='0'>";
+			headLine = oneTable(headLine, sup, times, i, sup_cnt, dataMap, tb_cnt);
+			/*var oddData = times.length % 3;// oddData=0或1或2
+			if (times.length == 1){
+			 for (j=0; j<1; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<1; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<2; m++) {
+			 var _currCnt = parseInt(sup_data[m + 2 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "</tr>";
+			 } else if (times.length == 2) {
+			 for (j=0; j<2; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<2; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 var count_2 = 0;
+			 var count_3 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<4; m++) {
+			 var _currCnt = parseInt(sup_data[m + 4 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 if (m==2) {
+			 count_2 += _currCnt;
+			 }
+			 if (m==3) {
+			 count_3 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+			 headLine += "</tr>";
+			 } else {
+			 if (oddData==0) {
+			 for (j=0; j<3; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<3; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 var count_2 = 0;
+			 var count_3 = 0;
+			 var count_4 = 0;
+			 var count_5 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<6; m++) {
+			 var _currCnt = parseInt(sup_data[m + 6 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 if (m==2) {
+			 count_2 += _currCnt;
+			 }
+			 if (m==3) {
+			 count_3 += _currCnt;
+			 }
+			 if (m==4) {
+			 count_4 += _currCnt;
+			 }
+			 if (m==5) {
+			 count_5 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+			 headLine += "<td>" + count_4 + "</td><td>"  + count_5 + "</td>";
+			 headLine += "</tr>";
+			 }
+			 if (oddData==1) {
+			 if (i < tb_cnt-oddData) {
+			 for (j=0; j<3; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<3; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 var count_2 = 0;
+			 var count_3 = 0;
+			 var count_4 = 0;
+			 var count_5 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<6; m++) {
+			 var _currCnt = parseInt(sup_data[m + 6 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 if (m==2) {
+			 count_2 += _currCnt;
+			 }
+			 if (m==3) {
+			 count_3 += _currCnt;
+			 }
+			 if (m==4) {
+			 count_4 += _currCnt;
+			 }
+			 if (m==5) {
+			 count_5 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+			 headLine += "<td>" + count_4 + "</td><td>"  + count_5 + "</td>";
+			 headLine += "</tr>";
+			 } else {
+			 for (j=0; j<oddData; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<oddData; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<2; m++) {
+			 var _currCnt = parseInt(sup_data[m + 6 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "</tr>";
+			 }
+			 }
+			 if (oddData==2) {
+			 if (tb_cnt < 2) {
+			 for (j=0; j<3; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<3; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 var count_2 = 0;
+			 var count_3 = 0;
+			 var count_4 = 0;
+			 var count_5 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<6; m++) {
+			 var _currCnt = parseInt(sup_data[m + 6 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 if (m==2) {
+			 count_2 += _currCnt;
+			 }
+			 if (m==3) {
+			 count_3 += _currCnt;
+			 }
+			 if (m==4) {
+			 count_4 += _currCnt;
+			 }
+			 if (m==5) {
+			 count_5 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+			 headLine += "<td>" + count_4 + "</td><td>"  + count_5 + "</td>";
+			 headLine += "</tr>";
+			 }else {
+			 if (i <= tb_cnt-oddData) {
+			 for (j=0; j<3; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<3; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 var count_2 = 0;
+			 var count_3 = 0;
+			 var count_4 = 0;
+			 var count_5 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<6; m++) {
+			 var _currCnt = parseInt(sup_data[m + 6 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 if (m==2) {
+			 count_2 += _currCnt;
+			 }
+			 if (m==3) {
+			 count_3 += _currCnt;
+			 }
+			 if (m==4) {
+			 count_4 += _currCnt;
+			 }
+			 if (m==5) {
+			 count_5 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+			 headLine += "<td>" + count_4 + "</td><td>"  + count_5 + "</td>";
+			 headLine += "</tr>";
+			 } else {
+			 for (j=0; j<oddData; j++) {
+			 if (j == 0) {
+			 headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 } else {
+			 headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+			 }
+			 }
+
+			 headLine += "</tr>";
+
+			 headLine += "<tr class='bc_gray2 f_b'>";
+			 for (j=0; j<oddData; j++) {
+			 headLine += "<td>当日统计</td>";
+			 headLine += "<td>去年同比</td>";
+			 }
+			 headLine += "</tr>";
+
+			 var count_0 = 0;
+			 var count_1 = 0;
+			 var count_2 = 0;
+			 var count_3 = 0;
+			 for (j=0; j<sup_cnt; j++) {
+			 var tr_j = dataMap[j];
+			 var sup_name = tr_j.sup;// 供应商
+			 var sup_data = tr_j.data;// 数据
+			 headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+			 for (m=0; m<4; m++) {
+			 var _currCnt = parseInt(sup_data[m + 6 * i]);
+			 if (m==0) {
+			 count_0 += _currCnt;
+			 }
+			 if (m==1) {
+			 count_1 += _currCnt;
+			 }
+			 if (m==2) {
+			 count_2 += _currCnt;
+			 }
+			 if (m==3) {
+			 count_3 += _currCnt;
+			 }
+			 headLine += "<td>" + _currCnt + "</td>";
+			 }
+			 headLine += "</tr>";
+			 }
+			 headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+			 headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+			 headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+			 headLine += "</tr>";
+			 }
+			 }
+
+			 }
+			 }*/
+			headLine += "</table>";
+		}
+		if (obj != null) {
+			$("#dataTitle").text($(obj).text());
+		} else {
+			$("#dataTitle").text("下载情况");
+		}
+		$("#dataTable").empty();
+		$("#dataTable").append(headLine);
+		$("#highChartsGraph").highcharts($.parseJSON(data[0].chartData));
+		var _chartData = $("#highChartsGraph").highcharts().getSVG();
+		$("#exp_svg").val(_chartData);
+	},
+	"json");
+}
+function oneTable(headLine, sup, times, i, sup_cnt, dataMap, tb_cnt){
+	var tableCol = 0;// 最后一个表的列数（数据的列数，不含表头、供应商名称）
+
+	var oddData = times.length % 3;
+
+	if (times.length == 1) {// 一个table， 一列数据
+		tableCol = 1;
+	} else if (times.length == 2) {// 一个table， 两列数据
+		tableCol = 2;
+	} else {// 多个table
+		if (oddData == 0) {// 多个table，最后一个表三列数据
+			tableCol = 3;
+		} else if (oddData == 1) {// 多个table，最后一个表一列数据
+
+			if (i < tb_cnt-oddData) {// 前面的表
+				tableCol = 3;
+			} else {// 最后一个表
+				tableCol = 1;
+			}
+		} else if (oddData == 2) {// 多个table，最后一个表两列数据
+
+			if (i <= tb_cnt-oddData) {// 前面的表
+				tableCol = 3;
+			} else {// 最后一个表
+				tableCol = 2;
+			}
+		}
+	}
+
+	for (j=0; j<tableCol; j++) {
+		if (j == 0) {
+			headLine += "<tr class='bc_gray2 f_b'><td rowspan='2'>" + sup + "</td>";
+			headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+		} else {
+			headLine += "<td class='bc_gray1' colspan='2'>" + times[j + 3 * i] + "</td>";
+		}
+	}
+
+	headLine += "</tr>";
+
+	headLine += "<tr class='bc_gray2 f_b'>";
+	for (j=0; j<tableCol; j++) {
+		headLine += "<td>当日统计</td>";
+		headLine += "<td>上期同比</td>";
+	}
+	headLine += "</tr>";
+
+	var count_0 = 0;
+	var count_1 = 0;
+	var count_2 = 0;
+	var count_3 = 0;
+	var count_4 = 0;
+	var count_5 = 0;
+	for (j=0; j<sup_cnt; j++) {
+		var tr_j = dataMap[j];
+		var sup_name = tr_j.sup;// 供应商
+		var sup_data = tr_j.data;// 数据
+		headLine += "<tr class='bc_gray2 f_b'><td>" + sup_name + "</td>";
+		for (m=0; m<tableCol*2; m++) {
+			var _currCnt = parseInt(sup_data[m + 6 * i]);
+			if (tableCol==1) {
+				if (m==0) { count_0 += _currCnt; }
+				if (m==1) { count_1 += _currCnt; }
+			} else if (tableCol==2) {
+				if (m==0) { count_0 += _currCnt; }
+				if (m==1) { count_1 += _currCnt; }
+				if (m==2) { count_2 += _currCnt; }
+				if (m==3) { count_3 += _currCnt; }
+			} else if (tableCol==3) {
+				if (m==0) { count_0 += _currCnt; }
+				if (m==1) { count_1 += _currCnt; }
+				if (m==2) { count_2 += _currCnt; }
+				if (m==3) { count_3 += _currCnt; }
+				if (m==4) { count_4 += _currCnt; }
+				if (m==5) { count_5 += _currCnt; }
+			}
+			headLine += "<td>" + _currCnt + "</td>";
+		}
+		headLine += "</tr>";
+	}
+	headLine += "<tr class='bc_gray2 f_b'><td>合计</td>";
+	headLine += "<td>" + count_0 + "</td><td>"  + count_1 + "</td>";
+	if (tableCol==2) {
+		headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+	} else if (tableCol==3) {
+		headLine += "<td>" + count_2 + "</td><td>"  + count_3 + "</td>";
+		headLine += "<td>" + count_4 + "</td><td>"  + count_5 + "</td>";
+	}
+	headLine += "</tr>";
+	return headLine;
+}
+</script>
+</body>
+</html>

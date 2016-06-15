@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="analyse" extends="struts-default">
+		<action name="appUseInfo" method="AppUseList" class="AppUseInfo">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/AppUseInfo.jsp</result>
+		</action>
+		
+		<action name="newsAppUseInfoAction" method="NewsAppUseInfo" class="newsAppUseInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/newsAppUseInfo.jsp</result>
+		</action>
+
+		<action name="setAppInfo" method="SetAppList" class="SetAppInfo">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/SetAppInfo.jsp</result>
+		</action>
+
+		<action name="holdTypeInfo" method="HpldType" class="HoldTypeInfo">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/HoldType.jsp</result>
+		</action>
+		
+		<action name="userGrowth!*" method="{1}" class="userGrowthAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/UserGrowthInfo.jsp</result>
+			<result name="successMonth">/analyse/UserGrowthMonthInfo.jsp</result>
+		</action>
+		
+		<action name="aKeyControl!*" method="{1}" class="aKeyControlAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/AKeyControlInfo.jsp</result>
+			<result name="successUsageStat">/analyse/KeyUsageStat.jsp</result>
+		</action>
+		
+		<action name="userUseInfo!*" method="{1}" class="userUseInfoAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="successByDay">/analyse/UserUseByDay.jsp</result>
+			<result name="successByMonth">/analyse/UserUseByMonth.jsp</result>
+		</action>
+		
+		<action name="brandUserGrowth!*" method="{1}" class="brandUserGrowthAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/BrandUserGrowthInfo.jsp</result>
+			<result name="successMonth">/analyse/BrandUserGrowthMonthInfo.jsp</result>
+		</action>
+		
+		<!-- 行业品牌情况 -->
+		<action name="industryBrandAction!*" method="{1}" class="industryBrandAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/industryBrandInfo.jsp</result>
+		</action>
+		
+		<!-- 活动上下线情况 -->
+		<action name="actOnlineStatusAction!*" method="{1}" class="actOnlineStatusAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/actOnlineStatus.jsp</result>
+		</action>
+
+		<!-- 供应商用户数据统计 -->
+		<action name="userAnalyseAction!*" method="{1}" class="userAnalyseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/actOnlineStatus.jsp</result>
+			<result name="complex">/analyse/complexStatistics.jsp</result>
+			<result name="complexAll">/analyse/ekey/analyseAll.jsp</result>
+		</action>
+
+		<!-- e键用户综合数据统计 -->
+		<action name="ekeyUserAnalyseAction!*" method="{1}" class="ekeyUserAnalyseAction">
+			<result name="success">/analyse/ekey/userAnalyse.jsp</result>
+		</action>
+
+		<!-- e键按键使用情况统计 -->
+		<action name="ekeyKeyUsingAction!*" method="{1}" class="ekeyKeyUsingAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/analyse/actOnlineStatus.jsp</result>
+			<result name="keyUsingData">/analyse/ekey/keyUsingData.jsp</result>
+		</action>
+	</package>
+
+</struts>

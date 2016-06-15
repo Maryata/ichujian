@@ -1,0 +1,109 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>数据分析</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<script type="text/javascript" charset="utf-8" src="${pageContext.request.contextPath}/js/jquery/jquery-1.11.1.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/table.css">
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/My97DatePicker/WdatePicker.js"></script>
+
+</head>
+
+<body >
+<div class="box_w"> 
+  <!--面包屑-->
+  <table width="100%" height="35"  border="0" align="center" cellpadding="0" cellspacing="0">
+    <tr>
+      <td class="c_gray">数据分析 <img class="m_0_10" src="${pageContext.request.contextPath}/image/dian2.jpg" width="9" height="9" /> </td>
+    </tr>
+  </table>
+  <!--表格1-->
+  <form id="form0" action="${basePath}/analyse/userAnalyseAction!AllComplexStatistics.action" method="post">
+  	<div class="w_100b bc_gray2  p_10 f_14" > 供应商
+      <select id="sup" name="sup" class="input_bor2 m_l_10"></select>
+    <span class="m_l_20"></span>
+    <span class="m_l_20">开始时间</span>
+    <input class="input_bor2 m_l_10" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="sDate" name="sDate"  value="${sDate}"/>
+    <span class="m_l_20">结束时间</span>
+    <input class="input_bor2 m_l_10" type="text" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="eDate" name="eDate" value="${eDate}"/>
+    <button type="button" class="btn_orange f_r m_r_20" onclick="expForm();">导出报表</button>
+        <button type="button" class="btn_green f_r m_r_10" onclick="_query();">查　询</button>
+  </div>
+  </form>
+
+
+  <div class="w_100b t_c f_18 f_b m_t_20" id="dataTitle"></div>
+  <!--表格3-->
+  <table class="w_100b border_b t_c p_td_10 m_t_20" cellspacing="0" cellpadding="0">
+    <tbody id="dataTable"></tbody>
+  </table>
+</div>
+
+<form id="expForm" action="${pageContext.request.contextPath}/analyse/userAnalyseAction!exportAllComplexStatistics.action" method="post">
+
+</form>
+<script type="text/javascript">
+
+
+  function _query() {
+    var sDate = $("#sDate").val();// 起始时间 2016-01-01
+    var eDate = $("#eDate").val();// 结束时间
+    if (sDate==null || sDate=="" || sDate=="undefined") {
+      alert("起始时间不能为空");
+      return;
+    }
+    if (eDate==null || eDate=="" || eDate=="undefined") {
+      alert("结束时间不能为空");
+      return;
+    } else {
+      var sTime = Date.parse(sDate);
+      var eTime = Date.parse(eDate);
+      if(sTime > eTime) {
+        alert("起始时间不能大于结束时间");
+        return ;
+      }
+    }
+    $('#form0').submit();
+  }
+
+
+
+
+
+
+
+
+
+  $(function(){
+    getSuppliers();
+  });
+  function getSuppliers(){
+    $.post("${pageContext.request.contextPath}/analyse/userAnalyseAction!getSuppliers.action",
+            function(data){
+              var suppliers = data[0].suppliers;
+              var supStr = "";
+              if (suppliers.length > 1) {
+                supStr += "<option value='0'>全部</option>"
+              }
+              for (i = 0; i < suppliers.length; i++) {
+                supStr += "<option value='" + suppliers[i].C_SUPPLIER_CODE + "'>" + suppliers[i].C_SUPPLIER_NAME + "</option>";
+              }
+              $("#sup").append(supStr);
+            },"json");
+  }
+
+  function expForm() {
+
+        $("#expForm").submit();
+  }
+
+
+
+</script>
+</body>
+</html>

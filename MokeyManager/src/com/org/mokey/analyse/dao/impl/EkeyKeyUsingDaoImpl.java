@@ -1,0 +1,638 @@
+package com.org.mokey.analyse.dao.impl;
+
+import com.org.mokey.analyse.dao.EkeyKeyUsingDao;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/5.
+ */
+@Repository
+public class EkeyKeyUsingDaoImpl implements EkeyKeyUsingDao {
+
+    private static final Log LOGGER = LogFactory.getLog(EkeyKeyUsingDaoImpl.class);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+
+    /**
+     * 查询所有供应商的总数量
+     * @param supCodes
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    public List<Map<String, Object>>  countAll( List<String> supCodes, String sDate, String eDate){
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+         StringBuffer sql = new StringBuffer("SELECT C_DATE, SUM(C_DOWNLOAD) C_DOWNLOAD, " +
+                 "SUM(C_ACTIVE) C_ACTIVE," +
+                 " SUM(C_REGISTER) C_REGISTER, " +
+                 "SUM(C_START) C_START, " +
+                 "SUM(C_USEKEY) C_USEKEY, " +
+                 "SUM(C_USE) C_USE, " +
+                 "SUM(C_USE_FREECALL) C_USE_FREECALL FROM(" +
+                 "SELECT T.C_SUP, TO_CHAR( T.C_DATE, 'yyyy-MM-dd') , T.C_DOWNLOAD, T.C_ACTIVE, T.C_ACTIVE_RATE," +
+                 "T.C_REGISTER, T.C_REGISTER_RATE,T.C_START,T.C_USEKEY, T.C_USE," +
+                 "  T.C_USE_FREECALL   FROM T_EK_ANALYSE_DATA T WHERE SUBSTR(T.C_SUP , 6, 6) IN (:suppliers)" +
+                 " WHERE T.C_DATE >= TO_DATE(:sDate, 'yyyy-MM-dd')" +
+                 "   AND T.C_DATE < (TO_DATE(:eDate, 'yyyy-MM-dd') + 1" +
+                 "GROUP BY T.C_SUP, T.C_DATE, T.C_DOWNLOAD, T.C_ACTIVE, T.C_ACTIVE_RATE, T.C_REGISTER," +
+                 "   T.C_REGISTER_RATE,T.C_START,T.C_USEKEY,T.C_USE,T.C_USE_FREECALL)GROUP BY C_DATE");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfActiveUsers failed ! e : ", e);
+        }
+        return list;
+    }
+
+
+
+
+
+
+
+
+    @Override
+    // 查询激活用户数
+    public List<Map<String, Object>> countOfActiveUsers(String timePattern, List<String> supCodes, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            StringBuffer sql = new StringBuffer("SELECT * FROM (SELECT" +
+                    " TO_CHAR(T.C_ACTIONDATE, '" + timePattern + "') DAY, COUNT(*) TOTAL" +
+                    " FROM T_ACTION_ACTIVE T WHERE SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " AND T.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND T.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " GROUP BY TO_CHAR(T.C_ACTIONDATE, '" + timePattern + "')) ORDER BY DAY");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfActiveUsers failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    // 查询指定时间段每个按键每天的使用人数
+    public List<Map<String, Object>> countOfUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            StringBuffer sql = new StringBuffer("SELECT DAY, KEY, COUNT(distinct C_IMEI) TOTAL" +
+                    " FROM (SELECT U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "') DAY, U.C_KEY KEY" +
+                    " FROM T_ACTION_USEAPP U, T_ACTION_ACTIVE T WHERE U.C_IMEI = T.C_IMEI" +
+                    " AND SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND U.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " GROUP BY U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "'), U.C_KEY)" +
+                    " GROUP BY DAY, KEY ORDER BY DAY, KEY");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfUsingUser failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    // 查询截至sDate这一时间之前激活用户数
+    public long countOfActiveUsersUtilSDate(String timePattern, List<String> supCodes, String sDate) {
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            StringBuffer sql = new StringBuffer("SELECT COUNT(*) FROM T_ACTION_ACTIVE T" +
+                    " WHERE SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " AND T.C_ACTIONDATE < TO_DATE(:sDate, '" + timePattern + "') + 1");
+            return namedParameterJdbcTemplate.queryForObject(sql.toString(), paramMap, Integer.class);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfActiveUsersUtilSDate failed ! e : ", e);
+        }
+        return 0;
+    }
+
+    @Override
+    // 查询指定时间段每个按键每天的使用次数
+    public List<Map<String, Object>> timesOfUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            StringBuffer sql = new StringBuffer("SELECT TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "') DAY," +
+                    " U.C_KEY KEY, COUNT(U.C_KEY) TOTAL FROM T_ACTION_USEAPP U, T_ACTION_ACTIVE T" +
+                    " WHERE U.C_IMEI = T.C_IMEI AND SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND U.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " GROUP BY TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "'), U.C_KEY");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.timesOfUsingUser failed ! e : ", e);
+        }
+        return list;
+    }
+
+
+    @Override
+    // 查询任意按键人数
+    public List<Map<String, Object>> countOfAllUseKeys(String timePattern, List<String> supCodes, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            StringBuffer sql = new StringBuffer("SELECT  DAY,CODE, COUNT(distinct C_IMEI) TOTAL" +
+                    " FROM (SELECT SUBSTR(T.C_ACTIVECODE, 6, 6) CODE," +
+                    " U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "') DAY" +
+                    " FROM T_ACTION_USEAPP U, T_ACTION_ACTIVE T WHERE U.C_IMEI = T.C_IMEI" +
+                    " AND U.C_KEY in(1,2,3,4) AND U.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " GROUP BY SUBSTR(T.C_ACTIVECODE, 6, 6)," +
+                    " U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "'))" +
+                    " GROUP BY CODE, DAY ORDER BY DAY, CODE");
+            System.out.println(sql + "=============");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfUsingUser failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    // 使用数和任意按键数的合计
+    public List<Map<String, Object>> countOfuseAndKeysAll(String timePattern, List<String> supCodes, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            StringBuffer sql = new StringBuffer("SELECT  DAY,CODE, COUNT(distinct C_IMEI) TOTAL" +
+                    " FROM (SELECT SUBSTR(T.C_ACTIVECODE, 6, 6) CODE," +
+                    " U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "') DAY" +
+                    " FROM T_ACTION_USEAPP U, T_ACTION_ACTIVE T WHERE U.C_IMEI = T.C_IMEI" +
+                    " AND U.C_KEY in(0,1,2,3,4) AND U.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " GROUP BY SUBSTR(T.C_ACTIVECODE, 6, 6)," +
+                    " U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "'))" +
+                    " GROUP BY CODE, DAY ORDER BY DAY, CODE");
+            System.out.println(sql.toString() + "合计");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfUsingUser failed ! e : ", e);
+        }
+        return list;
+    }
+
+
+
+
+
+    @Override
+    // 查询使用人数
+    public List<Map<String, Object>> countOfAllUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("suppliers", supCodes);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            System.out.println(sDate + "开始时间");
+            System.out.println(eDate + "结束时间");
+         /*   StringBuffer sql = new StringBuffer("SELECT DAY,COUNT(C_IMEI) TOTAL" +
+                    " FROM (SELECT U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "') DAY" +
+                    " FROM T_ACTION_USEAPP U, T_ACTION_ACTIVE T WHERE U.C_IMEI = T.C_IMEI" +
+                    "  AND U.C_KEY = '0'AND SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND U.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " GROUP BY U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "'))" +
+                    " GROUP BY DAY ORDER BY DAY");
+*/
+            StringBuffer sql = new StringBuffer("SELECT  DAY,CODE, COUNT(C_IMEI) TOTAL" +
+                    " FROM (SELECT SUBSTR(T.C_ACTIVECODE, 6, 6) CODE," +
+                    " U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "') DAY" +
+                    " FROM T_ACTION_USEAPP U, T_ACTION_ACTIVE T WHERE U.C_IMEI = T.C_IMEI" +
+                    " AND U.C_KEY = '0' AND U.C_ACTIONDATE < TO_DATE(:eDate, '" + timePattern + "') + 1" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(:sDate, '" + timePattern + "')" +
+                    " AND SUBSTR(T.C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " GROUP BY SUBSTR(T.C_ACTIVECODE, 6, 6)," +
+                    " U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, '" + timePattern + "'))" +
+                    " GROUP BY CODE, DAY ORDER BY DAY, CODE");
+            System.out.println(sql + "=============");
+            list = namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("EkeyKeyUsingDaoImpl.countOfUsingUser failed ! e : ", e);
+        }
+        return list;
+    }
+
+    /**
+     * 注册用户
+     *
+     * @param
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> registerUser(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT TO_CHAR(T.C_ACTIONDATE,'yyyy-MM-dd') AS DAY,TEMI.C_IMEI" +
+                    " FROM T_EK_MEMBER_INFO T" +
+                    " LEFT JOIN T_EK_MEMBER_IMEI TEMI ON TEMI.C_UID = T.C_ID" +
+                    " WHERE T.C_ACTIONDATE>=TO_DATE (:sDate , 'yyyy-MM-dd')" +
+                    "AND  T.C_ACTIONDATE< TO_DATE (:eDate , 'yyyy-MM-dd')+1 AND T .C_SUPCODE IN (:suppliers)";
+           /* String sql ="SELECT wm_concat(C_IMEI) AS C_IMEI,DAY,C_UID FROM (" +
+                    " SELECT C_IMEI,DAY,C_UID FROM (" +
+                    " SELECT TO_CHAR (T .C_ACTIONDATE,'yyyy-MM-dd') AS DAY,TEMI.C_IMEI,TEMI.C_UID" +
+                    " FROM T_EK_MEMBER_INFO T" +
+                    " LEFT JOIN T_EK_MEMBER_IMEI TEMI ON TEMI.C_UID = T .C_ID" +
+                    " LEFT JOIN T_ACTION_ACTIVE TAA ON TAA.C_IMEI=TEMI.C_IMEI" +
+                    " WHERE T .C_ACTIONDATE >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND T .C_ACTIONDATE < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  T.C_SUPCODE IN (:suppliers))" +
+                    " GROUP BY C_IMEI,DAY,C_UID) GROUP BY DAY,C_UID";*/
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.registerUser failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 日启动用户
+     *
+     * @param
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> startUser(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT SUBSTR (T .C_ACTIVECODE, 6, 6) CODE,U .C_IMEI,TO_CHAR (U .C_ACTIONDATE,'yyyy-MM-dd') AS DAY" +
+                    " FROM T_ACTION_USEAPP U,T_ACTION_ACTIVE T" +
+                    " WHERE U .C_IMEI = T .C_IMEI AND U .C_ACTIONDATE >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND U .C_ACTIONDATE < TO_DATE (:eDate, 'yyyy-MM-dd') + 1 " +
+                    " AND SUBSTR (T .C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " GROUP BY SUBSTR (T .C_ACTIVECODE, 6, 6),U .C_IMEI,TO_CHAR (U .C_ACTIONDATE,'yyyy-MM-dd')";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.startUser failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 周内启动一次以上用户
+     *
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> weekNStartUser(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT M.C_IMEI,COUNT(M.C_IMEI) AS SUM  FROM (" +
+                    " SELECT SUBSTR (T .C_ACTIVECODE, 6, 6) CODE,U .C_IMEI,TO_CHAR (U .C_ACTIONDATE,'yyyy-MM-dd') AS DAY" +
+                    " FROM T_ACTION_USEAPP U,T_ACTION_ACTIVE T" +
+                    " WHERE U .C_IMEI = T .C_IMEI AND U .C_ACTIONDATE >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND U .C_ACTIONDATE < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND SUBSTR (T .C_ACTIVECODE, 6, 6) IN (:suppliers)" +
+                    " GROUP BY SUBSTR (T .C_ACTIVECODE, 6, 6),U .C_IMEI,TO_CHAR (U .C_ACTIONDATE,'yyyy-MM-dd')" +
+                    " ) M GROUP BY M.C_IMEI ORDER BY COUNT(M.C_IMEI) DESC";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.weekNStartUser failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 注册数量查询
+     *
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> registerCount(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT COUNT (*) AS TOTAL,TO_CHAR (C_ACTIONDATE, 'yyyy-MM-dd') AS DAY" +
+                    " FROM T_EK_MEMBER_INFO WHERE" +
+                    " C_ACTIONDATE >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND C_ACTIONDATE < TO_DATE (:eDate, 'yyyy-MM-dd') + 1 AND C_SUPCODE IN (:suppliers)" +
+                    " GROUP BY TO_CHAR (C_ACTIONDATE, 'yyyy-MM-dd')";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.registerCount failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 激活用户数
+     *
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> activityUser(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT TO_CHAR (T .C_ACTIONDATE,'yyyy-MM-dd') AS DAY,T.C_IMEI" +
+                    " FROM T_ACTION_ACTIVE T" +
+                    " WHERE T .C_ACTIONDATE >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    "AND T .C_ACTIONDATE < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  SUBSTR(T.C_ACTIVECODE,6,6)  IN (:suppliers)";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.activityUser failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 激活数量
+     *
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> activityUserCount(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT M.DAY,COUNT(M.C_IMEI) AS TOTAL FROM (" +
+                    " SELECT TO_CHAR (T .C_ACTIONDATE,'yyyy-MM-dd') AS DAY,T.C_IMEI" +
+                    " FROM T_ACTION_ACTIVE T" +
+                    " WHERE T .C_ACTIONDATE >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    "AND T .C_ACTIONDATE < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  SUBSTR(T.C_ACTIVECODE,6,6)  IN (:suppliers)" +
+                    " ) M GROUP BY M.DAY";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.activityUserCount failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 查询日期 前1天，6天，29天 总人数
+     *
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> freeCallUserCount(List<String> suppliers,String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT COUNT(C_FYACCOUNTID) AS TOTAL,DAY FROM(" +
+                    " SELECT T.C_FYACCOUNTID,TO_CHAR(TO_DATE(T.C_CREATEDATE,'YYYY-MM-DD HH24:MI:SS'),'yyyy-MM-dd') AS DAY  FROM" +
+                    " T_FY_USER T,T_EK_MEMBER_INFO TEMI\n" +
+                    " WHERE TEMI.C_PHONENUM=T.C_GLOBALMOBILEPHONE AND TO_DATE(T.C_CREATEDATE,'YYYY-MM-DD HH24:MI:SS')>= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND TO_DATE(T.C_CREATEDATE,'YYYY-MM-DD HH24:MI:SS')< TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  TEMI.C_SUPCODE IN (:suppliers) AND T.C_STATUS=1" +
+                    " ) GROUP BY DAY";
+           /* String sql = "SELECT COUNT(C_FYACCOUNTID) AS TOTAL,DAY FROM(" +
+                    " SELECT C_FYACCOUNTID,DAY,SUM(TIME) FROM (" +
+                    " SELECT T.C_FYACCOUNTID,TO_CHAR (T.C_TIME,'yyyy-MM-dd') AS DAY," +
+                    " (TFC.C_CALLENDTIME-TFC.C_CALLSTARTTIME) AS TIME,TFU.C_GLOBALMOBILEPHONE" +
+                    " FROM T_FY_AUTH  T,T_FY_CALLHIS TFC,T_FY_USER TFU,T_EK_MEMBER_INFO TEMI" +
+                    " WHERE TFC.C_FYCALLID=T.C_FYCALLID  AND TFU.C_FYACCOUNTID=T.C_FYACCOUNTID " +
+                    " AND TEMI.C_PHONENUM=TFU.C_GLOBALMOBILEPHONE AND T .C_TIME >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND T .C_TIME < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  TEMI.C_SUPCODE IN (:suppliers)" +
+                    " ) GROUP BY C_FYACCOUNTID,DAY" +
+                    " ) GROUP BY DAY";*/
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.freeCallUserCount failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 查询日期  前1天，6天，29天  总列表
+     *
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> BeforeFellCallUser(List<String> suppliers,String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT C_FYACCOUNTID AS C_IMEI,DAY,SUM(TIME) AS TIME FROM (" +
+                    " SELECT T.C_FYACCOUNTID,TO_CHAR (T.C_TIME,'yyyy-MM-dd') AS DAY," +
+                    " CEIL((TFC.C_CALLENDTIME-TFC.C_CALLSTARTTIME)/(1000*60)) AS TIME " +
+                    " FROM T_FY_AUTH  T,T_FY_CALLHIS TFC,T_FY_USER TFU,T_EK_MEMBER_INFO TEMI" +
+                    " WHERE TFC.C_FYCALLID=T.C_FYCALLID AND TFU.C_FYACCOUNTID=T.C_FYACCOUNTID" +
+                    " AND TEMI.C_PHONENUM=TFU.C_GLOBALMOBILEPHONE AND T .C_TIME >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND T .C_TIME < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  TEMI.C_SUPCODE IN (:suppliers)" +
+                    " ) GROUP BY C_FYACCOUNTID,DAY";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.BeforeFellCallUser failed ! e :", e);
+        }
+        return list;
+    }
+
+    /**
+     * 查询日期  前1天，6天，29天 前注册  总列表
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> _BeforeFellCallUser(List<String> suppliers, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT C_FYACCOUNTID AS C_IMEI,DAY FROM(" +
+                    " SELECT T.C_FYACCOUNTID,TO_CHAR(TO_DATE(T.C_CREATEDATE,'YYYY-MM-DD HH24:MI:SS'),'yyyy-MM-dd') AS DAY  FROM " +
+                    " T_FY_USER T,T_EK_MEMBER_INFO TEMI\n" +
+                    " WHERE TEMI.C_PHONENUM=T.C_GLOBALMOBILEPHONE AND TO_DATE(T.C_CREATEDATE,'YYYY-MM-DD HH24:MI:SS')>= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND TO_DATE(T.C_CREATEDATE,'YYYY-MM-DD HH24:MI:SS')< TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  TEMI.C_SUPCODE IN (:suppliers) AND T.C_STATUS=1" +
+                    " ) GROUP BY C_FYACCOUNTID,DAY";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl._BeforeFellCallUser failed ! e :", e);
+        }
+        return list;
+    }
+
+
+    /**
+     * 查询  六天内或29天内免费通话人数
+     *
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> NFreeCallStartUser(List<String> suppliers,String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("suppliers", suppliers);
+            paramMap.put("sDate", sDate);
+            paramMap.put("eDate", eDate);
+            String sql = "SELECT COUNT(C_FYACCOUNTID) AS SUM,C_FYACCOUNTID AS C_IMEI,SUM(TIME) AS TIME FROM (" +
+                    " SELECT T.C_FYACCOUNTID,TO_CHAR (T.C_TIME,'yyyy-MM-dd') AS DAY,CEIL((TFC.C_CALLENDTIME-TFC.C_CALLSTARTTIME)/(1000*60)) AS TIME" +
+                    " FROM T_FY_AUTH  T,T_FY_CALLHIS TFC,T_FY_USER TFU,T_EK_MEMBER_INFO TEMI" +
+                    " WHERE TFC.C_FYCALLID=T.C_FYCALLID AND TFU.C_FYACCOUNTID=T.C_FYACCOUNTID" +
+                    " AND TEMI.C_PHONENUM=TFU.C_GLOBALMOBILEPHONE AND T .C_TIME >= TO_DATE (:sDate, 'yyyy-MM-dd')" +
+                    " AND T .C_TIME < TO_DATE (:eDate, 'yyyy-MM-dd') + 1" +
+                    " AND  TEMI.C_SUPCODE IN (:suppliers)" +
+                    " ) GROUP BY C_FYACCOUNTID";
+            list = namedParameterJdbcTemplate.queryForList(sql, paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.NFreeCallStartUser failed ! e :", e);
+        }
+        return list;
+    }
+
+
+
+    @Override
+    // 查询该时间段所有启动过的用户
+    public List<Map<String, Object>> allUsingUser(String supCode, String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, 'yyyy-MM-dd') DAY" +
+                    " FROM T_ACTION_ACTIVE T, T_ACTION_USEAPP U WHERE T.C_IMEI = U.C_IMEI" +
+                    " AND U.C_ACTIONDATE >= TO_DATE(?, 'yyyy-MM-dd')" +
+                    " AND U.C_ACTIONDATE < TO_DATE(?, 'yyyy-MM-dd') + 1 AND U.C_KEY = '0'" +
+                    " AND U.C_IMEI NOT IN ('0', '000000000000000')";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            if (!"0".equals(supCode)) {
+                sql += " AND SUBSTR(T.C_ACTIVECODE, 6, 6) = ?";
+                args.add(supCode);
+            }
+            sql += " GROUP BY U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, 'yyyy-MM-dd') ORDER BY TO_CHAR(U.C_ACTIONDATE, 'yyyy-MM-dd')";
+
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+
+        } catch (DataAccessException e) {
+            LOGGER.error("UserAnalyseOfDayDaoImpl.stayingDataAllMonth failed ! e :", e);
+        }
+        return list;
+    }
+
+//    @Override
+//    public List<Map<String, Object>> countOfAllUsingUser(String supCode, String sDate, String eDate) {
+//        List<Map<String, Object>> list = new ArrayList<>();
+//        try {
+//            String sql = "SELECT SUM(CT) CNT, DAY FROM (" +
+//                    " SELECT COUNT(U.C_IMEI) CT, TO_CHAR(U.C_ACTIONDATE, 'yyyy-MM-dd') DAY" +
+//                    " FROM T_ACTION_ACTIVE T, T_ACTION_USEAPP U WHERE T.C_IMEI = U.C_IMEI" +
+//                    " AND U.C_ACTIONDATE >= TO_DATE(?, 'yyyy-MM-dd')" +
+//                    " AND U.C_ACTIONDATE < TO_DATE(?, 'yyyy-MM-dd') + 1 AND U.C_KEY = '0'" +
+//                    " AND U.C_IMEI NOT IN ('0', '000000000000000')";
+//            List<Object> args = new ArrayList<>();
+//            args.add(sDate);
+//            args.add(eDate);
+//            if (!"0".equals(supCode)) {
+//                sql += " AND SUBSTR(T.C_ACTIVECODE, 6, 6) = ?";
+//            }
+//            sql += " GROUP BY U.C_IMEI, TO_CHAR(U.C_ACTIONDATE, 'yyyy-MM-dd')) GROUP BY DAY ORDER BY DAY";
+//
+//            list = jdbcTemplate.queryForList(sql, args.toArray());
+//
+//        } catch (DataAccessException e) {
+//            LOGGER.error("UserAnalyseOfDayDaoImpl.stayingDataAllMonth failed ! e :", e);
+//        }
+//        return list;
+//    }
+
+
+}

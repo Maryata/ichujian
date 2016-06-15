@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>活动详情</title>
+<style>
+img{ width: 100%;}
+body{ line-height: 12px; font-size: 9px;}
+.zsy_box{ width: 100%; overflow: hidden;}
+p {
+    margin: 0;
+    line-height: 20px;
+}
+</style>
+</head>
+<body >
+<div class="zsy_box">
+    ###C_FULL_DETAIL###
+</div>
+</body>
+</html>

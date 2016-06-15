@@ -1,0 +1,19 @@
+根据现在需求建立了5各模块
+1 analyse  运营分析模块
+2 basedata 基础信息模块
+  2.1 baseinfo 设备、激活等基础信息
+  2.2 sysinfo 系统基础字典表
+3 common  公共模块  放置了公用工具以及公共类
+4 report  报表模块
+5 system  系统级模块  系统登录、退出、修改密码等
+
+各自模块中结构：
+action
+service
+service.impl
+dao
+dao.impl
+entiy
+根据个人的开发模块把package建立完全后把该文件删除
+另外所有的struts配置文件也需要根据模块分文件定义  例如：基础信息模块应该有一个struts-basedata.xml
+spring文件同样有各自模块的配置文件   例如：基础信息模块应该有一个applicationContext-basedata.xml

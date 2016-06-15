@@ -1,0 +1,153 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{ 
+	padding: 0px;
+	margin: auto;
+	FONT: 12px/1.6em Verdana, Arial, sans-serif;
+	text-align:center;
+	background-color:#E1E1E1;
+	color:#000;
+	background-repeat: repeat-x;
+	}
+
+table{ font-size:12px; color:#666;}
+
+#layout{
+	position: absolute;/*--绝对定位--*/
+	top: 50px;
+	left: 50%;
+	margin-top: 0px;/*--div高度的一半--*/
+	margin-left: -325px;/*--div宽度的一半--*/
+	width: 650px;	
+	height: 430px;
+	background-image:url(../image/login.jpg);
+	}
+.mlearning_logo{
+	position: absolute;/*--绝对定位--*/
+	top: 80px;
+	left: 50%;
+	margin-left: -92px;/*--div宽度的一半--*/
+	width: 184px;	
+	height: 81px;
+	}
+.customer_logo{
+	position: absolute;/*--绝对定位--*/
+	top: 58px;
+	left: 50%;
+	margin-left: 420px;/*--div宽度的一半--*/
+	width: 72px;	
+	height: 33px;
+	font-weight:bold;
+	font-size:14px;
+	}
+.bottom{
+	position: absolute;/*--绝对定位--*/
+	top: 400px;
+	left:50%;
+	padding-top:5px;
+	margin-top:50px;
+	padding-bottom:5px;
+	margin-left: -325px;/*--div宽度的一半--*/
+	width: 650px;	
+	color:#ffffff;
+	}
+.login {
+	position: absolute;/*--绝对定位--*/
+	top: 240px;
+	left: 50%;
+	margin-top: -63px;/*--div高度的一半--*/
+	margin-left: -210px;/*--div宽度的一半--*/
+	width: 460px;	
+	float:left;
+} 
+.btn_login{
+		background:url(../image/btn_login1.gif) repeat-x;
+		height:27px;
+		width:125px;
+		border:0px;
+		padding:2px 8px 0px 8px;
+		margin-right:5px;
+		font-size:12px;
+		font-weight:bold;
+		color:#fff;
+}
+.btn_re{
+		background:url(../image/btn_re1.gif) repeat-x;
+		height:27px;
+		width:125px;
+		border:0px;
+		padding:2px 8px 0px 8px;
+		margin-right:5px;
+		font-size:12px;
+		font-weight:bold;
+}
+.error {
+	float:left;
+	margin-left:2px;
+	margin-top:53px;
+	width:540px;
+	height:50px;
+	background-color:#ffffff;
+	border:1px solid #ff0000;
+} 
+
+.font_login {
+	color: #000; 
+	font-size:12px;
+}
+
+.nTab{ 
+float: left; 
+width: 100%;
+margin-top:20px;
+} 
+.nTab .TabTitle{ 
+clear: both; 
+height: 35px; 
+overflow: hidden;
+} 
+.nTab .TabTitle ul{ 
+border:0; 
+margin:0; 
+padding:0;
+} 
+.nTab .TabTitle li{ 
+float: left; 
+width: 150px;
+height:35px;
+cursor: pointer; 
+padding-top: 6px; 
+padding-right: 0px; 
+padding-left: 0px; 
+padding-bottom: 10px; 
+list-style-type: none; 
+} 
+.nTab .TabTitle .active{
+width: 179px;
+border: 0px;
+padding-top: 10px;
+margin-top:2px;
+font-weight:bold;
+font-size:14px;
+text-align:center;
+background-image:url(../image/login_tap12.gif);
+} 
+.nTab .TabTitle .normal{ 
+width: 181px;
+border: 0px;
+padding-top: 10px;
+margin-top:2px;
+font-weight:bold;
+font-size:14px;
+color:#999;
+text-align:center;
+background-image:url(../image/login_tap21.gif);
+} 
+.nTab .TabContent{ 
+width:auto;
+text-align:left;
+margin: 0px auto; 
+padding:0px; 
+} 
+.none {display:none;} 

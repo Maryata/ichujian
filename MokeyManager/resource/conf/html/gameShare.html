@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no">
+  <title>###C_NAME###</title>
+  <link rel="stylesheet" href="http://www.ichujian.com/static/game/css/css.css" />
+    
+    <!--demo展示所用css end-->
+    <!--组件依赖css begin-->
+    <link rel="stylesheet" type="text/css" href="http://www.ichujian.com/static/game/css/widget/slider/slider.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.ichujian.com/static/game/css/widget/slider/slider.default.css" /> <!--皮肤文件，若不使用该皮肤，可以不加载-->
+    <!--组件依赖css end-->
+  </head>
+  <body>
+  <input hidden id="appId" value="###C_ID###"><!-- app id -->
+  <input hidden id="sign" value="###sign###"><!-- sign -->
+  <div class="head_img"><img src="###C_LOGOURL###" ></div>
+  <div class="app_title">
+    <h1>###C_NAME###</h1>
+    <!--<p class="hot"><img id="img_score" src="http://www.ichujian.com/static/game/images/score_3.png" ></p>
+    --><p><span>###C_VERSION###</span>|<span>###C_SIZE###</span></p> <!-- |<span id="span_numberOfDownloads"></span> -->
+  
+  </div>
+  <div class="banner_box">   
+    <h2><span>游戏图片</span></h2>
+    <!-- 图片代码 开始 -->
+<div id="slider"></div>
+<!-- 图片代码 结束 -->
+
+    <h2><span>游戏简介</span></h2>
+    <div style=" width:95%; overflow:hidden; margin:10px 10px 100px; float:left">
+    <!-- 更多收回 -->
+      <p class="t-a">更新日期：###C_DATE###</p>
+      <p>
+      ###C_ABSTRACT1###
+      <span id="txt" class="none">###C_ABSTRACT2###</span>
+      <span id="btn" class="brand-nav-on">更多</span>
+      </p>
+      <!-- 更多收回 END -->
+    </div>
+  </div>
+  <div class="download_bg">
+  	<a href="###C_APPURL###" class="download_btn">下载</a>
+  </div>
+   <!--组件依赖js begin-->
+    <script type="text/javascript" src="http://www.ichujian.com/static/game/js/zepto.js"></script>
+	<script type="text/javascript" src="http://gmu.baidu.com/demo/mobileevent2pc.js"></script>      <!--此js为在PC端方便查看效果，用在手机上，可去掉此js-->
+    <script type="text/javascript" src="http://www.ichujian.com/static/game/js/touch.js"></script>      <!--新版zepto合并版中不包括touch.js-->
+    <script type="text/javascript" src="http://www.ichujian.com/static/game/js/zepto.extend.js"></script>
+    <script type="text/javascript" src="http://www.ichujian.com/static/game/js/zepto.ui.js"></script>
+    <script type="text/javascript" src="http://www.ichujian.com/static/game/js/widget/slider.js"></script>
+    <!--组件依赖js end-->
+	<script>
+
+    //创建slider组件
+    var slider = $.ui.slider('#slider', {
+        autoPlay:false,
+        showArr:false,
+        viewNum:3,
+        content:###IMGARRAY###
+    });
+</script>
+<!-- 图片高度自适应 -->
+<script type="text/javascript" src="http://www.ichujian.com/static/game/js/jquery.js"></script>
+<script type="text/javascript" src="http://www.ichujian.com/static/game/js/game.js"></script>
+<!-- 更多收回JS/CSS -->
+<script>//判断文字的class是否为none，替换样式inline或none
+     $(document).ready(function(){
+            $("#btn").click(function(){
+                if($("#txt").attr('class')=="none"){
+                    $("#txt").attr({ "class":"inline"});
+                    $("#btn").html('收回');
+                }else{
+                    $("#txt").attr({ "class":"none"});
+                    $("#btn").html('更多');
+                }
+            });
+			$("#btn").click(function(){    
+	 $( "#btn" ).toggleClass( "brand-nav-off", 500 );
+	
+  });
+        })
+</script>
+<style>
+.none{display:none;}
+.inline{display:inline;}
+#btn{color:#ff6b21; cursor:pointer; display:block; width:40px;height:20px; margin:5px auto;}
+.t-a{ text-align:right;}
+</style>
+<!-- 更多收回JS/CSS END -->
+<script type="text/javascript">
+$(window).load(function(){
+	img_height = $('.ui-slider-item').children().children('img').height();
+	$('#slider').css('height',img_height + 'px');
+	
+	//var appId = $("#appId").val();
+	//var sign = $("#sign").val();
+	
+	//if( appId ) {
+		//通过游戏ID获取游戏详情 并在span内显示下载数量，替换评分图片url
+	//	Game.dynamicProcessing(appId, sign);
+		
+		// 通过游戏ID获取下载数并在span内显示
+		//Game.getNumberOfDownloadsToSpanByAppId('span_numberOfDownloads', appId);
+		// 通过游戏ID获取游戏评分并替换评分图片url
+		//Game.getScoreByAppid('img_score', appId);
+	//}
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+package com.org.mokey.analyse.action;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.JSONException;
+
+import com.org.mokey.analyse.entiy.UserGrowthBean;
+import com.org.mokey.analyse.service.UserGrowthService;
+import com.org.mokey.common.AbstractAction;
+import com.org.mokey.common.util.ApDateTime;
+import com.org.mokey.common.util.zingchart.ChartUtils;
+import com.org.mokey.util.StrUtils;
+
+/**
+ * 运营分析-日用户增长情况
+ * @author giles
+ *
+ */
+@SuppressWarnings("serial")
+public class UserGrowthAction extends AbstractAction {
+
+	private UserGrowthService userGrowthService;
+	
+	public String getUserGrowthList() {
+		HttpServletRequest request = getRequest();
+
+		String method = request.getParameter("method");
+		
+		String startdate = getParameter("startdate");
+		String enddate = getParameter("enddate");
+		
+		if(StrUtils.isEmpty(startdate)){
+			startdate = ApDateTime.dateAdd("d", -7, new java.util.Date(), ApDateTime.DATE_TIME_YMD);
+		}
+		if(StrUtils.isEmpty(enddate)){
+			enddate = ApDateTime.getNowDateTime(ApDateTime.DATE_TIME_YMD);
+		}
+		
+		request.setAttribute("startdate", startdate);
+		request.setAttribute("enddate", enddate);
+		//String path =getRequest().getContextPath()+"/analyse/userGrowth!getUserGrowthList.action?method=getFlashChartData&startdate="+startdate+"&enddate="+enddate;
+		//getRequest().setAttribute("dataurl", path);
+		try{
+			Map<String,Object> userMap = userGrowthService.getUserGrowthList(startdate, enddate);
+			if(StrUtils.isNotEmpty(method)){
+				this.getFlashChartData(request, userMap);
+				return NONE;
+			}else{
+				request.setAttribute("nowDays", userMap.get("nowDays"));
+				request.setAttribute("nowList", userMap.get("nowList"));
+				request.setAttribute("lastList", userMap.get("lastList"));
+			}
+			//------
+		}catch(Exception e){
+			log.error("getUserGrowthList failed,",e);
+		}
+		return "success";
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String getFlashChartData(HttpServletRequest request,Map<String,Object> userMap) throws JSONException {
+		List<String> nowDays = (List<String>) userMap.get("nowDays");
+		Map<String,UserGrowthBean> nowList = (Map<String, UserGrowthBean>) userMap.get("nowList");
+		int max = nowDays.size();
+		
+		String[] xtitle = new String[2] ;
+    	xtitle[0]="安装情况";
+    	xtitle[1]="激活情况";
+    	
+		String[][] data = new String[2][max-1];
+		UserGrowthBean nowBean=null;
+		int flag = 0;
+		for(String nowDay:nowDays){
+			nowBean = nowList.get(nowDay);
+			if("合计".equals(nowDay)){
+				continue;
+			}
+			data[0][flag] = nowBean.getStartCn()+"";
+			data[1][flag] = nowBean.getActiveCn()+"";
+			flag ++;
+		}
+     	
+    	//查询数据
+		Long starttime = ApDateTime.getTime(nowDays.get(0), ApDateTime.DATE_TIME_YMD);
+    	String chartData=ChartUtils.getDateTimeData(nowDays.get(0)+"到"+nowDays.get(nowDays.size()-2)+"日用户增长情况",xtitle,starttime,900000l*96, data);
+    	try {
+			writeJson(getResponse(), chartData);
+		} catch (IOException e) {
+			log.error("getFlashChartData failed,", e);
+		}
+    	return chartData;
+    }
+
+
+	public UserGrowthService getUserGrowthService() {
+		return userGrowthService;
+	}
+
+	public void setUserGrowthService(UserGrowthService userGrowthService) {
+		this.userGrowthService = userGrowthService;
+	}
+}

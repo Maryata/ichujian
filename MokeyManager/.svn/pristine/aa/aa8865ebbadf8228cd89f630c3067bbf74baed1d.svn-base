@@ -1,0 +1,33 @@
+package com.org.mokey.analyse.service.impl;
+
+import com.org.mokey.analyse.dao.FreeCallDao;
+import com.org.mokey.analyse.entiy.CallingBill;
+import com.org.mokey.analyse.service.FreeCallService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/6/7.
+ */
+@Service
+public class FreeCallServiceImpl implements FreeCallService {
+
+    private static final Log LOGGER = LogFactory.getLog(FreeCallServiceImpl.class);
+
+    @Autowired
+    private FreeCallDao freeCallDao;
+
+    @Override
+    public List<CallingBill> getCallingBill(String sDate, String eDate) {
+        /** e键免费通话时长 */
+        List<Map<String, Object>> callingBill_ek = freeCallDao.callingBill_ek(sDate, eDate);
+        /** 飞语免费通话时长 */
+
+        return null;
+    }
+}

@@ -1,0 +1,57 @@
+ .sortable {
+	margin: auto;
+	padding: 0;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.sortable li .a{ float:left; width:60px; text-align:center}
+
+.sortable li .b{ float:right; width:60px; text-align:center}
+.closex{ float:right; width:10px; height:10px; text-align:center}
+.sortable.grid {
+	overflow: hidden;
+}
+/**
+* border: 1px dashed #CCCCCC; 
+**/
+.sortable li {
+	
+	list-style: none;
+	font-family: "Tahoma";
+	color: #1C94C4;
+	height: 50px;
+	 margin:0 0px 30px 0;
+}
+
+li.disabled {
+	opacity: 0.5;
+}
+.sortable.grid li {
+	line-height: 80px;
+	float: left;
+	width: 60px;
+	height: 60px;
+	text-align: center;
+}
+li.highlight {
+	background: #FEE25F;
+}
+
+li.sortable-placeholder {
+	border: 1px dashed #CCC;
+	background: none;
+}		
+		
+.sortable li .a span { display:block;background:#000; width:60px; height:50px; margin:0px auto; background:url(../image/icon_cpu.png) no-repeat; }
+.sortable li .active span{ background:url(../image/icon_cpu.png) no-repeat;}
+.sortable li .active img{background:#bce8f5 }
+.sortable li .b span {display:block;background:#f00; width:60px; height:50px;  margin:0px auto; background:url(../image/icon_cpu.png) no-repeat; }
+
+.btn_rig{ float:right; width:20px;padding-left:5px}
+.btn_rig i{cursor:pointer;}
+.icon-remove{background-position:-312px 0}
+.icon-edit{background-position:-96px -72px}

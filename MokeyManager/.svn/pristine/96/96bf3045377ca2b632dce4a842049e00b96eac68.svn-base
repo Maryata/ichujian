@@ -1,0 +1,369 @@
+package com.org.mokey.basedata.sysinfo.dao.impl;
+
+import com.org.mokey.basedata.sysinfo.dao.EKFreeCallDao;
+import com.org.mokey.basedata.sysinfo.entiy.FreeCall;
+import com.org.mokey.basedata.sysinfo.util.HttpUtil;
+import com.org.mokey.common.util.ApDateTime;
+import com.org.mokey.common.util.DaoUtil;
+import com.org.mokey.util.StrUtils;
+import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/4/11.
+ * e 键
+ * 免费通话 管理
+ */
+@Repository
+public class EKFreeCallDaoImpl implements EKFreeCallDao {
+    private static final Logger LOGGER = Logger.getLogger(EKFreeCallDaoImpl.class);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    /**
+     * 免费通话 列表
+     *
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> freeCallList(int page, String fyAccountId, String phone, String status, String sdate, String edate) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        String updateSql = "UPDATE T_FY_USER SET C_CREATEDATE=? WHERE C_ID=?";
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM T_FY_USER T WHERE 1=1");
+                List<Object> args = new ArrayList<Object>();
+                if (StrUtils.isNotEmpty(fyAccountId)) {
+                    sql.append(" AND T.C_FYACCOUNTID LIKE ?");
+                    args.add("%" + fyAccountId + "%");
+                }
+                if (StrUtils.isNotEmpty(phone)) {
+                    sql.append(" AND T.C_GLOBALMOBILEPHONE LIKE ?");
+                    args.add("%" + phone + "%");
+                }
+                if (StrUtils.isNotEmpty(status)) {
+                    sql.append(" AND T.C_STATUS = ?");
+                    args.add(status);
+                }
+                if (StrUtils.isNotEmpty(sdate)) {
+                    sql.append("AND TO_DATE(T.C_CREATEDATE, 'yyyy-mm-dd hh24:mi:ss') >= TO_DATE(?, 'yyyy-mm-dd hh24:mi:ss' ）");
+                    args.add(sdate);
+                }
+                if (StrUtils.isNotEmpty(edate)) {
+                    sql.append(" AND TO_DATE(T.C_CREATEDATE, 'yyyy-mm-dd hh24:mi:ss') <= TO_DATE(?, 'yyyy-mm-dd hh24:mi:ss' )+1");
+                    args.add(edate);
+                }
+
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY TO_DATE(T.C_CREATEDATE, 'yyyy-mm-dd hh24:mi:ss') DESC");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "T.C_ID,T.C_APPACCOUNTID,T.C_FYACCOUNTID,T.C_CREATEDATE,CASE WHEN T.C_STATUS = '1' THEN '启用' ELSE '禁用' END AS STATUS,T.C_GLOBALMOBILEPHONE,T.C_STATUS");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.freeCallList failed, e : " + e);
+        }
+        return ret;
+    }
+
+    /**
+     * 查询飞语不存在账号
+     *
+     * @param file
+     * @param ID
+     * @param C_FYACCOUNTID
+     */
+    public static int method(File file, String ID, String C_FYACCOUNTID) {
+        try {
+            //File file = new File("D:\\test.txt");
+            FileOutputStream fos = new FileOutputStream(file, true);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            BufferedWriter bw = new BufferedWriter(osw);
+
+            String s1 = new String(C_FYACCOUNTID + "==" + ID);
+            bw.write(s1);
+            bw.newLine();
+
+            bw.flush();
+            bw.close();
+            osw.close();
+            fos.close();
+
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+            return 0;
+        } catch (IOException e2) {
+            e2.printStackTrace();
+            return 0;
+        }
+        return 1;
+    }
+
+
+    /**
+     * 查询  飞语账户信息  By   id
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectFyUserById(String id) {
+        List<Map<String, Object>> list = null;
+        try {
+            String sql = "SELECT T.C_ID,T.C_APPACCOUNTID,T.C_FYACCOUNTID,T.C_CREATEDATE,T.C_GLOBALMOBILEPHONE,T.C_STATUS FROM T_FY_USER T WHERE T.C_ID =?";
+            List<Object> args = new ArrayList<Object>();
+            args.add(id);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.selectFyUserById failed, e : " + e);
+        }
+        return list;
+    }
+
+    /**
+     * 修改本地飞语账号的状态
+     *
+     * @param args
+     */
+    @Override
+    public void updateFreeCall(List<Object> args) {
+        try {
+            String sql = "UPDATE T_FY_USER SET C_STATUS = ? WHERE C_ID = ?";
+            this.jdbcTemplate.update(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.updateFreeCall failed, e : " + e);
+        }
+
+    }
+
+    /**
+     * 授权列表
+     *
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> authList(int page, String hjType, String whShow, String fyId) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM T_FY_AUTH T WHERE 1=1");
+                List<Object> args = new ArrayList<Object>();
+                if (StrUtils.isNotEmpty(fyId)) {
+                    sql.append(" AND T.C_FYACCOUNTID LIKE ?");
+                    args.add("%" + fyId + "%");
+                }
+                if (StrUtils.isNotEmpty(hjType)) {
+                    sql.append(" AND T.C_CALLTYPE=?");
+                    args.add(hjType);
+                }
+                if (StrUtils.isNotEmpty(whShow)) {
+                    sql.append(" AND T.C_SHOWNUMBERTYPE=?");
+                    args.add(whShow);
+                }
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY T.C_ID DESC");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "T.C_ID,T.C_FYCALLID,CASE WHEN T.C_CALLTYPE = '0' THEN '互联网语音' WHEN T.C_CALLTYPE = '1' THEN '网络直拨' ELSE '双向回拨' END AS CALLTYPE,CASE WHEN T.C_SHOWNUMBERTYPE = '1' THEN '显号' ELSE '不显号' END AS SHOWNUMBERTYPE," +
+                        "CASE WHEN T.C_CALLER = '2' OR T.C_CALLER = '1'  THEN '飞语帐号' ELSE '电话号码' END AS CALLER," +
+                        "CASE WHEN T.C_CALLEE = '0'  THEN '飞语帐号' ELSE '电话号码' END AS CALLEE," +
+                        "T.C_FYACCOUNTID,T.C_CHANNELID,CASE WHEN T.C_IFRECORD ='1' THEN '录音' ELSE '不录音' END AS IFRECORD,T.C_TIME_MILLIS,T.C_TIME");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.authList failed, e : " + e);
+        }
+        return ret;
+    }
+
+    /**
+     * 话单列表
+     *
+     * @param page
+     * @return
+     */
+    @Override
+    public Map<String, Object> callHisList(int page, String hjId, String zdReason) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM T_FY_CALLHIS T WHERE 1=1");
+                List<Object> args = new ArrayList<Object>();
+                if (StrUtils.isNotEmpty(hjId)) {
+                    sql.append(" AND T.C_FYCALLID LIKE ?");
+                    args.add("%" + hjId + "%");
+                }
+                if (StrUtils.isNotEmpty(zdReason)) {
+                    sql.append(" AND T.C_STOPREASON=?");
+                    args.add(zdReason);
+                }
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY T.C_ID DESC");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "T.C_ID,T.C_FYCALLID,T.C_APPID,T.C_APPCALLID,T.C_CALLSTARTTIME,T.C_CALLENDTIME," +
+                        "CASE WHEN T.C_STOPREASON ='1' THEN '主叫挂断' WHEN T.C_STOPREASON ='2' THEN '被叫挂断' WHEN T.C_STOPREASON ='3' THEN '呼叫不可及' WHEN T.C_STOPREASON ='5' THEN '超时未接'" +
+                        " WHEN T.C_STOPREASON ='6' THEN '拒接或超时' WHEN T.C_STOPREASON ='7' THEN '网络问题' WHEN T.C_STOPREASON ='9' THEN 'API请求挂断' WHEN T.C_STOPREASON ='10' THEN '余额不足'" +
+                        " WHEN T.C_STOPREASON ='11' THEN '呼叫失败，系统错误' WHEN T.C_STOPREASON ='12' THEN '被叫拒接' WHEN T.C_STOPREASON ='13' THEN '被叫无人接听' WHEN T.C_STOPREASON ='14' THEN '被叫正忙'" +
+                        " WHEN T.C_STOPREASON ='15' THEN '被叫不在线' ELSE '呼叫超过最大呼叫时间' END AS STOPREASON," +
+                        "CASE WHEN T.C_TRUESHOWNUMBERTYPE='1' THEN '显示号码' ELSE '不显示号码' END AS TRUESHOWNUMBERTYPE," +
+                        "CASE WHEN T.C_TRUEIFRECORD ='1' THEN '录音' ELSE '不录音' END AS TRUEIFRECORD");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.callHisList failed, e : " + e);
+        }
+        return ret;
+    }
+
+    /**
+     * 查询飞语账号信息
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectOne(String id) {
+        String sql = "SELECT T.C_APPACCOUNTID,T.C_GLOBALMOBILEPHONE FROM T_FY_USER T WHERE T.C_ID =?";
+        List<Object> args = new ArrayList<Object>();
+        args.add(id);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, args.toArray());
+        return list;
+    }
+
+    @Override
+    public int addAccount(String fyAccountId, String fyAccountPwd, String addDate, String status, String id) {
+        String updateSql = "UPDATE T_FY_USER SET C_FYACCOUNTID=?, C_FYACCOUNTPWD=?, C_CREATEDATE=?,C_STATUS=? WHERE C_ID=?";
+        return jdbcTemplate.update(updateSql, new Object[]{fyAccountId, fyAccountPwd, addDate, status, id});
+    }
+
+    /**
+     * 删除时间
+     *
+     * @param fYiD
+     * @return
+     */
+    @Override
+    public int deleteTime(String fYiD) {
+        try {
+            String sql = "DELETE FROM T_FY_USER_TIME WHERE C_FYACCOUNTID = ?";
+           return  this.jdbcTemplate.update(sql, new Object[]{fYiD});
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.deleteTime failed, e : " + e);
+        }
+        return 0;
+    }
+
+    @Override
+    public void addTime(String fyAccountId) {
+       /* try {
+            Map<String, Object> param = new HashMap<>();
+
+            param.put("C_FYACCOUNTID", fyAccountId);
+            // 临时时间
+            param.put("C_TIME_TEMP", 200);
+            param.put("C_TIME_PERPETUAL", 0);
+            param.put("C_VALIDITY", ApDateTime.getTheEndSecOfCurrMonth());
+            getSqlMapClientTemplate().update("ek_freeCall.grantUserCallTime", param);
+
+            // 永久时间
+            param.put("C_TIME_TEMP", 0);
+            param.put("C_TIME_PERPETUAL", 0);
+            param.put("C_VALIDITY", ApDateTime.getTheEndOfCurrCentury());
+            getSqlMapClientTemplate().update("ek_freeCall.grantUserCallTime", param);
+        } catch (DataAccessException e) {
+            LOGGER.error("FeiyuCloudServiceImpl.grantUserCallTime failed ! e : ", e);
+        }*/
+        try {
+            //ApDateTime.getDate(sdate, ApDateTime.DATE_TIME_Sec);
+            String sql1 = " INSERT INTO T_FY_USER_TIME " +
+                    "          (C_ID,C_FYACCOUNTID,C_TIME_TEMP,C_TIME_PERPETUAL,C_VALIDITY)VALUES (SEQ_FY_USER_TIME.NEXTVAL,?,?,?,?)";
+            String sql2 = " INSERT INTO T_FY_USER_TIME " +
+                    "          (C_ID,C_FYACCOUNTID,C_TIME_TEMP,C_TIME_PERPETUAL,C_VALIDITY)VALUES (SEQ_FY_USER_TIME.NEXTVAL,?,?,?,?)";
+            List<Object> args1 = new ArrayList<Object>();
+            args1.add(fyAccountId);
+            args1.add("200");
+            args1.add("0");
+            args1.add(ApDateTime.getTheEndSecOfCurrMonth());
+            this.jdbcTemplate.update(sql1, args1.toArray());
+            List<Object> args2 = new ArrayList<Object>();
+            args2.add(fyAccountId);
+            args2.add("0");
+            args2.add("0");
+            args2.add(ApDateTime.getTheEndOfCurrCentury());
+            this.jdbcTemplate.update(sql2, args2.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.addTime failed, e : " , e);
+        }
+    }
+
+    @Override
+    public int selectAll() {
+        int count=0;
+        Map<String, Object> ret = new HashMap<String, Object>();
+        String sql ="SELECT T.C_ID,T.C_APPACCOUNTID,T.C_FYACCOUNTID,T.C_CREATEDATE,CASE WHEN T.C_STATUS = '1' THEN '启用' ELSE '禁用' END AS STATUS,T.C_GLOBALMOBILEPHONE,T.C_STATUS FROM T_FY_USER T WHERE 1=1";
+        try {
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+                FreeCall e = new FreeCall();
+                FreeCall freeCall = null;
+                String data = null;
+               for(int i=0;i<list.size();i++){
+                   Map<String,Object> map = list.get(i);
+                   String ID =StrUtils.emptyOrString(map.get("C_ID"));
+                   String C_FYACCOUNTID = StrUtils.emptyOrString(map.get("C_FYACCOUNTID"));
+                       Map<String, String> paramMap =  new HashMap<String, String>();
+                       Long time = freeCall.GetTime();
+                       paramMap.put("appId", freeCall.GetAppId());//appId
+                       paramMap.put("infoType", "1");//类型
+                       paramMap.put("info", StrUtils.emptyOrString(map.get("C_FYACCOUNTID")));//账号id
+                       paramMap.put("ti", String.valueOf(time));//时间
+                       paramMap.put("ver", freeCall.GetVer());//版本
+                       paramMap.put("au", freeCall.getAuValue(time));//AU
+                       data = HttpUtil.sendPost(e.freecall_select, paramMap, "UTF-8");
+                       JSONObject json = JSONObject.fromObject(data);
+                       String resultCode = json.getString("resultCode");
+                       if(!"0".equals(resultCode)){
+                           try{
+                               File file = new File("d://text.txt");
+                               boolean success = file.delete();
+                               if (success) {
+                                   System.out.println("Successfully deleted empty directory: " + file);
+                               } else {
+                                   System.out.println("Failed to delete empty directory: " + file);
+                               }
+                               if(file.createNewFile()){
+                                   System.out.println("Create file successed");
+                               }
+                               int r =method(file ,ID, C_FYACCOUNTID);
+                               if(r>0){
+                                   count+=1;
+                               }
+                           }catch(Exception e1){
+                               System.out.println(e1);
+                           }
+                       }
+
+               }
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.selectAll failed, e : " + e);
+        }
+        return count;
+    }
+
+}

@@ -1,0 +1,302 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,user-scalable=no">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>###C_TITLE### 活动帮 |触键</title>
+<meta name="keywords" content="活动帮,触键" />
+<link rel="shortcut icon" href="http://www.ichujian.com/static/favicon.ico">
+<!--[if lt IE 9]><script src="http://www.ichujian.com/static/js/html5.js"></script><![endif]-->
+<style>
+body {
+	margin: 0;
+	padding: 0;
+}
+.cj_banner_box {
+	position: relative;
+	width: 100%;
+}
+.cj_btn_box {
+}
+.cj_hdxq {
+	color: #fff;
+	width: 100%;
+	background: transparent url(http://www.ichujian.com/static/images/title_bg.png) no-repeat left bottom;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 5;
+	height: 100px;
+	line-height: 60px;
+	text-align: center;
+	font-size: 18px;
+	font-size: 1.8rem;
+}
+.banner img {
+	width: 100%;
+}
+h1 span,h2 span{ padding-left:10px;}
+h1 {
+	float: left;
+	font-size: 19px;
+	font-size: 1.2rem;
+	
+	color: #333;
+	width:100%;
+}
+h2 {
+	font-weight: 100;
+	float: left;
+	font-size: 18px;
+	font-size: 1.1rem;
+	color: #777;
+	height: 40px;
+	width: 100%;
+	border-bottom: 1px #d8d8d8 solid;
+	border-top: 1px #d8d8d8 solid;
+	background: #efefef;
+	
+	line-height: 40px;
+	margin: 0;
+}
+.cj_hot {
+	width: 170px;
+	height: 20px;
+	line-height: 18px;
+	float: left;
+	margin-left: 10px;
+	font-size: 15px;
+	color: #777;	
+}
+.cj_hot img{display:inline;  float: right; width:100px;}
+.cj_star5 {
+	background-position: right 0;
+}
+.cj_star4 {
+	background-position: right -21px;
+}
+.cj_star3 {
+	background-position: right -43px;
+}
+.cj_star2 {
+	background-position: right -65px;
+}
+.cj_star1 {
+	background-position: right -86px;
+}
+.cj_star0 {
+	background-position: right -108px;
+}
+.cj_look {
+	width: 80px;
+	height: 20px;
+	line-height: 20px;
+	float: right;
+	margin-right: 10px;
+	text-align: right;
+	font-size: 15px;
+	font-size: 1.0rem;
+	color: #777;
+}
+.cj_look img{display:inline;  float: left; width:20px;}
+.cj_time_box {
+	border-top: 1px #eee solid;
+	width: 100%;
+	height: 60px;
+	float: left;
+	margin-top: 10px;
+}
+.cj_time {
+	width: 190px;
+	height: 20px;
+	line-height: 20px;
+	float: left;
+	margin-top: 20px;
+	margin-left: 10px;
+	text-align: right;
+	font-size: 15px;
+	font-size: 1.0rem;
+	color: #777;	
+}
+.cj_time img{display:inline;  float: left; width:18px;}
+.cj_btn {
+	margin-top:10px;
+	margin-right: 20px;
+	background: #4385f4;
+	width: 110px;
+	height: 40px;
+	float: right;
+	text-decoration: none;
+	line-height: 40px;
+	text-align: center;
+	display: block;
+	font-size: 18px;
+	font-size: 1.2rem;
+	color: #fff;
+	border-radius: 3px;
+}
+.co_box {
+	margin: 10px;
+	width: 90%;
+	height: 80px;
+	float: left;
+}
+.co_logo {
+	width: 50px;
+	height: 50px;
+	margin-right: 10px;
+	float: left;
+}
+.co_name {
+	font-size: 19px;
+	font-size: 1.2rem;
+	color: #333;
+	width: 70%;
+	float: left;
+}
+.co_num {
+	font-size: 15px;
+	font-size: 1rem;
+	color: #777;
+	width: 70%;
+	float: left;
+}
+/*轮播图css*/
+.rslides {
+	position: relative;
+	list-style: none;
+	overflow: hidden;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+.rslides li {
+	-webkit-backface-visibility: hidden;
+	position: absolute;
+	display: none;
+	width: 100%;
+	left: 0;
+	top: 0;
+}
+.rslides li:first-child {
+	position: relative;
+	display: block;
+	float: left;
+}
+.rslides img {
+	display: block;
+	height: auto;
+	float: left;
+	width: 100%;
+	border: 0;
+}
+.slide_container {
+	margin-bottom: 10px;
+	position: relative;
+	float: left;
+	width: 100%;
+}
+.slide {
+	position: relative;
+	list-style: none;
+	overflow: hidden;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+.slide li {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	top: 0;
+}
+.slide img {
+	display: block;
+	position: relative;
+	z-index: 1;
+	height: auto;
+	width: 100%;
+	border: 0;
+}
+.slide .caption {
+	display: block;
+	position: absolute;
+	z-index: 2;
+	font-size: 20px;
+	text-shadow: none;
+	color: #fff;
+	background: #000;
+	background: rgba(0,0,0, .8);
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 10px 20px;
+	margin: 0;
+	max-width: none;
+}
+.slide_nav {
+	position: absolute;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	top: 52%;
+	left: 0;
+	opacity: 0.2;
+	z-index: 3;
+	text-indent: -9999px;
+	overflow: hidden;
+	text-decoration: none;
+	height: 100px;
+	width: 45px;
+	background: transparent url("http://www.ichujian.com/static/images/themes.png") no-repeat left top;
+	margin-top: -45px;
+}
+.slide_nav:active {
+	opacity: 1.0;
+}
+.slide_nav.next {
+	left: auto;
+	background-position: right top;
+	right: 0;
+}
+.rslides li img{height:235px;}
+/*轮播图css 结束*/
+</style>
+
+</head>
+<body>
+  <div class="cj_banner_box"> 
+    <!-- 功能按钮代码 开始 -->
+    <div class="cj_hdxq"></div>
+    <!-- 功能按钮代码 结束 --> 
+    <!-- 轮播图代码 开始 -->
+    <div class="slide_container">
+      <ul class="rslides" id="slider">
+        ###C_IMAGEURL###
+      </ul>
+    </div>
+    <!-- 轮播图代码 结束 -->
+    <h1><span>###C_TITLE###</span></h1>
+    <div class="cj_hot">活动热度:<img src="http://www.ichujian.com/static/images/score_###C_GRADE###.png" ></div>
+    <div class="cj_look"><span id="data_actLook">100</span><img src="http://www.ichujian.com/static/images/look.png" ></div>
+    <div class="cj_time_box">
+      <div class="cj_time">###C_DATE###<img src="http://www.ichujian.com/static/images/time.png" ></div>
+      <a href="###C_JOINURL###" class="cj_btn">我要参加</a> </div>
+    <h2><span>活动介绍</span></h2>
+    <div style=" width:95%; overflow:hidden; margin:10px; float:left">###C_CONTENT###</div>
+    <h2><span style="font-size: 17px;">本活动来自###C_PUBLISHER###</span></h2>
+    <div class="co_box"> <img class="co_logo" src="###C_BRANDLOGO###" >
+      <div class="co_name">###C_BRANDNAME###</div>
+      <div class="co_num"><span id="data_brandFocus">200</span>人已关注</div>
+      <div class="co_num">###C_INDUSTRYNAME###</div>
+    </div>
+  </div>
+<input type="hidden" id="data_actId" value="###C_ID###">
+
+<script src="http://www.ichujian.com/static/js/jquery.min.js"></script>
+<script src="http://www.ichujian.com/static/js/responsiveslides.min.js"></script>
+<script src="http://www.ichujian.com/static/js/slide.js"></script>
+<script src="http://www.ichujian.com/static/js/chujian.js?v=150424"></script>
+
+</body>
+</html>

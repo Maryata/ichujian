@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<package name="ekeyShop" extends="struts-default" namespace="/basedata/ekey">
+		<!--任务维护-->
+		<action name="eKShopTaskInfoAction!*" method="{1}" class="eKShopTaskInfoAction">
+			<result name="toList">/ekpages/pages/shop/shopTaskInfo.jsp</result>
+			<result name="toTSList">/ekpages/pages/shop/taskhandle.jsp</result>
+			<result name="toUpdate">/ekpages/pages/shop/shopTaskInfo-update.jsp</result>
+			<result name="toHandle">/ekpages/pages/shop/shopTaskInfo-handle.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKShopTaskInfoAction!toList</param>
+			</result>
+			<result name="reload2" type="redirectAction">
+				<param name="actionName">eKShopTaskInfoAction!toTSList</param>
+			</result>
+		</action>
+
+		<!--签到奖励管理-->
+		<action name="eKRewardAction!*" method="{1}" class="eKRewardAction">
+			<result name="toList">/ekpages/pages/shop/rewardList.jsp</result>
+			<result name="toUpdate">/ekpages/pages/shop/rewardForm.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKRewardAction!toList</param>
+			</result>
+		</action>
+
+		<!--广告位维护-->
+		<action name="eKMallAdvertAction!*" method="{1}" class="eKMallAdvertAction">
+			<result name="toList">/ekpages/pages/shop/mallAdvertList.jsp</result>
+			<result name="toUpdate">/ekpages/pages/shop/mallAdvertForm.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKMallAdvertAction!toList</param>
+			</result>
+		</action>
+
+		<!--商品详情-->
+		<action name="eKMallProductAction!*" method="{1}" class="eKMallProductAction">
+			<result name="toList">/ekpages/pages/shop/mallProductList.jsp</result>
+			<result name="toUpdate">/ekpages/pages/shop/mallProductForm.jsp</result>
+			<result name="reload" type="redirectAction">
+				<param name="actionName">eKMallProductAction!toList</param>
+			</result>
+			<result name="toCodesList">/ekpages/pages/shop/mallCodesList.jsp</result>
+		</action>
+
+		<!-- 商品分类管理 -->
+		<action name="eKShopProductCateAction!*" method="{1}" class="eKShopProductCateAction">
+			<result name="toList">/ekpages/pages/shop/mallCategory-List.jsp</result>
+			<result name="toHandle">/ekpages/pages/shop/mallCategory-handle.jsp</result>
+		</action>
+
+	</package>
+
+</struts>

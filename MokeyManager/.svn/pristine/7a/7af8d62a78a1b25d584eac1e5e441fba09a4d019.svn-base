@@ -1,0 +1,203 @@
+package com.org.mokey.analyse.dao;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/5.
+ */
+public interface EkeyKeyUsingDao {
+
+    /**
+     * 查询激活用户数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfActiveUsers(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 查询指定时间段每个按键每天的使用人数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 查询截至sDate这一时间之前激活用户数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @return
+     */
+    long countOfActiveUsersUtilSDate(String timePattern, List<String> supCodes, String sDate);
+
+    /**
+     * 查询指定时间段每个按键每天的使用次数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> timesOfUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 查询该时间段所有启动过的用户
+     *
+     * @param supCode 供应商
+     * @param sDate   起始时间
+     * @param eDate   截止时间
+     * @return
+     */
+    List<Map<String, Object>> allUsingUser(String supCode, String sDate, String eDate);
+
+
+    /**
+     * 查询所有供应商的总数量
+     * @param supCode
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    List<Map<String, Object>> countAll(List<String> supCodes,String sDate,String eDate);
+
+
+    /**
+     * 查询指定时间段使用人数
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfAllUsingUser(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 日注册用户
+     *
+     * @param
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    List<Map<String, Object>> registerUser(List<String> sup, String sDate, String eDate);
+
+    /**
+     * 查询按键1,2,3,4任意一个
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfAllUseKeys(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 使用数和任意按键数的合计
+     *
+     * @param timePattern 日期格式
+     * @param supCodes    供应商
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<Map<String, Object>> countOfuseAndKeysAll(String timePattern, List<String> supCodes, String sDate, String eDate);
+
+    /**
+     * 日启动用户
+     *
+     * @param suppliers
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    List<Map<String, Object>> startUser(List<String> suppliers, String sDate, String eDate);
+
+    /***
+     * 周内启动一次以上用户
+     *
+     * @param sup
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    List<Map<String, Object>> weekNStartUser(List<String> sup, String sDate, String eDate);
+
+    /**
+     * 注册数量查询
+     *
+     * @param sup
+     * @param sDay
+     * @param eDay
+     * @return
+     */
+    List<Map<String, Object>> registerCount(List<String> sup, String sDay, String eDay);
+
+    /**
+     * 激活用户
+     *
+     * @param sup
+     * @param sDay
+     * @param eDay
+     * @return
+     */
+    List<Map<String, Object>> activityUser(List<String> sup, String sDay, String eDay);
+
+    /**
+     * 激活用户数量
+     *
+     * @param sup
+     * @param sDay
+     * @param eDay
+     * @return
+     */
+    List<Map<String, Object>> activityUserCount(List<String> sup, String sDay, String eDay);
+
+    /**
+     * 查询日期  前1天，6天，29天  总人数
+     *
+     * @param sDay
+     * @param eDay
+     * @return
+     */
+    List<Map<String, Object>> freeCallUserCount(List<String> sup,String sDay, String eDay);
+
+    /**
+     * 查询日期  前1天，6天，29天  总列表
+     *
+     * @param sDay
+     * @param eDay
+     * @return
+     */
+    List<Map<String, Object>> BeforeFellCallUser(List<String> sup,String sDay, String eDay);
+
+    /**
+     * 周内免费通化人数
+     *
+     * @param sNow
+     * @param eNow
+     * @return
+     */
+    List<Map<String, Object>> NFreeCallStartUser(List<String> sup,String sNow, String eNow);
+
+    /**
+     * 查询日期  前1天，6天，29天 前注册 总列表
+     * @param sup
+     * @param sDay
+     * @param eDay
+     * @return
+     */
+    List<Map<String,Object>> _BeforeFellCallUser(List<String> sup, String sDay, String eDay);
+}

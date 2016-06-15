@@ -1,0 +1,36 @@
+package com.org.mokey.analyse.util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/3/9.
+ */
+public class Singletons {
+    private static Singletons instance;
+    private Singletons(){}
+    public static Singletons getInstance() {
+    if (instance == null) {
+        instance = new Singletons();
+         }
+     return instance;
+       }
+
+    private Map<String,Integer> map = new HashMap<String,Integer>();
+
+    public void put(String key, Integer value){
+        map.put(key, value);
+    }
+
+        public Integer get(String key){
+        return map.get(key);
+    }
+
+    public Map<String, Integer> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, Integer> map) {
+        this.map = map;
+    }
+}

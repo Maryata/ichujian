@@ -1,0 +1,534 @@
+package com.org.mokey.basedata.sysinfo.action;
+
+import com.org.mokey.basedata.sysinfo.entiy.FreeCall;
+import com.org.mokey.basedata.sysinfo.service.EKFreeCallService;
+import com.org.mokey.basedata.sysinfo.util.HttpUtil;
+import com.org.mokey.basedata.sysinfo.util.JsonTools;
+import com.org.mokey.basedata.sysinfo.util.Singleton;
+import com.org.mokey.common.AbstractAction;
+import com.org.mokey.util.StrUtils;
+import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Controller;
+
+import java.io.*;
+import java.util.*;
+
+/**
+ * Created by vpc on 2016/4/11.
+ * e 键
+ * 免费通话 管理
+ */
+@Controller("eKFreeCallAction")
+public class EKFreeCallAction extends AbstractAction {
+
+    @Autowired
+    private EKFreeCallService eKFreeCallService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    FreeCall freeCall = null;
+    FreeCall e = new FreeCall();
+    String fyAccountId = "";
+    Map<String, String> paramMap = null;
+    String data = null;
+
+    /**
+     * 跳转到免费通话列表页面
+     *
+     * @return
+     */
+    public String toList() {
+        return "toList";
+    }
+
+    /**
+     * 免费通话  ：  查询列表
+     *
+     * @return
+     */
+    public String freeCallList() {
+        Map<String, Object> retmap = new HashMap<String, Object>();
+        String sPage = getParameter("page");// 获取page
+        String fyAccountId = getParameter("fyAccountId");
+        String phone = getParameter("phone");
+        String status = getParameter("status");
+        String sdate = getParameter("sdate");
+        String edate = getParameter("edate");
+        log.info("into EKFreeCallAction.freeCallList");
+        log.info("sPage=" + sPage);
+        try {
+            int page = 1;// 默认第一页
+            if (null != sPage && sPage.matches("\\d+")) {
+                page = Integer.parseInt(sPage);
+            } else {
+                log.info(sPage);
+            }
+            // 分页显示活动详情
+            retmap = eKFreeCallService.freeCallList(page, fyAccountId, phone, status, sdate, edate);
+            // 回写查询结果
+            this.writeJSONToResponse(retmap);
+        } catch (Exception e) {
+            retmap.put("status", "N");
+            log.error("EKFreeCallAction.freeCallList failed, e : " + e);
+        }
+        return NONE;
+    }
+
+    /**
+     * 修改 飞语账户的是否禁用状态
+     *
+     * @return
+     */
+    public String updateStatus() {
+        String id = getParameter("cid");
+        List<Map<String, Object>> list = selectFyUserById(id);
+        String status = null;
+        for (Map item : list) {
+            if (item.size() > 0) {
+                //查询账户信息  by id
+                fyAccountId = StrUtils.emptyOrString(item.get("C_FYACCOUNTID"));//飞语云账户
+                status = StrUtils.emptyOrString(item.get("C_STATUS"));//状态
+            }
+        }
+        //修改  飞语平台  账户的状态
+        //参数
+        paramMap = new HashMap<String, String>();
+        Long time = freeCall.GetTime();
+        paramMap.put("appId", freeCall.GetAppId());//appId
+        paramMap.put("fyAccountId", fyAccountId);//账号id
+        paramMap.put("ti", String.valueOf(time));//时间
+        paramMap.put("ver", freeCall.GetVer());//版本
+        paramMap.put("au", freeCall.getAuValue(time));//AU
+        if ("1".equals(status)) {//禁用
+            data = HttpUtil.sendPost(e.freecall_disable, paramMap, "UTF-8");
+        } else {//启用
+            data = HttpUtil.sendPost(e.freecall_enble, paramMap, "UTF-8");
+        }
+        //修改本地数据
+        JSONObject json = JSONObject.fromObject(data);
+        String resultCode = json.getString("resultCode");
+        Map map = (Map) json;
+        if ("0".equals(resultCode)) {
+            eKFreeCallService.updateFreeCall(id, status);
+        }
+        try {
+            this.writeJSONToResponse(map);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return NONE;
+    }
+
+    /**
+     * 查询  飞语账户信息  By   id
+     *
+     * @return
+     */
+    public List<Map<String, Object>> selectFyUserById(String id) {
+        List<Map<String, Object>> list = eKFreeCallService.selectFyUserById(id);
+        return list;
+    }
+
+    /**
+     * 查询账号在线状态 跳转列表页面
+     *
+     * @return
+     */
+    public String toSelect() {
+        return "toSelect";
+    }
+
+    /**
+     * 查询账号在线状态
+     *
+     * @return
+     */
+    public String onlineStatusList() {
+        String fyAccountId = getParameter("fyAccountIds");
+        String fyAccountIds = "";
+        List<Map<String, Object>> fyAccountIdsList = new ArrayList();
+        fyAccountIdsList = JsonTools.parseJSON2List(fyAccountId);
+        for (Map<String, Object> item : fyAccountIdsList) {
+            fyAccountIds += String.valueOf(item.get("fyAccountIds")) + ",";
+        }
+        fyAccountIds = fyAccountIds.substring(0, fyAccountIds.length() - 1);
+
+        //参数
+        paramMap = new HashMap<String, String>();
+        Long time = freeCall.GetTime();
+        paramMap.put("appId", freeCall.GetAppId());//appId
+        paramMap.put("fyAccountIds", fyAccountIds);//账号id
+        paramMap.put("ti", String.valueOf(time));//时间
+        paramMap.put("ver", freeCall.GetVer());//版本
+        paramMap.put("au", freeCall.getAuValue(time));//AU
+
+        if (StrUtils.isNotEmpty(fyAccountId)) {
+            data = HttpUtil.sendPost(e.freecall_onlineStatus, paramMap, "UTF-8");
+        }
+
+        JSONObject json = JSONObject.fromObject(data);
+        Map map = (Map) json;
+        try {
+            this.writeJSONToResponse(map);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return NONE;
+    }
+
+    /**
+     * 跳转  授权列表
+     *
+     * @return
+     */
+    public String toAuth() {
+
+        return "toAuth";
+    }
+
+    /**
+     * 授权列表
+     *
+     * @return
+     */
+    public String authList() {
+        Map<String, Object> retmap = new HashMap<String, Object>();
+        String hjType = getParameter("hjType");
+        String whShow = getParameter("whShow");
+        String fyId = getParameter("fyId");
+        String sPage = getParameter("page");// 获取page
+        log.info("into EKFreeCallAction.authList");
+        log.info("sPage=" + sPage);
+        try {
+            int page = 1;// 默认第一页
+            if (null != sPage && sPage.matches("\\d+")) {
+                page = Integer.parseInt(sPage);
+            } else {
+                log.info(sPage);
+            }
+            // 分页显示活动详情
+            retmap = eKFreeCallService.authList(page, hjType, whShow, fyId);
+            // 回写查询结果
+            this.writeJSONToResponse(retmap);
+        } catch (Exception e) {
+            retmap.put("status", "N");
+            log.error("EKFreeCallAction.authList failed, e : " + e);
+        }
+        return NONE;
+    }
+
+    /**
+     * 跳转 话单列表
+     *
+     * @return
+     */
+    public String toCallHis() {
+
+        return "toCallHis";
+    }
+
+    /**
+     * 话单列表
+     *
+     * @return
+     */
+    public String callHisList() {
+        Map<String, Object> retmap = new HashMap<String, Object>();
+        String hjId = getParameter("hjId");
+        String zdReason = getParameter("zdReason");
+        String sPage = getParameter("page");// 获取page
+        log.info("into EKFreeCallAction.callHisList");
+        log.info("sPage=" + sPage);
+        try {
+            int page = 1;// 默认第一页
+            if (null != sPage && sPage.matches("\\d+")) {
+                page = Integer.parseInt(sPage);
+            } else {
+                log.info(sPage);
+            }
+            // 分页显示活动详情
+            retmap = eKFreeCallService.callHisList(page, hjId, zdReason);
+            // 回写查询结果
+            this.writeJSONToResponse(retmap);
+        } catch (Exception e) {
+            retmap.put("status", "N");
+            log.error("EKFreeCallAction.callHisList failed, e : " + e);
+        }
+        return NONE;
+    }
+
+    /**
+     * 查询账户信息
+     *
+     * @return
+     */
+    public String getAccount() {
+        String fyAccountId = getParameter("fyAccountId");
+        String type = getParameter("type");
+        String phone = getParameter("phone");
+        String appId = getParameter("appId");
+        //查询飞语账号信息
+        //参数
+        paramMap = new HashMap<String, String>();
+        Long time = freeCall.GetTime();
+        paramMap.put("appId", freeCall.GetAppId());//appId
+        if ("1".equals(type)) {
+            paramMap.put("infoType", "1");//类型
+            paramMap.put("info", fyAccountId);//账号id
+        } else if ("2".equals(type)) {
+            paramMap.put("infoType", "2");//类型
+            paramMap.put("info", appId);//appid
+        } else if ("3".equals(type)) {
+            paramMap.put("infoType", "3");//类型
+            paramMap.put("info", phone);//手机号
+        }
+        paramMap.put("ti", String.valueOf(time));//时间
+        paramMap.put("ver", freeCall.GetVer());//版本
+        paramMap.put("au", freeCall.getAuValue(time));//AU
+        data = HttpUtil.sendPost(e.freecall_select, paramMap, "UTF-8");
+        //修改本地数据
+        JSONObject json = JSONObject.fromObject(data);
+        Map map = (Map) json;
+        try {
+            this.writeJSONToResponse(map);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return NONE;
+    }
+
+    /**
+     * 数据库操作  禁用此功能
+     * <p/>
+     * 进行此项操作之前   首先查到所有异常的账号  在d://text.txt  文件中以fyId==id 的形式写入
+     * <p/>
+     * 查询方法中   注销的代码    methed是写入到txt文件中
+     * <p/>
+     * 如果飞语账户不存在 ,而本地存在  通过本地飞语用户的regid  和   手机号   重新注册用户/修改本地的账号信息/重新添加时间
+     *
+     * @return
+     */
+    public String addAccount() {
+        String type = getParameter("type");
+        /*try {
+            String encoding = "UTF-8";
+            File file = new File("d://text.txt");
+            if (file.isFile() && file.exists()) {
+                //判断文件是否存在
+                InputStreamReader read = new InputStreamReader(
+                        new FileInputStream(file), encoding);//考虑到编码格式
+                BufferedReader bufferedReader = new BufferedReader(read);
+                String lineTxt = null;
+                while ((lineTxt = bufferedReader.readLine()) != null && lineTxt.length() != 0) {*/
+
+
+                  /*
+                    System.out.println(lineTxt);
+                    String id = lineTxt.split("==")[1];
+                    String FYiD = lineTxt.split("==")[0];*/
+        if ("1".equals(type)) {
+            Map<String, String> maplist = Singleton.getInstance().getMaps();
+            if (StrUtils.isNotEmpty(maplist)) {
+                Set<String> set = maplist.keySet();// 取得里面的key的集合
+                for (String str : set) {// 遍历set去出里面的的Key
+                    System.out.println(maplist.get(str) + " ==" + str);// 通过key,取得value打印出来
+                    String id = str;
+                    String FYiD = maplist.get(str);
+                    /****查询手机号****/
+                    List<Map<String, Object>> mapList = eKFreeCallService.selectOne(id);
+                    Map maps = mapList.get(0);
+                    String phone = StrUtils.emptyOrString(maps.get("C_GLOBALMOBILEPHONE"));
+                    String regid = StrUtils.emptyOrString(maps.get("C_APPACCOUNTID"));
+                    System.out.println(id + "==" + FYiD + "=" + phone);
+                    addAcount_common(regid, phone, id, FYiD, type);
+                }
+            }
+        } else if ("2".equals(type)) {
+            Map<String, String> maplist = Singleton.getInstance().getMemberInfoMap();
+            Set<String> set = maplist.keySet();// 取得里面的key的集合
+            for (String str : set) {// 遍历set去出里面的的Key
+                System.out.println(maplist.get(str) + " ==" + str);// 通过key,取得value打印出来
+                String phone = maplist.get(str);
+                String regid = str;
+                addAcount_common(regid, phone, null, null, type);
+            }
+        }
+
+               /* }
+                read.close();
+            } else {
+                System.out.println("找不到指定的文件");
+            }
+        } catch (Exception e) {
+            System.out.println("读取文件内容出错");
+            e.printStackTrace();
+        }*/
+
+        return NONE;
+    }
+
+    /**
+     * 添加公共方法
+     *
+     * @return
+     */
+    public void addAcount_common(String regid, String phone, String id, String FYiD, String type) {
+        /****添加飞语账号****/
+        paramMap = new HashMap<String, String>();
+        Long time = freeCall.GetTime();
+        paramMap.put("appId", freeCall.GetAppId());//appId
+        paramMap.put("appAccountId", regid);//code
+        paramMap.put("globalMobilePhone", "86+" + phone);
+        paramMap.put("district", "86");
+        paramMap.put("ti", String.valueOf(time));//时间
+        paramMap.put("ver", freeCall.GetVer());//版本
+        paramMap.put("au", freeCall.getAuValue(time));//AU
+        data = HttpUtil.sendPost(e.freecall_addAccount, paramMap, "UTF-8");
+        //修改本地数据
+        JSONObject json = JSONObject.fromObject(data);
+        String result = json.getString("result");
+        String resultCode = json.getString("resultCode");
+        JSONObject j = JSONObject.fromObject(result);
+        String fyAccountId = j.getString("fyAccountId");
+        if ("0".equals(resultCode)) {
+            /***查询是否添加成功**/
+            paramMap = new HashMap<String, String>();
+            Long time1 = freeCall.GetTime();
+            paramMap.put("appId", freeCall.GetAppId());//appId
+            paramMap.put("infoType", "1");//类型
+            paramMap.put("info", fyAccountId);//账号id
+            paramMap.put("ti", String.valueOf(time1));//时间
+            paramMap.put("ver", freeCall.GetVer());//版本
+            paramMap.put("au", freeCall.getAuValue(time1));//AU
+            String data1 = HttpUtil.sendPost(e.freecall_select, paramMap, "UTF-8");
+            JSONObject json1 = JSONObject.fromObject(data1);
+            String resultCode1 = json1.getString("resultCode");
+            if ("0".equals(resultCode1)) {
+                /***修改账户信息****/
+                String addDate = j.getString("addDate");
+                String fyAccountPwd = j.getString("fyAccountPwd");
+                String status = j.getString("status");
+                if ("1".equals(type)) {//更新
+                    int addAccount = eKFreeCallService.addAccount(fyAccountId, fyAccountPwd, addDate, status, id);
+                    if (addAccount > 0) {
+                        /***删除时间****/
+                        int deleteTime = eKFreeCallService.deleteTime(FYiD);
+                        eKFreeCallService.addTime(fyAccountId);
+                    }
+                } else {//添加
+                    int addAccount = eKFreeCallService.insertAccount(regid, fyAccountId, fyAccountPwd, addDate, status, phone);
+                    if (addAccount > 0) {
+                        eKFreeCallService.addTime(fyAccountId);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public String addTime() {
+        String fyAccountId = "FY88CE1BBSNHA";
+        eKFreeCallService.addTime(fyAccountId);
+
+        return NONE;
+    }
+
+    /**
+     * 异常账号
+     *
+     * @return
+     */
+    public String selectAll() {
+        Map<String, Object> retmap = new HashMap<String, Object>();
+        try {
+            int count = eKFreeCallService.selectAll();
+            retmap.put("count", count);
+            this.writeJSONToResponse(retmap);
+        } catch (Exception e) {
+            retmap.put("status", "N");
+            log.error("EKFreeCallAction.selectAll failed, e : " + e);
+        }
+        return NONE;
+    }
+
+    /**
+     * 跳转到未注册页面
+     *
+     * @return
+     */
+    public String toRegiter() {
+
+        return "toRegiter";
+    }
+
+    /**
+     * 未注册列表查询
+     *
+     * @return
+     */
+    public String registerList() {
+        Map<String, Object> retmap = new HashMap<String, Object>();
+        log.info("into EKFreeCallAction.registerList");
+        try {
+            retmap = eKFreeCallService.registerList();
+            // 回写查询结果
+            this.writeJSONToResponse(retmap);
+        } catch (Exception e) {
+            retmap.put("status", "N");
+            log.error("EKFreeCallAction.registerList failed, e : " + e);
+        }
+        return NONE;
+
+    }
+
+    /**
+     * 禁用并删除飞语账号
+     *
+     * @return
+     */
+    public String deleteFy() {
+        String id = getParameter("id");
+        String fyId = getParameter("fyId");
+        String appId = getParameter("appId");
+        String phone = getParameter("phone");
+        String status = getParameter("status");
+        Map map = new HashMap();
+        if ("1".equals(status)) {
+            paramMap = new HashMap<String, String>();
+            Long time = freeCall.GetTime();
+            paramMap.put("appId", freeCall.GetAppId());//appId
+            paramMap.put("fyAccountId", fyId);//账号id
+            paramMap.put("ti", String.valueOf(time));//时间
+            paramMap.put("ver", freeCall.GetVer());//版本
+            paramMap.put("au", freeCall.getAuValue(time));//AU
+            data = HttpUtil.sendPost(e.freecall_disable, paramMap, "UTF-8");
+            JSONObject json = JSONObject.fromObject(data);
+            String resultCode = json.getString("resultCode");
+            map = (Map) json;
+            if ("0".equals(resultCode)) {
+                //删除时间 和 用户
+                int deleteTime = eKFreeCallService.deleteTime(fyId);
+                int deleteUser=eKFreeCallService.deleteUser(fyId);
+                map.put("resultMsg","禁用并删除飞语成功！");
+            }else{
+                //resultMsg
+                map.put("resultMsg","禁用并删除飞语失败！");
+            }
+        } else {
+            //删除时间 和 用户
+            int deleteTime = eKFreeCallService.deleteTime(fyId);
+            int deleteUser=eKFreeCallService.deleteUser(fyId);
+            map.put("resultMsg","删除飞语成功！");
+        }
+        try {
+            this.writeJSONToResponse(map);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return NONE;
+    }
+
+
+
+}

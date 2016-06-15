@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet"
+			href="http://www.ichujian.com/static/game/h5/css/reset.css">
+		<link rel="stylesheet"
+			href="http://www.ichujian.com/static/game/h5/css/commom.css">
+		<script src="http://www.ichujian.com/static/game/h5/js/jquery.min.js">
+</script>
+	</head>
+	<body>
+		<div class="gamelist">
+			###dl###
+			<div class='after_div'></div>
+		</div>
+		
+		<div class="ajax_loading"><span style="display:none;" class="loading" ><img src="http://www.ichujian.com/static/game/h5/img/loading.gif"><span>正在加载...</span></span></div>
+		
+		<script src="http://www.ichujian.com/static/game/h5/js/base64.min.js">
+</script>
+		<script type="text/javascript">
+(function(global, $) {
+	var H5Game = {};
+	H5Game.load = function(page, i, url,callback) {
+		$.ajax( {
+			type : "GET",
+			url : url,
+			data : {
+				cid : i,
+				pageindex : page
+			},
+			dataType : 'jsonp',
+			crossDomain : true,
+			jsonpCallback:callback,
+			beforeSend : function() {
+				$('.loading').show(); //显示加载时候的提示
+			},
+			success : function(ret) {
+				//$(".after_div").before(ret) //将ajxa请求的数据追加到内容里面
+				$('.loading').hide(); //请求成功,隐藏加载提示
+				console.debug("success");
+			}
+		});
+	};
+	
+	global.H5Game = H5Game;
+})(window, jQuery);
+</script>
+		<!--滑动底部加载js-->
+		<script type="text/javascript">
+var page = 1;
+//var url = 'http://192.168.8.221/AppService/game/h5Gamecollection.action';
+var url = 'http://www.ichujian.com/AppService/game/h5Gamecollection.action';
+$(document).ready(
+		function() {
+			$(window).scroll(
+					function() {
+						if ($(document).scrollTop() >= $(document).height()
+								- $(window).height()) {
+							H5Game.load(Base64.encode(++page),
+								Base64.encode(1), url,Base64.encode('flightHandler'));
+						}
+					})
+		});
+
+function startH5Game(url,gid, logourl,name){
+	window.someThing.setSmething(url,gid,logourl,name);
+}
+
+var flightHandler = function(data) {
+	//data = {"games":[{"startCnts":"7","C_JARNAME":"com.mechanist.crystal.sy360","C_NAME":"盗梦英雄","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t0136ffea24fb354192.png","C_ID":"2","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.mechanist.crystal.sy360_2015052101.apk","C_TITLE":"踏上梦境征程，战出英雄梦！"},{"startCnts":"6","C_JARNAME":"com.babeltime.fknsango_360","C_NAME":"放开那三国","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t01843e54c11fe3370c.png","C_ID":"8","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.babeltime.fknsango_360_28.apk","C_TITLE":"新派卡牌让我先来。\n"},{"startCnts":"4","C_JARNAME":"com.moyogame.conan","C_NAME":"名侦探柯南OL","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t0100525bc4df8e723e.png","C_ID":"3","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.moyogame.conan_113.apk","C_TITLE":"首款正版授权柯南卡牌手游"},{"startCnts":"5","C_JARNAME":"com.huorong.papasg.qh","C_NAME":"啪啪三国","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t019c3e06d94ae574ab.png","C_ID":"1","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.huorong.papasg.qh_300.apk","C_TITLE":"岛国全民级街游“三国志大战”完美移植"},{"startCnts":"2","C_JARNAME":"com.crisisfire.android.qihoo","C_NAME":"全民枪战","C_LOGOURL":"http://www.ichujian.com/appinfo/gamelogourl/t01ac581c0f0da3331b.png","C_ID":"6","C_APPURL":"http://www.ichujian.com/appinfo/gameappurl/com.crisisfire.android.qihoo_13.apk","C_TITLE":"全球首款电竞手游《全民枪战》"}],"status":"Y"};
+	
+	if(data && data.status == 'Y') {
+		var games = data.games;
+		var len = games.length;
+		var $div = $(".after_div");
+		var sb_dl = '';
+		for(var i = 0; i < len; ++i) {
+			var game = games[i];
+					sb_dl += "<dl>";
+					sb_dl += "<a href=\""; 
+					sb_dl += game['C_APPURL'];
+					sb_dl += "\" target='_parent' class='play'>开始玩</a><dt><img width='100%' src='";
+					sb_dl +=game["C_LOGOURL"];
+					sb_dl +="'></dt><dd><h1>";
+					sb_dl +=game["C_NAME"]||'';
+					sb_dl +="</h1><span class='online'>";
+					sb_dl += game["startCnts"];
+					sb_dl += "人已玩过</span><span class='intr'>";
+					sb_dl += game["C_TITLE"]||'';
+					sb_dl +="</span></dd></dl>";
+					
+					$div.before(sb_dl);
+					sb_dl = '';
+		}
+		
+	}
+	$('.loading').hide(); //请求成功,隐藏加载提示
+};
+</script>
+	</body>
+</html>

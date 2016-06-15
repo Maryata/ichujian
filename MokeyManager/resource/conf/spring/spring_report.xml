@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	
+	<bean id="reportDownloadService"
+		class="com.org.mokey.report.service.impl.ReportDownloadServiceImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+
+	<bean id="reportDownload" class="com.org.mokey.report.action.ReportDownload">
+		<property name="reportDownloadService">
+			<ref bean="reportDownloadService" />
+		</property>
+	</bean>
+	
+	<bean id="statisticsDao" class="com.org.mokey.report.dao.impl.StatisticsDaoImpl" scope="prototype">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="statisticsService" class="com.org.mokey.report.service.impl.StatisticsServiceImpl" scope="prototype">
+		<property name="statisticsDao">
+			<ref bean="statisticsDao" />
+		</property>
+	</bean>
+	<bean id="statisticsAction" class="com.org.mokey.report.action.StatisticsAction" scope="prototype">
+		<property name="statisticsService">
+			<ref bean="statisticsService" />
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,186 @@
+package com.org.mokey.basedata.sysinfo.dao.impl;
+
+import com.org.mokey.basedata.sysinfo.dao.EKShopTaskInfoDao;
+import com.org.mokey.common.util.DaoUtil;
+import com.org.mokey.common.util.JdbcTemplateUtils;
+import com.org.mokey.util.StrUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/4/19.
+ */
+@Repository
+public class EKShopTaskInfoDaoImpl implements EKShopTaskInfoDao {
+    private static final Logger LOGGER = Logger.getLogger(EKShopTaskInfoDaoImpl.class);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    /**
+     * 查询 商城任务列表
+     *
+     * @param page
+     * @param type
+     * @param subType
+     * @return
+     */
+    @Override
+    public Map<String, Object> list(int page, String type, String subType) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        try {
+            if (StrUtils.isNotEmpty(page)) {
+                StringBuffer sql = new StringBuffer("SELECT COUNT(1) FROM T_EK_TASK T WHERE 1=1 AND T.C_ISLIVE = '1' ");
+                List<Object> args = new ArrayList<Object>();
+
+                if (StrUtils.isNotEmpty(type)) {
+                    sql.append(" AND T.C_TYPE= ?");
+                    args.add(type);
+                }
+                if (StrUtils.isNotEmpty(subType.trim())) {
+                    sql.append(" AND T.C_SUBTYPE = ?");
+                    args.add(subType.trim());
+                }
+                int count = jdbcTemplate.queryForObject(sql.toString(), args.toArray(), Integer.class);
+                // 查询
+                sql.append(" ORDER BY C_ID");
+                String sql1 = DaoUtil.addfy_oracle(sql, (page - 1) * 5, 5, args).toString().replace("COUNT(1)", "T.C_ID,T.C_TYPE,T.C_SUBTYPE,T.C_NAME,T.C_SUBNAME,T.C_SCORE,T.C_LOGO," +
+                        "CASE WHEN T.C_TYPE = '1' THEN '新手任务' WHEN T.C_TYPE = '2' THEN '每日任务' ELSE '特殊任务' END AS TYPE");
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, args.toArray());
+                ret.put("count", count);
+                ret.put("list", list);
+            }
+        } catch (Exception e) {
+            LOGGER.error("EKFreeCallDaoImpl.list failed, e : " + e);
+        }
+        return ret;
+    }
+
+    /**
+     * 商城任务 保存
+     *
+     * @param map
+     */
+    @Override
+    public void save(Map<String, Object> map) {
+        Object id_old = map.get("C_ID");
+
+        if (!StringUtils.isEmpty(id_old)) {
+            String sql = "select count(1) from T_EK_TASK t where t.c_id=?";
+            int count = jdbcTemplate.queryForObject(sql, new Object[]{id_old}, Integer.class);
+
+            if (count >= 1) {
+                Map<String, Object> wMap = new HashMap<String, Object>();
+                wMap.put("C_ID", id_old);
+                JdbcTemplateUtils.updateDataByMap(jdbcTemplate, map, wMap,
+                        "T_EK_TASK");
+            } else {
+                String sqlid = JdbcTemplateUtils.getSeqId(jdbcTemplate,
+                        "SEQ_EK_TASK");
+                map.put("C_ID", sqlid);
+                JdbcTemplateUtils.saveDataByMap(jdbcTemplate, map,
+                        "T_EK_TASK");
+            }
+        } else {
+            String sqlid = JdbcTemplateUtils.getSeqId(jdbcTemplate,
+                    "SEQ_EK_TASK");
+            map.put("C_ID", sqlid);
+            JdbcTemplateUtils.saveDataByMap(jdbcTemplate, map,
+                    "T_EK_TASK");
+        }
+    }
+
+    /**
+     * 加载查询条件
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> loadInfo() {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        StringBuffer sql = new StringBuffer(
+                "SELECT DISTINCT(T.C_SUBTYPE),T.C_NAME FROM T_EK_TASK T WHERE 1=1 AND T.C_ISLIVE = '1' AND T.C_TYPE !='1'");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString());
+        ret.put("list", list);
+        return ret;
+    }
+
+    /**
+     * 查询 子类型
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> subTypeInfo() {
+        String sql = "SELECT DISTINCT(T.C_SUBTYPE),T.C_NAME FROM T_EK_TASK T WHERE 1=1 AND T.C_ISLIVE = '1' AND T.C_TYPE !='1'";
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+        return list;
+    }
+
+    /**
+     * 查询 一条数据
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> taskList(String id) {
+        String sql = "SELECT T.C_ID,T.C_TYPE,T.C_SUBTYPE,T.C_NAME,T.C_SUBNAME,T.C_SCORE,T.C_LOGO,T.C_ISLIVE FROM T_EK_TASK T WHERE T.C_ID=?";
+        List<Object> args = new ArrayList<Object>();
+        args.add(id);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, args.toArray());
+        return list;
+    }
+
+    @Override
+    public Map<String, Object> loadInfos(String type) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        List<Object> args = new ArrayList<Object>();
+        args.add(type);
+        String sql = "SELECT DISTINCT(T.C_SUBTYPE),T.C_NAME FROM T_EK_TASK T WHERE 1=1 AND T.C_ISLIVE = '1' AND T.C_TYPE =? ";
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, args.toArray());
+        ret.put("list", list);
+        return ret;
+    }
+
+    /**
+     * 添加任务
+     *
+     * @param args
+     */
+    @Override
+    public void addTask(List<Object> args) {
+        try {
+            String sql = "INSERT INTO T_EK_TASK" +
+                    " (C_ID,C_TYPE,C_SUBTYPE,C_NAME,C_SUBNAME,C_SCORE,C_LOGO,C_ISLIVE)" +
+                    " VALUES(?, ? , ? , ? , ? , ?,?, ? )";
+            this.jdbcTemplate.update(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKShopTaskInfoDaoImpl.addTask failed, e : ", e);
+        }
+    }
+
+    /**
+     * 更新任务
+     *
+     * @param args
+     */
+    @Override
+    public void updateTask(List<Object> args) {
+        try {
+            String sql = "UPDATE T_EK_TASK SET C_TYPE = ?,C_SUBTYPE=?,C_NAME=?,C_SUBNAME=?,C_SCORE=?," +
+                    "C_LOGO=?, C_ISLIVE = ? WHERE C_ID = ?";
+            this.jdbcTemplate.update(sql, args.toArray());
+        } catch (Exception e) {
+            LOGGER.error("EKShopTaskInfoDaoImpl.updateTask failed, e : " + e);
+        }
+    }
+}

@@ -1,0 +1,48 @@
+package com.org.mokey.analyse.service;
+
+import com.org.mokey.analyse.vo.EkeyKeyUsingBean;
+
+import java.util.List;
+
+/**
+ * Created by Maryn on 2016/4/5.
+ */
+public interface EkeyKeyUsingService {
+    /**
+     * 查询用户按键使用情况
+     *
+     * @param timePattern 年月日字符串 YYYY-MM-DD
+     * @param userId      用户id
+     * @param timeType    时间类型 1.日，2.周，3.月
+     * @param userType    用户类型 1.激活用户，2.所有用户
+     * @param supCode     供应商代码
+     * @param sDate       起始时间
+     * @param eDate       截止时间
+     * @return
+     */
+    List<EkeyKeyUsingBean> keyUsingData(String timePattern, String userId, String timeType, String userType, String supCode, String sDate, String eDate);
+
+    /**
+     * 留存用户数量
+     *
+     * @param uid
+     * @param supCode 供应商代码
+     * @param sDate   起始时间
+     * @param eDate   截止时间
+     * @return
+     */
+    List<List<Object>> stayingUser(String uid, String supCode, String sDate, String eDate);
+
+    /**
+     * 留存用户查询
+     *
+     * @param userId
+     * @param sup
+     * @param sDate
+     * @param eDate
+     * @return
+     */
+    List<List<Object>> carryOverUser(String userId, String sup, String sDate, String eDate);
+
+    List<List<Object>> stayUserList(String userId, String sup, String sDate, String eDate, List<String> ids);
+}

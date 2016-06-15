@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="IchujianManager">
+    <output-path>$PROJECT_DIR$/out/artifacts/IchujianManager</output-path>
+    <root id="archive" name="IchujianManager.war">
+      <element id="artifact" artifact-name="MokeyManager:war exploded" />
+    </root>
+  </artifact>
+</component>

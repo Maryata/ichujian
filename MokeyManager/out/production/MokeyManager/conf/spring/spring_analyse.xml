@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="appUseInfoService" class="com.org.mokey.analyse.service.impl.AppUseInfoServiceImpl">
+	   <property name="jdbcTemplate">
+	         <ref bean="jdbcTemplate"/>
+	   </property>
+	</bean>
+	<bean id="AppUseInfo" class="com.org.mokey.analyse.action.AppUseInfo">
+		<property name="appUseInfoService">
+			<ref bean="appUseInfoService" />
+		</property>
+	</bean>
+
+	<bean id="newsAppUseInfoService" class="com.org.mokey.analyse.service.impl.NewsAppUseInfoServiceImpl">
+		<property name="jdbcTemplate">
+	         <ref bean="jdbcTemplate"/>
+	   </property>
+	</bean>
+	<bean id="newsAppUseInfoAction" class="com.org.mokey.analyse.action.NewsAppUseInfoAction">
+		<property name="newsAppUseInfoService">
+			<ref bean="newsAppUseInfoService" />
+		</property>
+	</bean>
+
+	<bean id="setAppInfoService" class="com.org.mokey.analyse.service.impl.SetAppInfoServiceImpl" >
+		<property name="jdbcTemplate">
+	         <ref bean="jdbcTemplate"/>
+	   </property>
+	</bean>
+	<bean id="SetAppInfo" class="com.org.mokey.analyse.action.SetAppInfo">
+		<property name="setAppInfoService">
+			<ref bean="setAppInfoService" />
+		</property>
+	</bean>
+
+	<bean id="holdTypeInfoService" class="com.org.mokey.analyse.service.impl.HoldTypeServiceImpl">
+		<property name="jdbcTemplate">
+	         <ref bean="jdbcTemplate"/>
+	   </property>
+	</bean>
+	<bean id="HoldTypeInfo" class="com.org.mokey.analyse.action.HoldTypeInfo">
+		<property name="holdTypeInfoService">
+			<ref bean="holdTypeInfoService" />
+		</property>
+	</bean>
+	
+	<bean id="userGrowthDao" class="com.org.mokey.analyse.dao.impl.UserGrowthDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="userGrowthService" class="com.org.mokey.analyse.service.impl.UserGrowthServiceImpl">
+		<property name="userGrowthDao">
+			<ref bean="userGrowthDao" />
+		</property>
+	</bean>
+	<bean id="userGrowthAction" class="com.org.mokey.analyse.action.UserGrowthAction">
+		<property name="userGrowthService">
+			<ref bean="userGrowthService" />
+		</property>
+	</bean>
+	
+	<bean id="aKeyControlDao" class="com.org.mokey.analyse.dao.impl.AKeyControlDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="aKeyControlService" class="com.org.mokey.analyse.service.impl.AKeyControlServiceImpl">
+		<property name="aKeyControlDao">
+			<ref bean="aKeyControlDao" />
+		</property>
+	</bean>
+	<bean id="aKeyControlAction" class="com.org.mokey.analyse.action.AKeyControlAction">
+		<property name="aKeyControlService">
+			<ref bean="aKeyControlService" />
+		</property>
+	</bean>
+	
+	<bean id="userUseInfoDao" class="com.org.mokey.analyse.dao.impl.UserUseInfoDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="userUseInfoService" class="com.org.mokey.analyse.service.impl.UserUseInfoServiceImpl">
+		<property name="userUseInfoDao">
+			<ref bean="userUseInfoDao" />
+		</property>
+	</bean>
+	<bean id="userUseInfoAction" class="com.org.mokey.analyse.action.UserUseInfoAction">
+		<property name="userUseInfoService">
+			<ref bean="userUseInfoService" />
+		</property>
+	</bean>
+	
+	
+	<bean id="brandUserGrowthDao" class="com.org.mokey.analyse.dao.impl.BrandUserGrowthDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	
+	<bean id="brandUserGrowthService" class="com.org.mokey.analyse.service.impl.BrandUserGrowthServiceImpl">
+		<property name="brandUserGrowthDao">
+			<ref bean="brandUserGrowthDao" />
+		</property>
+	</bean>
+	<bean id="brandUserGrowthAction" class="com.org.mokey.analyse.action.BrandUserGrowthAction">
+		<property name="brandUserGrowthService">
+			<ref bean="brandUserGrowthService" />
+		</property>
+	</bean>
+	
+	<!-- 行业品牌情况 -->
+	<bean id="industryBrandDao" class="com.org.mokey.analyse.dao.impl.IndustryBrandDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="industryBrandService" class="com.org.mokey.analyse.service.impl.IndustryBrandServiceImpl">
+		<property name="industryBrandDao">
+			<ref bean="industryBrandDao" />
+		</property>
+	</bean>
+	<bean id="industryBrandAction" class="com.org.mokey.analyse.action.IndustryBrandAction">
+		<property name="industryBrandService">
+			<ref bean="industryBrandService" />
+		</property>
+	</bean>
+	
+	<!-- 活动上下线情况 -->
+	<bean id="actOnlineStatusDao" class="com.org.mokey.analyse.dao.impl.ActOnlineStatusDaoImpl">
+		<property name="jdbcTemplate">
+			<ref bean="jdbcTemplate" />
+		</property>
+	</bean>
+	<bean id="actOnlineStatusService" class="com.org.mokey.analyse.service.impl.ActOnlineStatusServiceImpl">
+		<property name="actOnlineStatusDao">
+			<ref bean="actOnlineStatusDao" />
+		</property>
+	</bean>
+	<bean id="actOnlineStatusAction" class="com.org.mokey.analyse.action.ActOnlineStatusAction">
+		<property name="actOnlineStatusService">
+			<ref bean="actOnlineStatusService" />
+		</property>
+	</bean>
+
+</beans>

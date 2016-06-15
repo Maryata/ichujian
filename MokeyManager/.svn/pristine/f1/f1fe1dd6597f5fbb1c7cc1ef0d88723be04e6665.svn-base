@@ -1,0 +1,93 @@
+package com.org.mokey.analyse.dao.impl;
+
+import com.org.mokey.analyse.dao.FreeCallDao;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/6/7.
+ */
+@Repository
+public class FreeCallDaoImpl implements FreeCallDao {
+
+    private static final Log LOGGER = LogFactory.getLog(FreeCallDaoImpl.class);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public List<Map<String, Object>> callingBill(String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT TT1.C_DATE, TT1.TOTAL_EK, TT2.TOTAL_FY FROM" +
+                    " (SELECT C_DATE, SUM(TIME) TOTAL_EK FROM( SELECT T.C_FYACCID," +
+                    " TO_CHAR(T.C_DATE, 'YYYY-MM-DD') C_DATE, CEIL((T.C_ETIME - T.C_STIME) / (1000*60)) TIME" +
+                    " FROM T_FY_CALLING_REC T WHERE T.C_FYACCID IS NOT NULL AND T.C_UID != -1" +
+                    " AND T.C_STIME IS NOT NULL AND T.C_ETIME IS NOT NULL" +
+                    " AND T.C_DATE >= TO_DATE(?, 'YYYY-MM-DD') AND T.C_DATE < TO_DATE(?, 'YYYY-MM-DD') + 1) T1" +
+                    " GROUP BY T1.C_DATE) TT1," +
+                    " (SELECT T2.C_DATE, SUM(TIME) TOTAL_FY FROM (SELECT T.C_FYACCOUNTID," +
+                    " CEIL((C.C_CALLENDTIME - C.C_CALLSTARTTIME) / (1000*60)) TIME," +
+                    " TO_CHAR(C.C_STIME, 'YYYY-MM-DD') C_DATE FROM T_FY_AUTH T, T_FY_CALLHIS C" +
+                    " WHERE T.C_FYCALLID = C.C_FYCALLID AND C.C_STIME >= TO_DATE(?, 'YYYY-MM-DD')" +
+                    " AND C.C_STIME < TO_DATE(?, 'YYYY-MM-DD') + 1) T2 GROUP BY T2.C_DATE ) TT2" +
+                    " WHERE TT1.C_DATE = TT2.C_DATE ORDER BY C_DATE";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            args.add(sDate);
+            args.add(eDate);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> callingBill_ek(String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT C_DATE, SUM(TIME) TOTAL_FY FROM( SELECT T.C_FYACCID," +
+                    " TO_CHAR(T.C_DATE, 'YYYY-MM-DD') C_DATE, CEIL((T.C_ETIME - T.C_STIME) / (1000*60)) TIME" +
+                    " FROM T_FY_CALLING_REC T WHERE T.C_FYACCID IS NOT NULL AND T.C_UID != -1 AND" +
+                    " T.C_STIME IS NOT NULL AND T.C_ETIME IS NOT NULL AND" +
+                    " T.C_DATE >= TO_DATE(?, 'YYYY-MM-DD') AND" +
+                    " T.C_DATE < TO_DATE(?, 'YYYY-MM-DD') + 1) T1 GROUP BY T1.C_DATE ORDER BY C_DATE";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill_ek failed ! e : ", e);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> callingBill_fy(String sDate, String eDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String sql = "SELECT T2.C_DATE, SUM(TIME) TOTAL_FY FROM (SELECT T.C_FYACCOUNTID," +
+                    "  CEIL((C.C_CALLENDTIME - C.C_CALLSTARTTIME) / (1000*60)) TIME," +
+                    "  TO_CHAR(C.C_STIME, 'YYYY-MM-DD') C_DATE FROM T_FY_AUTH T, T_FY_CALLHIS C" +
+                    "  WHERE T.C_FYCALLID = C.C_FYCALLID AND C.C_STIME >= TO_DATE(?, 'YYYY-MM-DD')" +
+                    "  AND C.C_STIME < TO_DATE(?, 'YYYY-MM-DD') + 1) T2 GROUP BY T2.C_DATE ORDER BY C_DATE";
+            List<Object> args = new ArrayList<>();
+            args.add(sDate);
+            args.add(eDate);
+            list = jdbcTemplate.queryForList(sql, args.toArray());
+        } catch (DataAccessException e) {
+            LOGGER.error("FreeCallDaoImpl.callingBill_fy failed ! e : ", e);
+        }
+        return list;
+    }
+}
