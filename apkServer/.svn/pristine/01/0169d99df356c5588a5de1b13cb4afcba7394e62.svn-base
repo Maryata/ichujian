@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="icon" href="img/favicon.ico"
+			type="image/x-icon">
+		<title>趣游戏</title>
+		<link rel="stylesheet" href="css/main.css">
+		<style>
+.head {
+	text-align: center;
+}
+</style>
+	</head>
+
+	<body>
+		<div id="center">
+			<div id="div1" style="display: none; position: fixed; top: 0; z-index: 999;">
+				<img src="img/ma.gif">
+			</div>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<div class="head marginBottom5 marginTop15">
+				<img src="http://www.ichujian.com/supplier/resource/00/home_youxibang.png"
+					style="width: 72px; height: 72px;">
+				<p
+					style="font-size: 20px; color: #4285f4; font-family: '微软雅黑', '宋体'; margin-top: 15px;">
+					趣游戏
+				</p>
+			</div>
+			<br>
+			<br>
+			<br>
+			<div class="head paddingTop0">
+				<p class="value" id="infoId" style="display: block;">
+					<span>版本：v1.4 | 大小：6.22M</span>
+					<br>
+					<br>
+					<span>更新日期：2015.08.31</span>
+				</p>
+				<br>
+				<a id="downlink" href="javascript:down()"><img id="downImg"
+						src="img/btnactive.png"
+						style="width: 152px; height: 48px; border: none;">
+				</a>
+
+			</div>
+			
+		</div>
+		<script type="text/javascript" src="js/jquery.min.js">
+</script>
+
+		<script type="text/javascript">
+var docEle = function() {
+	return document.getElementById(arguments[0]) || false;
+};
+window.showMask = function() {
+	var _id = "maskDivId";
+	var m = "mask";
+	if (docEle(_id))
+		document.body.removeChild(docEle(_id));
+	if (docEle(m))
+		document.body.removeChild(docEle(m));
+
+	//mask遮罩层
+	var newMask = document.createElement("div");
+	newMask.id = m;
+	newMask.style.position = "absolute";
+	newMask.style.zIndex = "1";
+	_scrollWidth = document.body.scrollWidth;//Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);
+	_scrollHeight = Math.max(document.body.scrollHeight,
+			document.documentElement.scrollHeight);
+	newMask.style.width = _scrollWidth + "px";
+	newMask.style.height = _scrollHeight + "px";
+	newMask.style.top = "0px";
+	newMask.style.left = "0px";
+	newMask.style.background = "#33393C";
+	newMask.style.filter = "alpha(opacity=10)";
+	newMask.style.opacity = "0.20";
+	document.body.appendChild(newMask);
+
+	//新弹出层
+	var newDiv = document.createElement("div");
+	newDiv.id = _id;
+	newDiv.style.position = "absolute";
+	newDiv.style.zIndex = "9999";
+	newDivWidth = 250;
+	newDivHeight = 150;
+	newDiv.style.width = newDivWidth + "px";
+	newDiv.style.height = newDivHeight + "px";
+	newDiv.style.top = (document.body.clientHeight / 2) + "px"; //(document.body.scrollTop + document.body.clientHeight / 2)
+	newDiv.style.left = (document.body.clientWidth / 2 - newDivWidth / 2 - 10)
+			+ "px"; //(document.body.scrollLeft + document.body.clientWidth / 2 - newDivWidth / 2-5)
+	newDiv.style.background = "#f5f5f5";
+	newDiv.style.border = "0px solid #860001";
+	newDiv.style.padding = "15px";
+	newDiv.innerHTML = "<img src='img/loading.gif' alt='loading..' /> <br><br> 正在下载中... ";
+	document.body.appendChild(newDiv);
+
+	//弹出层滚动居中
+	function newDivCenter() {
+		newDiv.style.top = (document.body.scrollTop
+				+ document.body.clientHeight / 2 - newDivHeight / 2)
+				+ "px";
+		newDiv.style.left = (document.body.scrollLeft
+				+ document.body.clientWidth / 2 - newDivWidth / 2)
+				+ "px";
+	}
+	if (document.all) {
+		window.attachEvent("onscroll", newDivCenter);
+	} else {
+		window.addEventListener('scroll', newDivCenter, false);
+	}
+
+	//关闭新图层和mask遮罩层
+	window.hideMask = function() {
+		if (document.all) {
+			window.detachEvent("onscroll", newDivCenter);
+		} else {
+			window.removeEventListener('scroll', newDivCenter, false);
+		}
+		document.body.removeChild(docEle(_id));
+		document.body.removeChild(docEle(m));
+		return false;
+	}
+}
+</script>
+
+		<script>
+//var ajaxbg = $("#progressBar"); 
+//ajaxbg.hide(); 
+$(document).ajaxStart(function() {
+	//ajaxbg.show(); 
+		showMask();
+	}).ajaxStop(function() {
+	//ajaxbg.hide(); 
+		hideMask();
+	});
+</script>
+
+		<script>
+var weixin = false;
+var ua = window.navigator.userAgent.toLowerCase();
+if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+	weixin = true;
+}
+var lc = getUrlParam('lc');
+//root
+var down_root = "http://www.ichujian.com/app/";
+//var down_root = "http://www.ichujian.com/apk_base/";
+//var down_root = "http://192.168.8.221/app/";
+
+$(function() {
+	if (weixin) {
+		$("#div1").css("display", "block").addClass("tanceng");
+	}
+	//原始版本大小
+	if (!lc || lc.length == 0) {
+		$("#infoId")
+				.html(
+						"<span>版本：v1.4 | 大小：3.96M</span><br><br><span>更新日期：2015.08.31</span>");
+	} else {//打包后下载大小
+		$("#infoId")
+				.html(
+						"<span>版本：v1.4 | 大小：3.96M</span><br><br><span>更新日期：2015.08.31</span>");
+	}
+	$("#infoId").css("display", "block");
+});
+var isDown = false;
+function down() {
+	if (isDown) {
+		return;
+	}
+	//$("#downImg").attr("src", "img/btnafter.png");
+	$("#downImg").animate( {
+		opacity : 'toggle'
+	}, "slow", null, function() {
+		$("#downImg").attr("src", "img/btnafter.png");
+		$("#downImg").animate( {
+			opacity : 'toggle'
+		}, "slow");
+	});
+
+	if (!lc || lc.length == 0) {
+		isDown = false;
+		//not lc ,download default apk
+		window.location.href = down_root + "ichujian_game.apk";
+		return;
+	}
+	window.location.href = down_root + "ichujian_game.apk";
+	return;
+	
+	isDown = true;
+	$("#downlink").attr('disabled', true);
+	$.ajax( {
+		type : "POST",
+		url : "servlet/download",
+		data : "lc=" + lc,//+Math.ceil(Math.random()*1000),
+		dataType : "html",
+		success : function(data) {
+			//alert(data);
+			window.location.href = down_root + data;
+			$("#downlink").attr('disabled', false);
+			isDown = false;
+		},
+		error : function(xhr) {
+		}
+	});
+}
+
+function getUrlParam(name) {
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null)
+		return unescape(r[2]);
+	return '';
+}
+
+if (!weixin) {
+	//down();
+}
+</script>
+	</body>
+</html>

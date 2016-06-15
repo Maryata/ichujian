@@ -1,0 +1,32 @@
+# 1.\u914d\u7f6e\u6839Logger.rootLogger
+# log4j.rootLogger = [ level ] , appenderName, appenderName, \u2026
+# level \u662f\u65e5\u5fd7\u8bb0\u5f55\u7684\u4f18\u5148\u7ea7\uff0c\u5206\u4e3aOFF\u3001FATAL\u3001ERROR\u3001WARN\u3001INFO\u3001DEBUG\u3001ALL\u6216\u8005\u60a8\u5b9a\u4e49\u7684\u7ea7\u522b\u3002Log4j\u5efa\u8bae\u53ea\u4f7f\u7528\u56db\u4e2a\u7ea7\u522b\uff0c\u4f18\u5148\u7ea7\u4ece\u9ad8\u5230\u4f4e\u5206\u522b\u662fERROR\u3001WARN\u3001INFO\u3001DEBUG\u3002\u901a\u8fc7\u5728\u8fd9\u91cc\u5b9a\u4e49\u7684\u7ea7\u522b\uff0c\u60a8\u53ef\u4ee5\u63a7\u5236\u5230\u5e94\u7528\u7a0b\u5e8f\u4e2d\u76f8\u5e94\u7ea7\u522b\u7684\u65e5\u5fd7\u4fe1\u606f\u7684\u5f00\u5173\u3002\u6bd4\u5982\u5728\u8fd9\u91cc\u5b9a\u4e49\u4e86INFO\u7ea7\u522b\uff0c\u5219\u5e94\u7528\u7a0b\u5e8f\u4e2d\u6240\u6709DEBUG\u7ea7\u522b\u7684\u65e5\u5fd7\u4fe1\u606f\u5c06\u4e0d\u88ab\u6253\u5370\u51fa\u6765\u3002
+# appenderName\u5c31\u662f\u6307\u5b9a\u65e5\u5fd7\u4fe1\u606f\u8f93\u51fa\u5230\u54ea\u4e2a\u5730\u65b9\u3002\u60a8\u53ef\u4ee5\u540c\u65f6\u6307\u5b9a\u591a\u4e2a\u8f93\u51fa\u76ee\u7684\u5730
+#log4j.rootLogger=debug,FILE,CONSOLE
+log4j.addivity.org.apache=true
+log4j.appender.encoding = UTF-8
+#GBK UTF-8
+
+log4j.logger.com.qujian=debug,FILE,CONSOLE
+log4j.logger.org.apache=error,FILE,CONSOLE
+
+# \u5e94\u7528\u4e8e\u63a7\u5236\u53f0
+###################
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.Threshold=debug
+log4j.appender.CONSOLE.Target=System.out
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%d %-5p -%X{clientIp} [%t] %c{1}:%L - %m%n
+#log4j.appender.CONSOLE.layout.ConversionPattern=[start]%d{DATE}[DATE]%n%p[PRIORITY]%n%x[NDC]%n%t[thread] n%c[CATEGORY]%n%m[MESSAGE]%n%n
+
+###################
+# 2.\u5e94\u7528\u4e8e\u6587\u4ef6[\u6bcf\u65e5\u4e00\u4e2a\u6587\u4ef6]
+###################
+log4j.appender.FILE=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.FILE.Threshold=debug
+log4j.appender.FILE.File=${catalina.base}/logs/DATAONLINE/apkServer.log
+log4j.appender.FILE.Append=true
+log4j.appender.FILE.DatePattern='.'yyyy-MM-dd
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=%d %-5p -%X{clientIp} [%t] %c{1}:%L - %m%n
+#log4j.appender.FILE.layout.ConversionPattern=%d %-5p -%-4r [%t] %c %x - %m%n

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://java.sun.com/xml/ns/javaee"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+		 version="2.5" metadata-complete="true">
+	<display-name>appServer download services</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:config/applicationContext.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>openDownloadPage</servlet-name>
+		<servlet-class>com.qujian.openDownloadPage</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>download</servlet-name>
+		<servlet-class>com.qujian.download</servlet-class>
+	</servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>Index</servlet-name>
+    <servlet-class>com.qujian.Index</servlet-class>
+  </servlet>
+  <!-- <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>GameIndex</servlet-name>
+    <servlet-class>com.qujian.GameIndex</servlet-class>
+  </servlet> -->
+
+
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/servlet/download</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>openDownloadPage</servlet-name>
+		<url-pattern>/servlet/openDownloadPage</url-pattern>
+	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Index</servlet-name>
+    <url-pattern>/download.html</url-pattern>
+  </servlet-mapping>
+ <!--  <servlet-mapping>
+    <servlet-name>GameIndex</servlet-name>
+    <url-pattern>/gameDownload.html</url-pattern>
+  </servlet-mapping> -->
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

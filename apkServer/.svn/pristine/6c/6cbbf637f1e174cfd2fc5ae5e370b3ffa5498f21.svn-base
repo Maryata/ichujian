@@ -1,0 +1,8 @@
+package com.qujian.service;
+
+/**
+ * Created by Maryn on 2016/1/4.
+ */
+public interface DownloadRecService {
+    void recode(String cilentIp, String licenseCn);
+}
