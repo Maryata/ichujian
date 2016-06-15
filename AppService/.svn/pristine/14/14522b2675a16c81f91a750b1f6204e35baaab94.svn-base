@@ -1,0 +1,22 @@
+package com.sys.feiyucloud.action;
+
+import org.springframework.stereotype.Controller;
+
+/**
+ * Created by Maryn on 2016/4/12.
+ */
+@Controller("feiyuCloudAction")
+public class FeiyuCloudAction {
+
+
+
+    // 呼叫授权
+    public String callAuth() {
+        return "";
+    }
+
+    // 话单推送
+    public String pushCallInfo() {
+        return "";
+    }
+}

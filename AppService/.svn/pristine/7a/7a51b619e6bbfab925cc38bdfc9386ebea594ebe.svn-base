@@ -1,0 +1,250 @@
+package com.sys.service;
+
+import org.apache.log4j.Logger;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class AppServiceImpl extends SqlMapClientDaoSupport implements AppService {
+	
+	/** Logger available to subclasses */
+	private Logger log = (Logger.getLogger(AppServiceImpl.class));
+	
+	private JdbcTemplate jdbcTemplate;
+
+	@Override
+	public void AppActive(String activecode,String jobnumber,String imei,Date actiondate,String code_imei) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("activecode", activecode);
+		map.put("jobnumber", jobnumber);
+		map.put("imei", imei);
+		map.put("code_imei", code_imei);
+		map.put("actiondate", actiondate);
+		map.put("actioncount", 1);
+		getSqlMapClientTemplate().insert("soft_sql1.AppActive",map);
+	}
+
+	@Override
+	public List Update(String version) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("version", version);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.Update",map);
+		return list;
+	}
+	
+
+	
+	@Override
+	public void AppStart(String imei,String source,String version,Date actiondate) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		map.put("source", source);
+		map.put("version", version);
+		map.put("actiondate", actiondate);
+		getSqlMapClientTemplate().insert("soft_sql1.AppStart",map);
+		
+	}
+
+	@Override
+	public void Device(String imei,String brand,String model,String size,String system,String nettype,String longitude,String latitude, Date actiondate) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		map.put("brand", brand);
+		map.put("model", model);
+		map.put("size", size);
+		map.put("system", system);
+		map.put("nettype", nettype);
+		map.put("longitude", longitude);
+		map.put("latitude", latitude);
+		map.put("actiondate", actiondate);
+		getSqlMapClientTemplate().insert("soft_sql1.Device",map);
+	}
+
+	@Override
+	public List FindCode(String activecode) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("activecode", activecode);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.FindCode",map);
+		return list;
+	}
+	
+	@Override
+	public List FindJobNumber(String jobnumber) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("jobnumber", jobnumber);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.FindJobNumber",map);
+		return list;
+	}
+
+	@Override
+	public List FindProductSerial(String activecode) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("activecode", activecode);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.FindProductSerial",map);
+		return list;
+	}
+
+	@Override
+	public List FindCodeByImei(String imei) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.FindCodeByImei",map);
+		return list;
+	}
+
+	@Override
+	public void UpdateActiveCount(String imei) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		getSqlMapClientTemplate().update("soft_sql1.UpdateActiveCount",map);
+	}
+
+	@Override
+	public List FindStart(String imei) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.FindStart",map);
+		return list;
+	}
+
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	@Override
+	public void inscode(String code,Date actiondate) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("code", code);
+		map.put("actiondate", actiondate);
+		getSqlMapClientTemplate().insert("soft_sql.inscode",map);
+	}
+
+	@Override
+	public List FindDevice(String imei) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.FindDevice",map);
+		return list;
+	}
+
+	@Override
+	public void ActiveJob(String activeid, String jobid) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("activeid", activeid);
+		map.put("jobid", jobid);
+		getSqlMapClientTemplate().insert("soft_sql1.ActiveJob",map);
+	}
+
+	@Override
+	public void Device_Version(String imei, String version, Date actiondate) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		map.put("version", version);
+		map.put("actiondate", actiondate);
+		getSqlMapClientTemplate().insert("soft_sql1.Device_Version",map);
+	}
+
+	@Override
+	public void AppLog(String imei, String model, String system, String loginfo,Date actiondate) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("imei", imei);
+		map.put("model", model);
+		map.put("system", system);
+		map.put("loginfo", loginfo);
+		map.put("actiondate", actiondate);
+		getSqlMapClientTemplate().insert("soft_sql1.AppLog",map);
+	}
+
+	@Override
+	public void UpdateActivecodeStatus(String activecode) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("activecode", activecode);
+		getSqlMapClientTemplate().update("soft_sql1.UpdateActivecodeStatus", map);
+	}
+
+	@Override
+	public List Update(String version, String source) {
+		// TODO Auto-generated method stub
+		Map map=new HashMap();
+		map.put("version", version);
+		map.put("source", source);
+		List list=getSqlMapClientTemplate().queryForList("soft_sql1.Updates",map);
+		return list;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sys.service.AppService#islive(java.lang.String)
+	 */
+	@Override
+	public int islive(String code) {
+		Object o = getSqlMapClientTemplate().queryForObject( "soft_sql1.islive", code );
+		if(null != o) {
+			int count = Integer.parseInt( o.toString() );
+			
+			return count;
+		}
+		
+		return 0;
+	}
+
+	@Override
+	// 获取所有手机品牌信息
+	public List<Map<String, Object>> getAllBrandsOfPhone() {
+		return getSqlMapClientTemplate().queryForList("soft_sql1.getAllBrandsOfPhone");
+	}
+
+	@Override
+	// 根据品牌id获取该品牌下的所有型号信息
+	public List<Map<String, Object>> getSubBrandByBrandId(String id) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("ID", id);
+		return getSqlMapClientTemplate().queryForList("soft_sql1.getSubBrandByBrandId", param);
+	}
+
+	@Override
+	// 查询所有物流信息
+	public List<Map<String, Object>> expressInfo() {
+		return getSqlMapClientTemplate().queryForList("soft_sql1.expressInfo");
+	}
+
+	@Override
+	// 记录免费换膜行为
+	public void recExchange(String imei, String uid) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("IMEI", imei);
+		map.put("UID", uid);
+		getSqlMapClientTemplate().update("soft_sql1.recExchange", map);
+	}
+
+	@Override
+	// 查询是否有过“免费购膜”行为
+	public int hasExchanged(String imei) {
+		return (Integer) getSqlMapClientTemplate().queryForObject("soft_sql1.hasExchanged", imei);
+	}
+
+
+}

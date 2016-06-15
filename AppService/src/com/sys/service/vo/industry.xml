@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="industry">
+	
+	<!-- 行业类型 -->
+	<select id="getIndustrType"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select t.c_id,t.c_name,t.c_picurl from t_activity_industry_type t,T_ACTIVITY_CITY_INDUSTRY c
+where c.c_cityid=#cityid# and c.c_islive=1 and t.c_islive=1 and  c.c_industryid=t.c_id  order by c.c_order
+		]]> 
+	</select>
+	
+	<!-- 查询是否有推荐行业 -->
+	<select id="getIndustry"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select count(*) from T_ACTIVITY_CITY_INDUSTRY t where t.c_islive=1 and t.c_cityid=#cityid#
+		]]> 
+	</select>
+	
+		<!-- 品牌列表 -->
+	<select id="getBrand"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+           select t.c_id,t.c_cname bname,t.c_logourl,s.c_name,s.c_pinyin,s.c_ab from 
+T_ACTIVITY_BRAND_INFO t,T_ACTIVITY_SEARCH_KEY s where t.c_islive=1 and t.c_keyid=s.c_id order by t.c_cname
+		]]> 
+	</select>
+	
+ </sqlMap>
+

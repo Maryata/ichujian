@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="usernotify">
+	<parameterMap class="map" id="parameterMap">
+		<parameter property="regid" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="nickname" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="logintype" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="phonenum" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="sex" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="age" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="headimage" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="password" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="imei" jdbcType="varchar" javaType="java.lang.String" mode="IN"/>
+		<parameter property="r" jdbcType="NUMERIC" javaType="java.lang.Integer" mode="OUT"/>
+	</parameterMap>
+	
+	<procedure id="procUsernotify" resultClass="java.util.Map" parameterMap="parameterMap">
+			{CALL PROC_USER_NOTIFY(?,?,?,?,?,?,?,?,?,?)}
+	</procedure>
+	
+ </sqlMap>
+

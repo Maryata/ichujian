@@ -1,0 +1,301 @@
+package com.sys.ekey.freecall.action;
+
+import com.sys.commons.AbstractAction;
+import com.sys.ekey.freecall.common.FeiyuCloudErrorConst;
+import com.sys.ekey.freecall.common.FeiyuCloudParamConst;
+import com.sys.ekey.freecall.service.FeiyuCloudService;
+import com.sys.util.HttpUtil;
+import com.sys.util.MD5;
+import com.sys.util.StrUtils;
+import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/12.
+ */
+@Controller("feiyuCloudAction")
+public class FeiyuCloudAction extends AbstractAction {
+
+    @Autowired
+    private FeiyuCloudService feiyuCloudService;
+
+    // 呼叫授权
+    public String callAuth() {
+        JSONObject jsonObject = new JSONObject();
+
+        //请求类型：固定值：callauth
+        String action = getRequest().getParameter("action");
+        //呼叫类型：0）互联网语音；1）网络直拨；2）双向回拨
+        String callType = getRequest().getParameter("callType");
+        //外呼显号标示：1）显号；2）不显号
+        String showNumberType = getRequest().getParameter("showNumberType");
+        // 主叫号码type取值为0或1时，主叫号码为飞语帐号；type取值为2时，主叫号码为电话号码
+        String caller = getRequest().getParameter("caller");
+        // 被叫号码type取值为0时，被叫号码为飞语帐号；type取值为1、2时，被叫号码为电话号码
+        String callee = getRequest().getParameter("callee");
+        //第三方私有数据，APP客户端产生的，提交呼叫请求的时候传到我方服务器的
+        String appExtraData = getRequest().getParameter("appExtraData");
+        //飞语产生的呼叫的唯一标识
+        String fyCallId = getRequest().getParameter("fyCallId");
+        //提交呼叫请求的飞语账户号码
+        String fyAccountId = getRequest().getParameter("fyAccountId");
+        //在用户服务器端用户的唯一名称
+        String appAccountId = getRequest().getParameter("appAccountId");
+        //应用ID
+        String appId = getRequest().getParameter("appId");
+        //渠道ID，用来统计用
+        String channelId = getRequest().getParameter("channelId");
+        //是否需要录音：1）需要；2）不需要
+        String ifRecord = getRequest().getParameter("ifRecord");
+        //自1970年1月1日0时起的毫秒数（UTC/GMT+08:00）
+        String ti = getRequest().getParameter("ti");
+        // MD5（appId + appToken + ti）
+        String au = getRequest().getParameter("au");
+
+        String _au = MD5.md5Code(appId + FeiyuCloudParamConst.APPTOKEN + ti);
+
+        final String errMsg = "授权数据回写出错";
+
+        if (StringUtils.isEmpty(fyAccountId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_ACCID, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else if (StringUtils.isEmpty(appId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_APPID, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else if (StringUtils.isEmpty(au)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_AU, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else if (StringUtils.isEmpty(appAccountId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_APP_ACCID, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else if (!FeiyuCloudParamConst.APPID.equalsIgnoreCase(appId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_UNEXISTSAPP, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else if (!_au.equalsIgnoreCase(au)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_ENCRYPT, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else if (!feiyuCloudService.isEnableAccount(fyAccountId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.ACCOUNT_BAN, "", "", "0", appExtraData, showNumberType, ifRecord);
+        } else {
+            // 其它错误条件暂不验证，例如：用户不存在
+            int maxCallMinute = feiyuCloudService.getMaxCallMinuteByFyAccountId(fyAccountId);
+            fillJson(jsonObject, "0", "审核成功", "", String.valueOf(maxCallMinute), appExtraData, showNumberType, ifRecord);
+        }
+
+        writeJson(jsonObject, errMsg);
+
+        return NONE;
+    }
+
+    private void fillJson(JSONObject json, String resultCode, String resultMsg, String appCallId, String maxCallMinute,
+                          String appServerExtraData, String showNumberType, String ifRecord) {
+        //认证授权结果：0）：成功，其他代表错误码（如果自定义的错误码请使用9开头的6位数字，此错误码会透传给客户端）
+        json.put("resultCode", resultCode);
+        // 认证结果描述,会透传给客户端认证授权成功的话，result是下面的json数组
+        json.put("resultMsg", resultMsg);
+
+        JSONObject jsonObject = new JSONObject();
+        // APP端自己产生的呼叫ID
+        jsonObject.put("appCallId", appCallId);
+        // 最大通话分钟数
+        jsonObject.put("maxCallMinute", maxCallMinute);
+        // APP附加的数据，通话鉴权的时候产生的，话单推送的时候会同时推送给APP服务器端
+        jsonObject.put("appServerExtraData", appServerExtraData);
+        // 显号类型：1为显号，2为不显号
+        jsonObject.put("showNumberType", showNumberType);
+        // 是否录音：1为录音，2为不录音
+        jsonObject.put("ifRecord", ifRecord);
+
+        json.put("result", jsonObject);
+    }
+
+    // 新增飞语云账号
+    public String addCloudAccount(String phonenum, String regid) throws Exception {
+//        phonenum = "15002124206";
+//        regid = "ICJ100000000001";
+        Map<String, String> paramMap = new HashMap<>();
+        long ti = System.currentTimeMillis();
+        // 飞语云通讯给每个APP的分配的唯一APPID
+        paramMap.put("appId", FeiyuCloudParamConst.APPID);
+        // 在应用服务器端用户的唯一名称，同一个应用必须要保证唯一 （使用e键用户的regId）
+        paramMap.put("appAccountId", regid);
+        // 待绑定手机号码，拨打出去可以显示用户的本机号码，要带国别码；例如：86+13888888888；如果账户要调用双向回拨接口，必须绑定手机号;
+        paramMap.put("globalMobilePhone", "86+" + phonenum);
+        // 号码的国际区号（中国就是86）
+        paramMap.put("district", "86");
+        // 当前时间毫秒值
+        paramMap.put("ti", String.valueOf(ti));
+        // 当前接口的版本号：2.1.0
+        paramMap.put("ver", FeiyuCloudParamConst.VER);
+        // MD5（appId + appToken + ti）
+        paramMap.put("au", MD5.md5Code(FeiyuCloudParamConst.APPID + FeiyuCloudParamConst.APPTOKEN + ti));
+
+        String result = "";
+
+        try {
+            result = HttpUtil.post(paramMap, FeiyuCloudParamConst.URL_ADDACCOUNT, "utf-8");
+            if (!"".equals(result)) {
+                JSONObject jsonObject = JSONObject.fromObject(result);
+                /*if (!"用户已存在".equals(StrUtils.emptyOrString(jsonObject.get("resultMsg")))) {
+                    if ("0".equals(StrUtils.emptyOrString(jsonObject.get("resultCode")))) {
+                        // 将生成的飞语云用户存入数据库
+                        feiyuCloudService.addAccount(regid, phonenum, jsonObject);
+                    } else {
+                        // 返回码为0时表示添加失败，记录日志
+                        feiyuCloudService.addAccountLogError(regid, jsonObject, "1");
+                    }
+                } else {
+                    // 用户已存在，记录日志
+                    feiyuCloudService.addAccountLogError(regid, jsonObject, "1");
+                }*/
+                if ("0".equals(StrUtils.emptyOrString(jsonObject.get("resultCode")))) {
+                    // 将生成的飞语云用户存入数据库
+                    feiyuCloudService.addAccount(regid, phonenum, jsonObject);
+                } else {
+                    // 返回码为0时表示添加失败，记录日志
+                    feiyuCloudService.addAccountLogError(regid, jsonObject, "1");
+                }
+            } else {
+                log.error("Add account in FeiyuCloud failed, reason : [no result], phone : [" + phonenum + "]");
+            }
+        } catch (Exception e) {
+            log.error("Add account in FeiyuCloud failed, phone : [" + phonenum + "], e : ", e);
+        }
+
+        return NONE;
+    }
+
+    // 修改绑定手机
+    public String modifyPhone() {
+        Map<String, Object> reqMap = new HashMap<>();
+        String regId = getParameter("regId");
+        String fyAccountId = getParameter("fyAccountId");
+        String phonenum = getParameter("phonenum");
+//        String regId = "ICJ100000000001";
+//        String fyAccountId = "FY3A55F2OZVKX";
+//        String phonenum = "15002124204";
+        try {
+            Map<String, String> paramMap = new HashMap<>();
+            long ti = System.currentTimeMillis();
+            // 飞语云通讯给每个APP的分配的唯一APPID
+            paramMap.put("appId", FeiyuCloudParamConst.APPID);
+            // 在应用服务器端用户的唯一名称，同一个应用必须要保证唯一 （使用e键用户的regId）
+            paramMap.put("fyAccountId", fyAccountId);
+            // 待绑定手机号码，拨打出去可以显示用户的本机号码，要带国别码；例如：86+13888888888；如果账户要调用双向回拨接口，必须绑定手机号;
+            paramMap.put("globalMobilePhone", "86+" + phonenum);
+            // 号码的国际区号（中国就是86）
+            paramMap.put("district", "86");
+            // 当前时间毫秒值
+            paramMap.put("ti", String.valueOf(ti));
+            // 当前接口的版本号：2.1.0
+            paramMap.put("ver", FeiyuCloudParamConst.VER);
+            // MD5（appId + appToken + ti）
+            paramMap.put("au", MD5.md5Code(FeiyuCloudParamConst.APPID + FeiyuCloudParamConst.APPTOKEN + ti));
+
+            String result = "";
+            try {
+                result = HttpUtil.post(paramMap, FeiyuCloudParamConst.URL_MODIFY_PHONE, "utf-8");
+                if (!"".equals(result)) {
+                    JSONObject jsonObject = JSONObject.fromObject(result);
+                    if (!"0".equals(StrUtils.emptyOrString(jsonObject.get("resultCode")))) {
+                        // 返回码不为0时表示添加失败，记录日志
+                        feiyuCloudService.addAccountLogError(regId, jsonObject, "2");
+                    } else {
+                        // 成功则修改数据库中的绑定手机
+                        feiyuCloudService.modifyPhone(regId, fyAccountId, phonenum);
+                    }
+                    reqMap.put("result", "Y");
+                    reqMap.put("resultCode", StrUtils.emptyOrString(jsonObject.get("resultCode")));
+                } else {
+                    reqMap.put("result", "N");
+                    reqMap.put("info", "modify phone in FeiyuCloud failed, reason : [no result]");
+                    log.error("modify phone in FeiyuCloud failed, reason : [no result], phone : [" + phonenum + "]");
+                }
+            } catch (Exception e) {
+                reqMap.put("result", "N");
+                reqMap.put("info", "1003, " + e.getMessage());
+                log.error("modify phone in FeiyuCloud failed, phone : [" + phonenum + "], e : ", e);
+            }
+
+        } catch (Exception e) {
+            reqMap.put("result", "N");
+            log.error("FeiyuCloudAction.modifyPhone failed, e : ", e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NONE;
+    }
+
+    private void writeJson(JSONObject json, String errMsg) {
+        try {
+            writeToResponse(json.toString());
+        } catch (IOException e) {
+            log.error(errMsg, e);
+        }
+    }
+
+    // 套餐列表
+    public String combo() {
+        Map<String, Object> reqMap = new HashMap<>();
+        log.info("into FeiyuCloudAction.combo...");
+        try {
+            List<Map<String, Object>> combo = feiyuCloudService.combo();
+            reqMap.put("status", "Y");
+            reqMap.put("combo", combo);
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003, e :" + e.getMessage());
+            log.error("FeiyuCloudAction.modifyPhone failed, e : ", e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NONE;
+    }
+
+    // 用户信息
+    public String userInfo() {
+        Map<String, Object> reqMap = new HashMap<>();
+        String regId = getParameter("regId");// 用户注册id
+        log.info("into FeiyuCloudAction.userInfo...");
+        log.info("regId = " + regId);
+        try {
+            List<Map<String, Object>> userInfo = feiyuCloudService.userInfo(regId);
+            reqMap.put("status", "Y");
+            reqMap.put("userInfo", userInfo);
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003, e :" + e.getMessage());
+            log.error("FeiyuCloudAction.userInfo failed, e : ", e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NONE;
+    }
+
+    // 话单推送
+    public String pushCallInfo() {
+
+        return "";
+    }
+
+    // 语音验证码
+    public String voiceValidateCode() {
+        return "";
+    }
+
+    // 录音通知回调
+    public String voiceRecCallback() {
+        return "";
+    }
+
+}

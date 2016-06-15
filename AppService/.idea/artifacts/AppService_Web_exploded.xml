@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="AppService:Web exploded">
+    <output-path>$PROJECT_DIR$/out</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="AppService/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="javaee-facet-classes" facet="AppService/web/Web" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="lib" />
+          <element id="library" level="application" name="jsp-api" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

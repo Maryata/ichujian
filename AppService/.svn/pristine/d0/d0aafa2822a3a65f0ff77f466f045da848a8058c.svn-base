@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<!-- 飞语云 -->
+	<package name="feiyuCloud" namespace="/feiyuCloud" extends="struts-default">
+		<!-- 呼叫授权 -->
+		<action name="callAuth" method="callAuth" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 呼叫授权 -->
+		<action name="pushCallInfo" method="pushCallInfo" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	</package>
+</struts>

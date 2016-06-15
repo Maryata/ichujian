@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_gameMall">
+	<!-- 商城产品 -->
+	<select id="mallProduct" parameterClass="string" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID,
+		       T.C_NAME,
+		       T.C_WORTH,
+		       T.C_COST,
+		       T.C_TOTAL,
+		       T.C_IMG,
+		       T.C_ILLUSTR,
+		       T.C_METHOD,
+		       T.C_NAME,
+		       T.C_TYPE
+		  FROM T_GAME_MALL_PRODUCT T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_ID = #PID#
+		
+		]]>
+	</select>
+	<!-- 申请商品兑换 -->
+	<insert id="exchange" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_EXCHANGE(C_ID,C_UID,C_PID,C_CONTACT,C_CDATE,C_STATE, C_TYPE)
+		VALUES(SEQ_GAME_MEMBER_EXCHANGE.NEXTVAL,#UID#,#PID#,#CONTACT#,#CDATE#,0,#TYPE#)
+		]]>
+	</insert>
+
+	<!--某个游戏下的商品搜索,限定最多100，不可修改，后面有调整再说-->
+	<select id="search" resultClass="java.util.HashMap">
+		SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (select c_id,
+          c_name,
+       c_worth,
+       c_cost,
+       c_total,
+       c_img,
+       c_illustr,
+       c_method,
+       c_date,
+       c_editor,
+       c_order,
+       c_islive,
+       c_type,
+       c_gid
+  from t_game_mall_product
+ where c_gid = #gid#
+   and c_islive = '1'
+ order by c_order) T
+         WHERE ROWNUM &lt;= 100)
+ WHERE RN &gt;= 1
+	</select>
+	<!-- 商品兑换记录 -->
+	<select id="exchangeRecord" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME, C_IMG, C_WORTH, C_COST, C_EDATE
+		  FROM (SELECT ROWNUM RM, TEMP.*
+		          FROM (SELECT P.C_ID, P.C_NAME, P.C_IMG, P.C_WORTH, P.C_COST, T.C_EDATE
+		                  FROM T_GAME_MEMBER_EXCHANGE T, T_GAME_MALL_PRODUCT P
+		                 WHERE T.C_ISLIVE = 1
+		                   AND P.C_ISLIVE = 1
+		                   AND T.C_PID = P.C_ID
+		                   AND T.C_STATE = 1
+		                   AND T.C_UID = #UID#
+		                 ORDER BY T.C_EDATE DESC) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * #PSIZE#)
+		 WHERE RM > (#PAGE# - 1) * #PSIZE#
+		]]>
+	</select>
+</sqlMap>
+

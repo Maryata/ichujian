@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="detail" extends="struts-default">
+		<!--活动详情接口 -->
+		<action name="getactivitydetail" method="GetActivityDetail" class="ActivityDetailAction">
+		</action>
+		<!--我要参加  -->
+		<action name="jionactivityandcollectiontoshare" method="JionActivityAndCollectionToShare" class="ActivityDetailAction">
+		</action>
+		<!-- 取消收藏 -->
+		<action name="activitycancle" method="ActivityCancle" class="ActivityDetailAction">
+		</action>
+		<!--品牌详情  -->
+		<action name="branddetail" method="BrandDetail" class="ActivityDetailAction">
+		</action>
+		<!-- 品牌相关的活动及接口 -->
+		<action name="brandaboutactivity" method="BrandAboutActivity" class="ActivityDetailAction">
+		</action>
+		<!-- 品牌关注 -->
+		<action name="brandattention" method="BrandAttention" class="ActivityDetailAction">
+		</action>
+		<!-- 品牌取消关注 -->
+		<action name="brandcancelattention" method="BrandCancelAttention" class="ActivityDetailAction">
+		</action>
+
+		<!-- 活动分类接口 -->
+		<action name="activitysort" method="ActivitySort" class="ActivityDetailAction">
+		</action>
+
+	</package>
+</struts>

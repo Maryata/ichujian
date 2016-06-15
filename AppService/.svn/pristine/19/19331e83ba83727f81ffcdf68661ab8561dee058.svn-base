@@ -1,0 +1,30 @@
+package com.sys.ekey.freecall.common;
+
+/**
+ * 飞语云--请求参数常量
+ * <p/>
+ * Created by Maryn on 2016/4/12.
+ */
+public class FeiyuCloudParamConst {
+
+    /**
+     * URL-添加飞语云账户
+     */
+    public static final String URL_ADDACCOUNT = "http://api.feiyucloud.com/api/addAccount";
+    /**
+     * URL-修改飞语云账户绑定手机号
+     */
+    public static final String URL_MODIFY_PHONE = "http://api.feiyucloud.com/api/modifyAccountDisplayNumber";
+    /**
+     * 飞语云通讯给每个APP的分配的唯一APPID
+     */
+    public static final String APPID = "3A55FD32F25B1E0EA2455A70DEC45E41";
+    /**
+     * 飞语云通讯给每个APP的分配的唯一APPID
+     */
+    public static final String APPTOKEN  = "DB00DB75E4418C76C3EFD35FAB2DFD06";
+    /**
+     * 当前接口的版本号：2.1.0
+     */
+    public static final String VER = "2.1.0";
+}

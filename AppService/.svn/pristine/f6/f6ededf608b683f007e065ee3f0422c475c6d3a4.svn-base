@@ -1,0 +1,97 @@
+package com.sys.ekey.freecall.service.impl;
+
+import com.sys.ekey.freecall.service.FeiyuCloudService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/12.
+ */
+@Service
+public class FeiyuCloudServiceImpl extends SqlMapClientDaoSupport implements FeiyuCloudService {
+
+    private static final Log LOGGER = LogFactory.getLog(FeiyuCloudServiceImpl.class);
+
+    @Override
+    public void addAccount(String regid, String phonenum, Map<String, Object> jsonObject) {
+        try {
+            Map<String, Object> result = (Map) (jsonObject.get("result"));
+            Map<String, Object> param = new HashMap<>();
+            param.put("C_APPACCOUNTID", regid);
+            param.put("C_FYACCOUNTID", result.get("fyAccountId"));
+            param.put("C_FYACCOUNTPWD", result.get("fyAccountPwd"));
+            param.put("C_CREATEDATE", result.get("createDate"));
+            param.put("C_STATUS", result.get("status"));
+            param.put("C_GLOBALMOBILEPHONE", phonenum);
+            getSqlMapClientTemplate().update("ek_freeCall.addAccount", param);
+        } catch (DataAccessException e) {
+            LOGGER.error("FeiyuCloudServiceImpl.addAccount failed ! e : ", e);
+        }
+
+    }
+
+    @Override
+    public void addAccountLogError(String regid, Map<String, Object> jsonObject, String type) {
+        try {
+            Map<String, Object> param = new HashMap<>();
+            param.put("C_APPACCOUNTID", regid);
+            param.put("C_RESULTCODE", jsonObject.get("resultCode"));
+            param.put("C_RESULTMSG", jsonObject.get("resultMsg"));
+            param.put("C_DATE", new Date());
+            param.put("C_TYPE", type);
+            getSqlMapClientTemplate().update("ek_freeCall.addAccountLogError", param);
+        } catch (DataAccessException e) {
+            LOGGER.error("FeiyuCloudServiceImpl.addAccountLogError failed ! e : ", e);
+        }
+    }
+
+    @Override
+    // 修改绑定手机
+    public void modifyPhone(String regId, String fyAccountId, String phonenum) {
+        try {
+            Map<String, Object> param = new HashMap<>();
+            param.put("C_APPACCOUNTID", regId);
+            param.put("C_FYACCOUNTID", fyAccountId);
+            param.put("C_GLOBALMOBILEPHONE", phonenum);
+            getSqlMapClientTemplate().update("ek_freeCall.modifyPhone", param);
+        } catch (DataAccessException e) {
+            LOGGER.error("FeiyuCloudServiceImpl.modifyPhone failed ! e : ", e);
+        }
+    }
+
+    @Override
+    public boolean isEnableAccount(String fyAccountId) {
+        try {
+            String status = (String) getSqlMapClientTemplate().queryForObject("ek_freeCall.getStatusByFyAccountId", fyAccountId);
+
+            if("1".equals(status)) {
+                return true;
+            }
+        } catch (Exception e) {
+            LOGGER.error("查询飞语用户状态出错！", e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int getMaxCallMinuteByFyAccountId(String fyAccountId) {
+        try {
+            Integer maxCallMinute = (Integer) getSqlMapClientTemplate().queryForObject("ek_freeCall.getMaxCallMinuteByFyAccountId", fyAccountId);
+
+            return maxCallMinute;
+        } catch (Exception e) {
+            LOGGER.error("查询飞语用户状态出错！", e);
+        }
+
+        return 0;
+    }
+
+}

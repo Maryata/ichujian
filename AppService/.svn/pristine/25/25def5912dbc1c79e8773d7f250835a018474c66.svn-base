@@ -1,0 +1,123 @@
+package com.sys.ekey.freecall.action;
+
+import com.sys.commons.AbstractAction;
+import com.sys.ekey.freecall.common.FeiyuCloudErrorConst;
+import com.sys.util.MD5;
+import net.sf.json.JSONObject;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+
+/**
+ * Created by Maryn on 2016/4/12.
+ */
+@Controller("feiyuCloudAction")
+public class FeiyuCloudAction extends AbstractAction {
+
+    private final static String APPID = "3A55FD32F25B1E0EA2455A70DEC45E41";
+    private final static String APPTOKEN = "DB00DB75E4418C76C3EFD35FAB2DFD06";
+
+    // 呼叫授权
+    public String callAuth() {
+        JSONObject jsonObject = new JSONObject();
+
+        //请求类型：固定值：callauth
+        String action = getRequest().getParameter("action");
+        //呼叫类型：0）互联网语音；1）网络直拨；2）双向回拨
+        String callType = getRequest().getParameter("callType");
+        //外呼显号标示：1）显号；2）不显号
+        String showNumberType = getRequest().getParameter("showNumberType");
+        // 主叫号码type取值为0或1时，主叫号码为飞语帐号；type取值为2时，主叫号码为电话号码
+        String caller = getRequest().getParameter("caller");
+        // 被叫号码type取值为0时，被叫号码为飞语帐号；type取值为1、2时，被叫号码为电话号码
+        String callee = getRequest().getParameter("callee");
+        //第三方私有数据，APP客户端产生的，提交呼叫请求的时候传到我方服务器的
+        String appExtraData = getRequest().getParameter("appExtraData");
+        //飞语产生的呼叫的唯一标识
+        String fyCallId = getRequest().getParameter("fyCallId");
+        //提交呼叫请求的飞语账户号码
+        String fyAccountId = getRequest().getParameter("fyAccountId");
+        //在用户服务器端用户的唯一名称
+        String appAccountId = getRequest().getParameter("appAccountId");
+        //应用ID
+        String appId = getRequest().getParameter("appId");
+        //渠道ID，用来统计用
+        String channelId = getRequest().getParameter("channelId");
+        //是否需要录音：1）需要；2）不需要
+        String ifRecord = getRequest().getParameter("ifRecord");
+        //自1970年1月1日0时起的毫秒数（UTC/GMT+08:00）
+        String ti = getRequest().getParameter("ti");
+        // MD5（appId + appToken + ti）
+        String au = getRequest().getParameter("au");
+
+        String _au = MD5.md5Code(appId + APPTOKEN + ti);
+
+        final String errMsg = "授权数据回写出错";
+
+        if(StringUtils.isEmpty(fyAccountId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_ACCID,"","","0",appExtraData,showNumberType,ifRecord);
+        } else if(StringUtils.isEmpty(appId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_APPID,"","","0",appExtraData,showNumberType,ifRecord);
+        } else if(StringUtils.isEmpty(au)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_AU,"","","0",appExtraData,showNumberType,ifRecord);
+        } else if(StringUtils.isEmpty(appAccountId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_NULL_APP_ACCID,"","","0",appExtraData,showNumberType,ifRecord);
+        } else if(!APPID.equalsIgnoreCase(appId)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_UNEXISTSAPP,"","","0",appExtraData,showNumberType,ifRecord);
+        } else if(!_au.equalsIgnoreCase(au)) {
+            fillJson(jsonObject, FeiyuCloudErrorConst.Server.AUTH_FAIL_ENCRYPT,"","","0",appExtraData,showNumberType,ifRecord);
+        }
+
+
+
+        writeJson(jsonObject,errMsg);
+
+        return NONE;
+    }
+
+    private void fillJson(JSONObject json, String resultCode, String resultMsg, String appCallId, String maxCallMinute,
+                          String appServerExtraData, String showNumberType, String ifRecord) {
+        //认证授权结果：0）：成功，其他代表错误码（如果自定义的错误码请使用9开头的6位数字，此错误码会透传给客户端）
+        json.put("resultCode",resultCode);
+        // 认证结果描述,会透传给客户端认证授权成功的话，result是下面的json数组
+        json.put("resultMsg",resultMsg);
+
+        JSONObject jsonObject = new JSONObject();
+        // APP端自己产生的呼叫ID
+        jsonObject.put("appCallId",appCallId);
+        // 最大通话分钟数
+        jsonObject.put("maxCallMinute",maxCallMinute);
+        // APP附加的数据，通话鉴权的时候产生的，话单推送的时候会同时推送给APP服务器端
+        jsonObject.put("appServerExtraData",appServerExtraData);
+        // 显号类型：1为显号，2为不显号
+        jsonObject.put("showNumberType",showNumberType);
+        // 是否录音：1为录音，2为不录音
+        jsonObject.put("ifRecord",ifRecord);
+
+        json.put("result", jsonObject);
+    }
+
+    private void writeJson(JSONObject json, String errMsg) {
+        try {
+            writeToResponse(json.toString());
+        } catch (IOException e) {
+            log.error(errMsg,e);
+        }
+    }
+
+    // 话单推送
+    public String pushCallInfo() {
+        return "";
+    }
+
+    // 语音验证码
+    public String voiceValidateCode() {
+        return "";
+    }
+
+    // 录音通知回调
+    public String voiceRecCallback() {
+        return "";
+    }
+}

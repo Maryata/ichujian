@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekeyActivity" namespace="/ekeyActivity" extends="struts-default">
+
+		<!--活动详情-->
+		<action name="activityDetail" method="activityDetail" class="activityAction"></action>
+		<!--用户行为-->
+		<action name="userAction" method="userAction" class="activityAction"></action>
+
+		<!-- 活动头条 -->
+		<action name="headLine" method="headLine" class="activityAction"></action>
+
+		<!-- 首页分类 -->
+		<action name="indexCategory" method="indexCategory" class="activityAction"></action>
+
+		<!-- 分类详情 -->
+		<action name="categoryDetail" method="categoryDetail" class="activityAction"></action>
+
+		<!-- 活动参与记录 -->
+		<action name="joinInRec" method="joinInRec" class="activityAction"></action>
+
+		<!-- 活动收藏列表 -->
+		<action name="collectedAct" method="collectedAct" class="activityAction"></action>
+
+		<!-- 用户删除其参与的活动 -->
+		<action name="delActAttended" method="delActAttended" class="activityAction"></action>
+
+	</package>
+</struts>

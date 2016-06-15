@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="member" namespace="/member" extends="struts-default">
+		
+		<!-- 注册 -->
+		<action name="register" method="register" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 登录 -->
+		<action name="login" method="login" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 修改密码 -->
+		<action name="modifyPwd" method="modifyPwd" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取验证码 -->
+		<action name="getValiCode" method="getValiCode" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 忘记密码-判断验证码的有效性 -->
+		<action name="isValidCode" method="isValidCode" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 忘记密码-修改密码 -->
+		<action name="setPwdOfFgt" method="setPwdOfFgt" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 校验手机号是否可用 -->
+		<action name="validatePhone" method="validatePhone" class="memberAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+	</package>
+</struts>

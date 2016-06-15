@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="ekGameGift" namespace="/ekGame" extends="struts-default">
+
+        <!-- "我的礼包" -->
+        <action name="usersGifts" method="usersGifts" class="eKGameGiftAction"></action>
+
+        <action name="giftsIndex" method="giftsIndex" class="eKGameGiftAction"></action>
+        <action name="giftsCategoryDetail" method="giftsCategoryDetail" class="eKGameGiftAction"></action>
+        <!-- 所有游戏礼包 -->
+        <action name="gameGiftList" method="gameGiftList" class="eKGameGiftAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 单个游戏礼包 -->
+        <action name="gameGift" method="gameGift" class="eKGameGiftAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+
+        <!-- 礼包领取 -->
+        <action name="getGift" method="getGift" class="eKGameGiftAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+
+        <!-- 礼包淘号 -->
+        <action name="drawGiftCode" method="drawGiftCode" class="eKGameGiftAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+
+        <!-- 礼包详情 -->
+        <action name="giftDetail" method="giftDetail" class="eKGameGiftAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+
+        <!-- 礼包推荐 -->
+        <action name="recommendGift" method="recommendGift" class="eKGameGiftAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+
+    </package>
+
+</struts>

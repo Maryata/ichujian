@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="user" namespace="/user" extends="struts-default">
+
+		<action name="login" method="Login" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="external" method="External" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="userinfo" method="Userinfo" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="modifypd" method="Modifypd" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="edituserinfo" method="EditUserInfo" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="bindphone" method="BindPhone" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="bindexternal" method="BindExternal" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 解绑第三方账号 -->
+		<action name="unBindExternal" method="unBindExternal" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="reg" method="Reg" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="forgetpd" method="ForGetpd" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="forgetpdupdate" method="ForGetpdUpdate" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="usercenter" method="UserCenter" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="userfollowactivity" method="UserFollowActivity" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="userfollowbrand" method="UserFollowBrand" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="getValidateCode" method="GetValidateCode" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="userhead" method="UserHead" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="usercollecting" method="UserCollectingActivity" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="usermainfollowbrand" method="UserMainFollowBrand" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!--  校验手机号是否可用 -->
+		<action name="validatePhone" method="validatePhone" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		 <!-- 意见反馈  -->
+		<action name="feedback" method="Feedback" class="UserAction"></action>
+		
+	</package>
+</struts>

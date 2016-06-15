@@ -1,0 +1,14 @@
+{
+sftp:{
+	host : '10.175.193.25',
+	port : "22",
+	username : 'root',
+	password : 'PPx8675pg76N'
+},
+userhead:{
+	IS_SYNC_FTP:'Y',
+	
+	HTTP_ROOT : 'http://www.ichujian.com/',
+	DIR_ROOT : '/ichujian/static/'
+}
+}

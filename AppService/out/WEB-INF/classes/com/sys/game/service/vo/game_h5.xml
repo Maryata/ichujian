@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="gameH5">
+	<!-- H5游戏分类列表 -->
+	<select id="h5CategoryList" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME, T.C_LOGO
+		  FROM T_GAME_CATEGORY T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_TYPE = 04
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	<!-- 保存用户发弹幕的行为 -->
+	<insert id="saveH5Barrage" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_ACTION(C_ID,C_UID,C_GID,C_TYPE,C_DATE,C_SOURCE)
+		VALUES(SEQ_GAME_MEMBER_ACTION.NEXTVAL,#UID#,#GID#,#TYPE#,#DATE#,#SOURCE#)
+		]]>
+	</insert>
+	<!-- 根据合集id查询游戏信息（H5） -->  
+	<select id="h5GamesInCategory" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID,C_NAME,C_LOGOURL,C_APPURL,C_TITLE
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT
+							G.C_ID,G.C_NAME,G.C_LOGOURL,G.C_APPURL,G.C_TITLE
+						FROM
+							T_GAME_H5_APP_CATEGORY C, T_GAME_H5_INFO G
+						WHERE
+							C.C_CID = #CID#
+						AND G.C_ID = C.C_GID
+						AND G.C_ISLIVE = 1
+						ORDER BY
+							C.C_ORDER, C.C_CNTRORDER, G.C_ID) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	<!-- 最近在玩 -->
+	<select id="recentlyPlaying" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT ROWNUM, TEMP2.*
+		  FROM (SELECT H.C_ID, H.C_NAME, H.C_LOGOURL, H.C_APPURL, TEMP1.D
+		          FROM T_GAME_H5_INFO H
+		         INNER JOIN (SELECT C_GID, D
+		                      FROM (SELECT C_GID, MAX(C_DATE) AS D
+		                              FROM T_GAME_MEMBER_ACTION T
+		                             WHERE T.C_UID = #UID#
+		                               AND T.C_TYPE = 2
+		                               AND T.C_SOURCE = 4
+		                             GROUP BY C_GID)
+		                     WHERE C_GID NOT IN
+		                           (SELECT C_GID
+		                              FROM T_GAME_MEMBER_ACTION T2
+		                             WHERE T2.C_UID = #UID#
+		                               AND T2.C_TYPE = 6
+		                               AND T2.C_SOURCE = 4)) TEMP1
+		            ON TEMP1.C_GID = H.C_ID
+		           AND H.C_ISLIVE = 1
+		         ORDER BY TEMP1.D DESC) TEMP2
+		 WHERE ROWNUM < 9
+		]]>
+	</select>
+	<!-- 全部最近在玩 -->
+	<select id="allRecentlyPlaying" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT H.C_ID, H.C_NAME, H.C_LOGOURL, H.C_APPURL, TEMP.D
+		  FROM T_GAME_H5_INFO H
+		 INNER JOIN (SELECT C_GID, D
+		               FROM (SELECT C_GID, MAX(C_DATE) AS D
+		                       FROM T_GAME_MEMBER_ACTION T
+		                      WHERE T.C_UID = #UID#
+		                        AND T.C_TYPE = 2
+		                        AND T.C_SOURCE = 4
+		                      GROUP BY C_GID)
+		              WHERE C_GID NOT IN (SELECT C_GID
+		                                    FROM T_GAME_MEMBER_ACTION T2
+		                                   WHERE T2.C_UID = #UID#
+		                                     AND T2.C_TYPE = 6
+		                                     AND T2.C_SOURCE = 4)) TEMP
+		    ON TEMP.C_GID = H.C_ID
+		   AND H.C_ISLIVE = 1
+		 ORDER BY TEMP.D DESC
+		]]>
+	</select>
+	<!-- 查询指定H5游戏被启动的次数 -->
+	<select id="startingCountH5" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(*)
+		  FROM T_GAME_MEMBER_ACTION T
+		 WHERE T.C_GID = #GID#
+		   AND T.C_SOURCE = 4
+		   AND T.C_TYPE = 2
+	  	]]>
+	</select>
+	<!-- 搜索小游戏 -->
+	<select id="searchH5" resultClass="java.util.HashMap">
+		SELECT t1.C_ID,
+		t1.C_NAME,
+		t1.C_LOGOURL,
+		t1.C_APPURL,
+		t1.C_TITLE,
+		nvl(t2.c, 0) as startCnts
+		from T_GAME_H5_INFO t1
+		left join (select count(1) as c, c_gid
+		from T_GAME_MEMBER_ACTION
+		where c_source = 4
+		and c_type = 2
+		group by c_gid) t2
+		on t1.c_id = t2.c_gid
+		WHERE
+		t1.C_ISLIVE = 1 and t1.c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<select id="searchH51" resultClass="java.util.HashMap">
+		select c_id, c_name from t_game_h5_info where c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<!-- 游戏搜索行为 -->
+	<insert id="searchBehavior" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_ACTION(C_ID, C_UID, C_TYPE, C_DATE,C_SOURCE,C_IMEI,C_CONTENT) VALUES(SEQ_GAME_MEMBER_ACTION.nextval,#uid#,#type#,#date#,#source#,#imei#,#content#)
+		]]>
+	</insert>
+	<select id="get" resultClass="java.util.HashMap">
+		SELECT t1.C_ID,
+             t1.C_NAME,
+             t1.C_LOGOURL,
+             t1.C_APPURL,
+             t1.C_TITLE,
+             nvl(t2.c, 0) as startCnts
+        from T_GAME_H5_INFO t1
+        left join (select count(1) as c, c_gid
+                     from T_GAME_MEMBER_ACTION
+                    where c_source = 4
+                      and c_type = 2
+                    group by c_gid) t2
+          on t1.c_id = t2.c_gid
+       WHERE t1.C_ID = #id#
+	</select>
+</sqlMap>
+

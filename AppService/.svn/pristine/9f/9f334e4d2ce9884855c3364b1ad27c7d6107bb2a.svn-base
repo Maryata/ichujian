@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_freeCall">
+
+    <!--获取飞语帐号状态-->
+    <select id="getStatusByFyAccountId" resultClass="java.lang.String">
+        SELECT C_STATUS FROM T_FY_USER WHERE c_fyaccountid = #id#
+    </select>
+    <!--获取飞语帐号允许的最大通话分钟数-->
+    <select id="getMaxCallMinuteByFyAccountId" resultClass="java.lang.Integer">
+       SELECT nvl(sum(t2.c_time_temp) + sum(t2.c_time_perpetual), 0) as ti
+      FROM T_FY_USER T
+      LEFT JOIN T_FY_USER_TIME T2
+        on T.C_FYACCOUNTID = T2.C_FYACCOUNTID
+     WHERE T.C_FYACCOUNTID = #id#
+       AND T.C_STATUS = '1'
+   AND T2.C_VALIDITY &gt;= sysdate;
+    </select>
+
+    <!-- 新增飞语云账号相关信息 -->
+    <insert id="addAccount" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_USER
+          (C_ID,
+           C_APPACCOUNTID,
+           C_FYACCOUNTID,
+           C_FYACCOUNTPWD,
+           C_CREATEDATE,
+           C_STATUS,
+           C_GLOBALMOBILEPHONE)
+        VALUES
+          (SEQ_FY_USER.NEXTVAL,
+           #C_APPACCOUNTID#,
+           #C_FYACCOUNTID#,
+           #C_FYACCOUNTPWD#,
+           #C_CREATEDATE#,
+           #C_STATUS#,
+           #C_GLOBALMOBILEPHONE#)
+		]]>
+    </insert>
+
+    <!-- 新增飞语云账号出错的日志记录 -->
+    <insert id="addAccountLogError" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_LOG
+          (C_ID, C_APPACCOUNTID, C_RESULTCODE, C_RESULTMSG, C_DATE, C_TYPE)
+        VALUES
+          (SEQ_FY_LOG.NEXTVAL,
+           #C_APPACCOUNTID#,
+           #C_RESULTCODE#,
+           #C_RESULTMSG#,
+           #C_DATE#,
+           #C_TYPE#)
+		]]>
+    </insert>
+
+    <!-- 修改绑定手机 -->
+    <update id="modifyPhone" parameterClass="java.util.HashMap">
+        <![CDATA[
+        UPDATE T_FY_USER
+           SET C_GLOBALMOBILEPHONE = #C_GLOBALMOBILEPHONE#
+         WHERE C_APPACCOUNTID = #C_APPACCOUNTID#
+           AND C_FYACCOUNTID = #C_FYACCOUNTID#
+		]]>
+    </update>
+
+
+</sqlMap>
+

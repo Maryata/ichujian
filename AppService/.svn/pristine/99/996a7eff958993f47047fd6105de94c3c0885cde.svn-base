@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="weixin" namespace="/weixin" extends="struts-default">
+		<action name="validatePhone" method="validatePhone" class="h5Action"></action>
+		
+		<!-- 礼包列表 -->
+		<action name="list" method="list" class="h5Action">
+			<result>/pages/h5/libao.jsp</result>
+		</action>
+		<!-- 礼包列表 ajax获取 -->
+		<action name="ajaxList" method="ajaxList" class="h5Action"></action>
+		
+		<!-- 登录 -->
+		<action name="login" method="login" class="h5Action">
+		</action>
+		
+		<!-- 登录页 -->
+		<action name="index" method="index" class="h5Action">
+			<result>/pages/h5/index.jsp</result>
+		</action>
+		
+		<!-- 设置新密码 -->
+		<action name="modifypwd" method="modifypwd" class="h5Action">
+			<result>/pages/h5/szxmm.jsp</result>
+		</action>
+		<action name="setpwdoffgt" method="setpwdoffgt" class="h5Action">
+		</action>
+		
+		<!-- 忘记密码 -->
+		<action name="pwdoffgt" method="pwdoffgt" class="h5Action">
+			<result>/pages/h5/wjmm.jsp</result>
+		</action>
+		
+		<!-- 跳转到注册页面-->
+		<action name="register" method="register" class="h5Action">
+			<result>/pages/h5/zc.jsp</result>
+		</action>
+		
+		<!-- 验证码 -->
+		<action name="sendCode" method="sendCode" class="h5Action">
+			<result>/pages/h5/yzm.jsp</result>
+		</action>
+		<!-- 重新发送验证码 -->
+		<action name="sendCodeR" method="sendCodeR" class="h5Action"></action>
+		
+		<!-- 验证码是否有效 -->
+		<action name="isvalidcode" method="isvalidcode" class="h5Action"></action>
+		
+		<!-- 注册提交行为 -->
+		<action name="reg" method="reg" class="h5Action"></action>
+		
+		<!-- 礼包领取 -->
+		<action name="getGift" method="getGift" class="h5Action"></action>
+		<!-- 礼包详情 -->
+		<action name="giftDetail" method="giftDetail" class="h5Action"></action>
+	</package>
+</struts>

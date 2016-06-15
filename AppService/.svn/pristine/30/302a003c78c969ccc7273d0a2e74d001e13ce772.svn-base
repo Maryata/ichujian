@@ -1,0 +1,392 @@
+package com.sys.ekey.user.service.impl;
+
+import com.sys.ekey.user.service.EKMemberService;
+import com.sys.util.StrUtils;
+import com.sys.util.file.FileServices;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.*;
+
+@SuppressWarnings("deprecation")
+@Service
+public class EKMemberServiceImpl extends SqlMapClientDaoSupport implements EKMemberService {
+	private Logger LOGGER = (Logger.getLogger(EKMemberServiceImpl.class));
+
+	@Resource
+	private JdbcTemplate jdbcTemplate;
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> isUsableCode(String phonenum,
+			String valicode, String s_date, String type) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("DATE", s_date);
+			map.put("VALICODE", valicode);
+			map.put("TYPE", type);
+			map.put("PHONENUM", phonenum);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.isUsableCode", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.isUsableCode failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public String register(String phonenum, String pwd, String supcode) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("PHONENUM", phonenum);
+			map.put("PWD", pwd);
+			map.put("DATE", new Date());
+			map.put("SUPCODE", supcode);
+			return (String) this.getSqlMapClientTemplate().insert("ek_member.register", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.register failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public String getUid(String regid) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("REGID", regid);
+			return (String) this.getSqlMapClientTemplate().queryForObject("ek_member.getUid", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.getUid failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public void defaultNickname(String nickname, String regid) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("NICKNAME", nickname);
+			map.put("REGID", regid);
+			this.getSqlMapClientTemplate().update("ek_member.defaultNickname", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.defaultNickname failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void insertImei(String regid, String imei, String valicode, String uid) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("REGID", regid);
+			map.put("IMEI", imei);
+			map.put("VALICODE", valicode);
+			map.put("DATE", new Date());
+			map.put("UID", uid);
+			this.getSqlMapClientTemplate().update("ek_member.insertImei", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.insertImei failed! e : ", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> login(String phonenum, String pwd) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("PHONENUM", phonenum);
+			map.put("PWD", pwd);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.login", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.login failed! e : ", e);
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> getMemberImei(String regid, String imei) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("REGID", regid);
+			map.put("IMEI", imei);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.getMemberImei", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.getMemberImei failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public void updateIsLogin(String regid, String imei) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("REGID", regid);
+			map.put("IMEI", imei);
+			this.getSqlMapClientTemplate().update("ek_member.updateIsLogin", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.updateIsLogin failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void updateIsNotLogin(String regid, String imei) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("REGID", regid);
+			map.put("IMEI", imei);
+			this.getSqlMapClientTemplate().update("ek_member.updateIsNotLogin", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.invalidatedOther failed! e : ", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> findUserByUidNPwd(String uid, String pwd) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			map.put("PWD", pwd);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.findUserByUidNPwd", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.findUserByUidNPwd failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public void modifyPwd(String uid, String oldpwd, String newpwd) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			map.put("OPWD", oldpwd);
+			map.put("NPWD", newpwd);
+			map.put("ACTIONDATE", new Date());
+			this.getSqlMapClientTemplate().update("ek_member.modifyPwd", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.modifyPwd failed! e : ", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> findByPhone(String phonenum) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("PHONENUM", phonenum);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.findByPhone", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.findByPhone failed! e : ", e);
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> getValiCode(String phonenum, String type,
+			String date) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("PHONENUM", phonenum);
+			map.put("TYPE", type);
+			map.put("DATE", date);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.getValiCode", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.getValiCode failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public void invalidatedOther(String phonenum, String type) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("PHONENUM", phonenum);
+			map.put("TYPE", type);
+			this.getSqlMapClientTemplate().update("ek_member.invalidatedOther", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.invalidatedOther failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void insertValicode(String imei, String phonenum, String type,
+			Date date, String code) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("IMEI", imei);
+			map.put("DATE", date);
+			map.put("CODE", code);
+			map.put("TYPE", type);
+			map.put("PHONENUM", phonenum);
+			this.getSqlMapClientTemplate().insert("ek_member.insertValicode", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.insertValicode failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void setNewPwd(String phonenum, String pwd) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("PHONENUM", phonenum);
+			map.put("PWD", pwd);
+			map.put("ACTIONDATE", new Date());
+			this.getSqlMapClientTemplate().update("ek_member.setNewPwd", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.setNewPwd failed! e : ", e);
+		}
+	}
+
+	@Override
+	// 活动用户头像、昵称
+	public List<Map<String, Object>> userHeadImg(String uid, String loginType) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.userHeadImg", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.userHeadImg failed! e : ", e);
+		}
+		return null;
+	}
+
+	@Override
+	public List<Map<String, Object>> getUserInfo(String uid) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			return this.getSqlMapClientTemplate().queryForList("ek_member.getUserInfo", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.getUserInfo failed! e : ", e);
+		}
+		return null;
+
+	}
+
+	@Override
+	public void updateHead(String uid, String fileurl) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			map.put("HEADIMAGE", fileurl);
+			map.put("ACTIONDATE", new Date());
+			this.getSqlMapClientTemplate().update("ek_member.updateHead", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.updateHead failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void modify(String uid, String type, String info) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			map.put("TYPE", type);
+			map.put("INFO", info);
+			this.getSqlMapClientTemplate().update("ek_member.modify", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.modify failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void usersAddress(String uid, String name, String phone, String addr, String postCode) {
+		try {
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("UID", uid);
+			map.put("NAME", name);
+			map.put("PHONE", phone);
+			map.put("ADDR", addr);
+			map.put("POSTCODE", postCode);
+			this.getSqlMapClientTemplate().update("ek_member.usersAddress", map);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.updateUsersAddress failed! e : ", e);
+		}
+	}
+
+	@Override
+	public void setIndexApp4NewUser(String uid) {
+		try {
+			List<Object[]> rags = new ArrayList<>();
+			// 查询所有可编辑的模板APP
+			List<Map<String, Object>> list = this.getSqlMapClientTemplate().queryForList("ek_member.getEditableApp");
+			// 封装批量操作的每一行数据
+			if (StrUtils.isNotEmpty(list)) {
+				for (Map<String, Object> map : list) {
+					Object[] objArr = new Object[4];
+					String aid = map.get("C_AID").toString();
+					String order = map.get("C_ORDER").toString();
+					objArr[0] = uid;
+					objArr[1] = aid;
+					objArr[2] = order;
+					objArr[3] = new Date();
+					rags.add(objArr);
+				}
+			}
+
+			// 批量插入数据
+			String sql = "INSERT INTO T_EK_INDEX_USER_APP" +
+					" (C_ID, C_UID, C_AID, C_ORDER, C_DATE) VALUES" +
+					" (SEQ_EK_INDEX_APP_INFO.NEXTVAL, ?, ?, ?, ?)";
+			jdbcTemplate.batchUpdate(sql, rags);
+		} catch (DataAccessException e) {
+			LOGGER.error("MemberServiceImpl.setIndexApp4NewUser failed! e : ", e);
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getMessage(int i, int pageNumber, int pageSize) {
+		int start = pageSize * (pageNumber - 1) + 1;
+		int maxRows = start + pageSize - 1;
+
+		Map<String, Object> parameterObject = new HashMap<String, Object>();
+
+		parameterObject.put("uid", i);
+		parameterObject.put( "startingIndex", start );
+		parameterObject.put( "maxRows", maxRows );
+
+		return _queryForList("ek_member.getMessage",parameterObject);
+	}
+
+	protected List<Map<String, Object>> _queryForList(String statementName, Object parameterObject) {
+		List<Map<String, Object>> list = getSqlMapClientTemplate().queryForList( statementName, parameterObject );
+
+		if ( null == list || list.size() == 0 )
+			return new ArrayList<Map<String,Object>>();
+
+		return list;
+	}
+
+	@Override
+	public void contactServiceRoute (String sUid, String message, String[] imgArr) throws IOException {
+		Map<String,Object> parameterObject = new HashMap<String,Object>();
+		StringBuilder stringBuilder = new StringBuilder();
+		if(imgArr != null) {
+			for (int i = 0; i < imgArr.length; ++i) {
+				String dest = "ek-user/message/" + sUid + "/" + System.currentTimeMillis() + ".png";
+
+				String s = new String(Base64.decodeBase64(imgArr[i].getBytes())).replaceAll(" ","").replaceAll("%3D","=");
+
+				String path = FileServices.saveFile(new ByteArrayInputStream(Base64.decodeBase64(s)), dest);
+				if(stringBuilder.length() == 0) {
+					stringBuilder.append(path);
+				} else {
+					stringBuilder.append(";").append(path);
+				}
+			}
+		}
+
+		parameterObject.put("uid",Long.parseLong(sUid));
+		parameterObject.put("message",message);
+		parameterObject.put("img",stringBuilder.toString());
+
+		getSqlMapClientTemplate().insert("ek_member.contactServiceRoute",parameterObject);
+	}
+}

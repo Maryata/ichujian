@@ -1,0 +1,471 @@
+package com.sys.ekey.task.service.impl;
+
+import com.sys.ekey.task.service.EKTaskService;
+import com.sys.util.ApDateTime;
+import com.sys.util.StrUtils;
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.stereotype.Service;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+@Service
+public class EKTaskServiceImpl extends SqlMapClientDaoSupport implements EKTaskService {
+
+    private Logger LOGGER = Logger.getLogger(EKTaskServiceImpl.class);
+
+    /**
+     * 任务奖励
+     *
+     * @param taskType 任务类型
+     * @param taskId   任务id
+     * @param uid      用户id
+     * @param itemId   特殊任务对应的id
+     */
+    public void reward(String uid, String taskType, String taskId, String itemId) {
+        String strDate = "";
+        Date today = new Date();
+        long timeMillis = today.getTime();
+        try {
+            strDate = ApDateTime.getDateTime(ApDateTime.DATE_TIME_YMD, timeMillis);
+        } catch (Exception e) {
+        }
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("TID", taskId);
+        paramMap.put("ITEMID", itemId);
+        paramMap.put("UID", uid);
+        paramMap.put("CHANGING", "1");
+        paramMap.put("DATE", today);
+        paramMap.put("STRDATE", strDate);
+        try {
+            if (StrUtils.isNotEmpty(taskType) && StrUtils.isNotEmpty(taskId) && !"".equals(uid)) {
+                LOGGER.info(">>>>>> task reward >>>>>> [taskType : " + taskType + "], [taskId : " + taskId + "], [uid : " + uid + "]");
+                /** A.签到 */
+                if ("26".equals(taskId)) {
+                    // 查询当天是否已经签到
+                    Integer hasSigned = (Integer) this.getSqlMapClientTemplate().queryForObject("ekeyTask.hasSigned", paramMap);
+                    if (hasSigned > 0) {
+                        return;
+                    } else {
+                        int signScore = 0;
+                        try {
+                            /** 1.签到基础奖励 */
+                            Integer signReward = (Integer) this.getSqlMapClientTemplate().queryForObject("ekeyTask.signReward");
+                            signScore += StrUtils.zeroOrInt(signReward);
+
+                            /** 2.签到 */
+                            Map<String, Object> signParam = new HashMap<>();
+
+                            SimpleDateFormat ymFormat = new SimpleDateFormat("yyyy-MM");
+                            SimpleDateFormat ymdFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            SimpleDateFormat dFormat = new SimpleDateFormat("dd");
+
+                            signParam.put("UID", uid);
+                            signParam.put("DATE", ymFormat.format(today));
+                            signParam.put("STRDATE", strDate);
+                            // 查询用户本月所有签到日期
+                            List<Map<String, Object>> dates = this.getSqlMapClientTemplate().queryForList("ekeyTask.signedDates", signParam);
+
+                            signParam.put("DATE", today);
+
+                            // 连续签到天数
+                            Integer seq = 1;
+                            if (null != dates && dates.size() > 0) {
+                                Map<String, Object> latestDate = dates.get(0);// 上一次签到
+                                Object seqObj = latestDate.get("C_SEQ");
+                                Object dateObj = latestDate.get("C_DATE");
+                                String c_seq = StrUtils.emptyOrString(seqObj);
+                                String c_date = StrUtils.emptyOrString(dateObj);
+                                Integer i_seq = Integer.valueOf(c_seq);
+                                // 获取今天
+                                //Calendar c = Calendar.getInstance();
+                                //int day = c.get(Calendar.DAY_OF_MONTH);// 日期
+                                String day = dFormat.format(today);
+                                if ("1".equals(day)) {
+                                    // 如果今天是1号，seq = 1
+                                    seq = 1;
+                                } else {
+                                    if (StrUtils.isNotEmpty(seqObj)) {
+                                        // 昨天
+                                        String yesterday = ApDateTime.dateAdd("d", -1, today, ApDateTime.DATE_TIME_YMD);
+                                        if (yesterday.equals(c_date)) {
+                                            // 如果昨天签到了，seq + 1
+                                            seq = i_seq + 1;
+                                        }
+                                    } else {
+                                        LOGGER.error("WRONG SEQ IN [T_EK_SIGN], UID = " + uid + ", DATE = " + ymdFormat.format(today));
+                                    }
+                                }
+                                signParam.put("SEQ", seq);
+                                // 记录签到
+                                this.getSqlMapClientTemplate().insert("ekeyTask.signIn", signParam);
+
+                                /** 3.查询奖励 */
+                                // 查询连续签到奖励
+                                String seqReward = (String) this.getSqlMapClientTemplate().queryForObject("ekeyTask.successions", signParam);
+                                signScore += StrUtils.zeroOrInt(seqReward);
+                                // 查询累计签到奖励
+                                signParam.put("SUMDAY", dates.size() + 1);
+                                String sumReward = (String) this.getSqlMapClientTemplate().queryForObject("ekeyTask.sumReward", signParam);
+                                signScore += StrUtils.zeroOrInt(sumReward);
+                            } else {
+                                signParam.put("SEQ", 1);
+                                // 记录签到
+                                this.getSqlMapClientTemplate().insert("ekeyTask.signIn", signParam);
+                                // 查询累计签到1天奖励
+                                signParam.put("SUMDAY", 1);
+                                String sumReward = (String) this.getSqlMapClientTemplate().queryForObject("ekeyTask.sumReward", signParam);
+                                signScore += StrUtils.zeroOrInt(sumReward);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("EKTaskServiceImpl.signIn failed, e : ", e);
+                        }
+                        paramMap.put("SCORE", signScore);// 这种情况itemId就是奖励的积分
+                        recordNReward(paramMap, taskId, uid, timeMillis);
+                    }
+                } else {/** B.任务奖励 */
+                    // 查询任务对应的奖励
+                    Integer score = (Integer) this.getSqlMapClientTemplate().queryForObject("ekeyTask.getScoreById", paramMap);
+                    paramMap.put("SCORE", StrUtils.zeroOrInt(score));
+
+//                    boolean specialTask = false;
+//                    if ("3".equals(taskType)) {
+//                        specialTask = (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveCompletedSpecial", paramMap) == 0;
+//                    }
+                    /** 一次性任务或每日随机任务或特殊任务 */
+                    if ("1".equals(taskType) || "2".equals(taskType) || "4".equals(taskType)) {
+                        recordNReward(paramMap, taskId, uid, timeMillis);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("EKTaskServiceImpl.reward failed, e : ", e);
+        }
+    }
+
+    private void recordNReward(Map<String, Object> paramMap, String taskId, String uid, long timeMillis) throws Exception {
+        try {
+            if (!"25".equals(taskId)) {// 由于唯一约束，所以当任务是“注册-奖励邀请人”时，不做任务记录，只更新邀请人的积分
+                // 记录任务
+                this.getSqlMapClientTemplate().insert("ekeyTask.reward", paramMap);
+            }
+        } catch (DataAccessException e) {
+            LOGGER.error("task has done, task id >>> [" + taskId + "], task uid" +
+                    " >>> [" + uid + "], time >>> [" + ApDateTime.getDateTime(ApDateTime.DATE_TIME_Sec, timeMillis) + "]");
+            // 数据库添加uid-tid-strdate组成的唯一约束，如果不满足，直接return，不用加积分
+            return;
+        }
+        // 修改用户积分
+        this.updateUserScore(paramMap);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean hasDoneTask(String uid, String taskType, String taskId, String itemId) {
+        Integer result = 0;
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("UID", uid);
+        paramMap.put("TID", taskId);
+
+        switch (taskType) {
+            case "1" : // 新手任务
+                result = (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveCompletedOneTime", paramMap);
+                break;
+            case "2" : // 每日随机任务
+                String strDate = "";
+                try {
+                    strDate = ApDateTime.getDateTime(ApDateTime.DATE_TIME_YMD, System.currentTimeMillis());
+                } catch (Exception e) {
+                }
+                paramMap.put("STRDATE", strDate);
+                result = (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveCompletedRandom", paramMap);
+                break;
+            case "3" : // 特殊任务
+                paramMap.put("ITEMID", itemId);
+                result = (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveCompletedSpecial", paramMap);
+                break;
+        }
+
+        if (result == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+//    /**
+//     * 任务奖励
+//     *
+//     * @param taskType 任务类型
+//     * @param taskId   任务id
+//     * @param uid      用户id
+//     */
+//    public void reward(String uid, String taskType, String taskId, String itemId) {
+//        try {
+//            if (StrUtils.isNotEmpty(taskType) && StrUtils.isNotEmpty(taskId) && !"".equals(uid)) {
+//                LOGGER.info(">>>>>> task reward >>>>>> [taskType : " + taskType + "], [taskId : " + taskId + "], [uid : " + uid + "]");
+//                String strDate = "";
+//                long timeMillis = System.currentTimeMillis();
+//                try {
+//                    strDate = ApDateTime.getDateTime(ApDateTime.DATE_TIME_YMD, timeMillis);
+//                } catch (Exception e) {
+//                }
+//                Map<String, Object> paramMap = new HashMap<>();
+//                paramMap.put("TID", taskId);
+//                paramMap.put("ITEMID", itemId);
+//                // 查询任务对应的奖励
+//                Integer score = (Integer) this.getSqlMapClientTemplate().queryForObject("ekeyTask.getScoreById", paramMap);
+//
+//                paramMap.put("UID", uid);
+//                paramMap.put("SCORE", StrUtils.zeroOrInt(score));
+//                paramMap.put("CHANGING", "1");
+//                paramMap.put("DATE", new Date());
+//                paramMap.put("STRDATE", strDate);
+//                boolean specialTask = false;
+//                if ("3".equals(taskType)) {
+//                    specialTask = (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveCompletedSpecial", paramMap) == 0;
+//                }
+//                /** 一次性任务或每日随机任务或特殊任务 */
+//                if ("1".equals(taskType) || "2".equals(taskType) || specialTask) {
+//                    if (!"25".equals(taskId)) {// 由于唯一约束，所以当任务是“注册-奖励邀请人”时，不做任务记录，只更新邀请人的积分
+//                        try {
+//                            // 记录任务
+//                            this.getSqlMapClientTemplate().insert("ekeyTask.reward", paramMap);
+//                        } catch (DataAccessException e1) {
+//                            LOGGER.error("task has done, task id >>> [" + taskId + "], task uid" +
+//                                    " >>> [" + uid + "], time >>> [" + ApDateTime.getDateTime(ApDateTime.DATE_TIME_Sec, timeMillis) + "], e : ", e1);
+//                            // 数据库添加uid-tid-strdate组成的唯一约束，如果不满足，直接return，不用加积分
+//                            return;
+//                        }
+//                    }
+//                    // 修改用户积分
+//                    this.updateUserScore(paramMap);
+//                }
+//            }
+//        } catch (Exception e) {
+//            LOGGER.error("EKTaskServiceImpl.reward failed, e : ", e);
+//        }
+//    }
+
+    /*@Override
+    public void reward(String id, String uid, String type) {
+        try {
+            String strDate = "";
+            long timeMillis = System.currentTimeMillis();
+            try {
+                strDate = ApDateTime.getDateTime(ApDateTime.DATE_TIME_YMD, timeMillis);
+            } catch (Exception e) {
+            }
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("ID", id);
+            // 查询任务对应的奖励
+            String score = (String) this.getSqlMapClientTemplate().queryForObject("ekeyTask.getScoreById", paramMap);
+            paramMap.put("UID", uid);
+            paramMap.put("SCORE", score);
+            paramMap.put("CHANGING", "1");
+            paramMap.put("DATE", new Date());
+            paramMap.put("STRDATE", strDate);
+            try {
+                // 任务记录
+                this.getSqlMapClientTemplate().insert("ekeyTask.reward", paramMap);
+            } catch (DataAccessException e1) {
+                LOGGER.error("task has done, task id >>> [" + id + "], task uid" +
+                        " >>> [" + uid + "], time >>> [" + strDate + "], e : ", e1);
+                // 数据库添加uid-tid-strdate组成的唯一约束，如果不满足，直接return，不用加积分
+                return;
+            }
+            if ("1".equals(type)) {// 一次性任务
+                // 修改用户积分
+                this.updateUserScore(paramMap);
+            } else if ("2".equals(type)) {// 签到
+                SimpleDateFormat ymFormat = new SimpleDateFormat("yyyy-MM");
+                Date today = new Date();
+                paramMap.clear();
+                paramMap.put("UID", uid);
+                paramMap.put("DATE", ApDateTime.getDateTime(ApDateTime.DATE_TIME_YM, timeMillis));
+                // 1.查询用户本月所有签到日期（时间倒序排列）
+                List<Map<String, Object>> dates = this.getSqlMapClientTemplate().queryForList("ekeyTask.signedDates", paramMap);
+                Integer seq = 1;
+                if (StrUtils.isNotEmpty(dates)) {
+                    Map<String, Object> latestDate = dates.get(0);// 上一次签到
+                    Object seqObj = latestDate.get("C_SEQ");
+                    Object dateObj = latestDate.get("C_DATE");
+                    String c_seq = StrUtils.emptyOrString(seqObj);
+                    String c_date = StrUtils.emptyOrString(dateObj);
+                    Integer i_seq = Integer.valueOf(c_seq);
+                    // 获取今天
+                    Calendar c = Calendar.getInstance();
+                    int day = c.get(Calendar.DAY_OF_MONTH);// 日期
+                    if (1 == day) {
+                        seq = 1;
+                    } else {
+                        if (StrUtils.isNotEmpty(seqObj)) {
+                            seq = i_seq;
+                            // 昨天
+                            *//*String yesterday = ApDateTime.dateAdd("d", -1, new Date(), ApDateTime.DATE_TIME_YMD);
+                            if (yesterday.equals(c_date)) {
+                                // 如果昨天签到了，seq + 1
+                                seq = i_seq + 1;
+                            }*//*
+                        } else {
+                            LOGGER.error("WRONG SEQ IN [T_GAME_SIGN], UID = " + uid + ", DATE = " + strDate);
+                        }
+                    }
+                }
+                // 查询连续天数对应的奖励
+                paramMap.clear();
+                paramMap.put("SEQ", seq);
+                String reward = (String) this.getSqlMapClientTemplate().queryForObject("ekeyTask.successions", paramMap);
+                // 修改用户积分
+                paramMap.clear();
+                paramMap.put("UID", uid);
+                paramMap.put("SCORE", Integer.valueOf(score) + Integer.valueOf(StrUtils.zeroOrInt(reward)));
+                paramMap.put("CHANGING", "1");
+                this.updateUserScore(paramMap);
+            } else {// 每日随机任务
+                this.updateUserScore(paramMap);
+            }
+
+            }catch(Exception e){
+                LOGGER.error("EKTaskServiceImpl.reward failed, e : ", e);
+            }
+        }*/
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Map<String, Object>> getRandomTask(String uid) {
+        Map<String, Object> parameterObject = new HashMap<>();
+        parameterObject.put("uid", Long.valueOf(uid));
+        return getSqlMapClientTemplate().queryForList("ekeyTask.randomTask", parameterObject);
+    }
+
+    // 更新用户积分
+    public void updateUserScore(Map<String, Object> paramMap) {
+        try {
+            this.getSqlMapClientTemplate().update("ekeyTask.changeUserScore", paramMap);
+        } catch (Exception e) {
+            LOGGER.error("EKTaskServiceImpl.updateUserScore failed, e : ", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    // 查询用户当天的签到记录
+    public List<Map<String, Object>> signRecord(String uid) {
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("UID", uid);
+            paramMap.put("DATE", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            return this.getSqlMapClientTemplate().queryForList("ekeyTask.signRecord", paramMap);
+        } catch (Exception e) {
+            LOGGER.error("EKTaskServiceImpl.signRecord failed, e : ", e);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    // 每日签到
+    public Map<String, Object> signIn(String uid, String signRecord) {
+        Map<String, Object> reqMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        try {
+            // 获取今天
+            Calendar c = Calendar.getInstance();
+            int day = c.get(Calendar.DAY_OF_MONTH);// 日期
+            Date today = new Date();
+            SimpleDateFormat ymFormat = new SimpleDateFormat("yyyy-MM");
+            SimpleDateFormat ymdFormat = new SimpleDateFormat("yyyy-MM-dd");
+            paramMap.put("UID", uid);
+            paramMap.put("DATE", ymFormat.format(today));
+            // 1.查询用户本月所有签到日期
+            List<Map<String, Object>> dates = this.getSqlMapClientTemplate()
+                    .queryForList("ekeyTask.signedDates", paramMap);
+
+            // 2.连续签到天数
+            Integer seq = 1;
+            if ("0".equals(signRecord)) {
+                if (StrUtils.isNotEmpty(dates)) {
+                    Map<String, Object> latestDate = dates.get(0);// 上一次签到
+                    Object seqObj = latestDate.get("C_SEQ");
+                    Object dateObj = latestDate.get("C_DATE");
+                    String c_seq = StrUtils.emptyOrString(seqObj);
+                    String c_date = StrUtils.emptyOrString(dateObj);
+                    Integer i_seq = Integer.valueOf(c_seq);
+                    if (1 == day) {
+                        // 如果今天是1号，seq = 1
+                        reqMap.put("seq", day);
+                        seq = 1;
+                    } else {
+                        if (StrUtils.isNotEmpty(seqObj)) {
+                            // 昨天
+                            String yesterday = ApDateTime.dateAdd("d", -1, new Date(), ApDateTime.DATE_TIME_YMD);
+                            if (yesterday.equals(c_date)) {
+                                // 如果昨天签到了，seq + 1
+                                seq = i_seq + 1;
+                            }
+                        } else {
+                            LOGGER.error("WRONG SEQ IN [T_GAME_SIGN], UID = "
+                                    + uid + ", DATE = " + ymdFormat.format(today));
+                        }
+                    }
+                }
+            }
+
+            String reward = "";
+            if ("0".equals(signRecord)) {
+                paramMap.put("DATE", today);
+                paramMap.put("SEQ", seq);
+                // 签到
+                this.getSqlMapClientTemplate().insert("ekeyTask.signIn", paramMap);
+
+                // 将今天的签到放入集合
+                Map<String, Object> firstDay = new HashMap<String, Object>();
+                firstDay.put("C_SEQ", seq);
+                firstDay.put("C_DATE", ymdFormat.format(today));
+                dates.add(firstDay);
+
+                reward = (String) this.getSqlMapClientTemplate().queryForObject("ekeyTask.successions", paramMap);
+            } else {
+                if (StrUtils.isNotEmpty(dates)) {
+                    Map<String, Object> latestDate = dates.get(0);// 上一次签到
+                    String c_seq = latestDate.get("C_SEQ").toString();
+                    Integer i_seq = Integer.valueOf(c_seq);
+                    seq = i_seq;
+                }
+            }
+
+            reqMap.put("dates", dates);// 所有签到日期
+            reqMap.put("seq", seq);// 连续签到天数
+            reqMap.put("reward", StrUtils.emptyOrString(reward));// 连续签到奖励
+            reqMap.put("total", StrUtils.isEmpty(dates) ? "1" : dates.size());// 总计签到天数
+        } catch (Exception e) {
+            LOGGER.error("EKTaskServiceImpl.signIn failed, e : ", e);
+        }
+        return reqMap;
+    }
+
+    @Override
+    // 查询用户是否已经做过一次性任务（上传头像、修改昵称、修改性别、修改手机号、绑定第三方）
+    public int haveCompleted(String tid, String uid) {
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("UID", uid);
+        paramMap.put("TID", tid);
+        return (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveCompleted", paramMap);
+    }
+
+    @Override
+    public int haveBound(String uid, String loginType) {
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("UID", uid);
+        paramMap.put("LOGINTYPE", loginType);
+        return (Integer) getSqlMapClientTemplate().queryForObject("ekeyTask.haveBound", paramMap);
+    }
+
+}

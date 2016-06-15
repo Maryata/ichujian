@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameApp" namespace="/game" extends="struts-default">
+		
+		<!-- 根据合集id获取单个游戏合集 -->
+		<action name="gamecollection" method="gameCollection" class="gameAppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取游戏APP信息（游戏名、LOGO、包名） -->
+		<action name="gameinfo" method="gameInfo" class="gameAppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 首页广告 -->
+		<action name="advertinfo" method="advertInfo" class="gameAppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!--持久化用户行为-->
+	<action name="persistentUserBehavior" method="persistentUserBehavior" class="gameAppAction"></action>
+	
+	<!-- 持久化用户子项行为 -->
+	<action name="persistentUserBehavior2" method="persistentUserBehavior2" class="gameAppAction"></action>
+	
+	<!--通过游戏ID获取游戏详情-->
+	<action name="getGameDetailByGameId" method="getGameDetailByGameId" class="gameAppAction"></action>
+	
+	<!--用户评分-->
+	<action name="userRating" method="userRating" class="gameAppAction"></action>
+	
+	<!--用户评论-->
+	<action name="userComments" method="userComments" class="gameAppAction"></action>
+	
+	<!--统计游戏星级评论-->
+	<action name="starGameStatistics" method="starGameStatistics" class="gameAppAction"></action>
+	
+	<!--通过游戏id获取游戏评论列表-->
+	<action name="getThroughTheGameIdGameReviewList" method="getThroughTheGameIdGameReviewList" class="gameAppAction"></action>
+	
+	<!-- 通过用户ID和游戏ID获取用户对该游戏的评分 -->
+	<action name="getUserRating" method="getUserRating" class="gameAppAction"></action>
+	
+	<!-- 根据JAR包名获取游戏LOGO -->
+	<action name="getLogo" method="getLogo" class="gameAppAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 游戏分类列表 -->
+	<action name="categoryList" method="categoryList" class="gameAppAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 根据分类id获取具体某一分类中的游戏 -->
+	<action name="gamesInCategory" method="gamesInCategory" class="gameAppAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 游戏推荐 -->
+	<action name="gameRecommend" method="gameRecommend" class="gameAppAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+		<action name="islike" method="isLike" class="gameAppAction"></action>
+		<!--具体游戏相关搜索-->
+		<action name="search" method="search" class="gameAppAction"></action>
+		<!--游戏搜索-->
+		<action name="searchApp" method="searchApp" class="gameAppAction"></action>
+	</package>
+</struts>

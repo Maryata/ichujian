@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="recommend">
+	
+	<!-- 推荐关注 -->
+	<select id="getRecommendFollow"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select * from 
+(select t.c_id,t.c_cname,t.c_logourl from T_ACTIVITY_BRAND_INFO t,T_ACTIVITY_FOLLOW_SCHEME s,T_ACTIVITY_FOLL_SCH_DETAIL d,T_ACTIVITY_CITY_INFO i
+where i.c_cname like '%$cityname$%'and i.c_level=2 and i.c_id=s.c_cityid and s.c_islive=1 and s.c_id=d.c_schemeid and d.c_brandid=t.c_id and t.c_islive=1 
+order by t.c_order desc) a1 left join
+(select b.c_brandid,count(b.c_brandid) count from T_ACTIVITY_MEMBER_BRAND b where b.c_islive=1 group by b.c_brandid) a2 on a2.c_brandid=a1.c_id
+		]]> 
+	</select>
+	
+	<!-- 首页推荐行业 -->
+	<select id="getRecommendMainIndustry"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select t.c_cityid,t.c_industryid,tp.c_name,tp.c_picurl from T_ACTIVITY_CITY_INDUSTRY t,t_Activity_Industry_Type tp where 
+t.c_cityid=#cityid# and t.c_type=0 and t.c_industryid=tp.c_id and t.c_islive=1 order by t.c_order
+		]]> 
+	</select>
+	
+	<!-- 首页轮播广告 -->
+	<select id="getRecommendMainAdvert"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select ad.c_picurl,ad.c_id,ad.c_activityid from T_ACTIVITY_CITY_ADVERT t,T_ACTIVITY_ADVERT_INFO ad where 
+t.c_cityid=#cityid# and t.c_advertid=ad.c_id and t.c_islive=1 and t.c_menuid=3 order by ad.c_order
+		]]> 
+	</select>
+	
+	<!-- 首页小广告 -->
+	<select id="getRecommendMainAdvertMin"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select ad.c_picurl,ad.c_id,ad.c_activityid from T_ACTIVITY_CITY_ADVERT t,T_ACTIVITY_ADVERT_INFO ad where 
+t.c_cityid=#cityid# and t.c_advertid=ad.c_id and t.c_islive=1 and t.c_menuid=1 order by ad.c_order
+		]]> 
+	</select>
+	
+	<!-- 首页热门 -->
+	<select id="getRecommendMainHot"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+ select *
+  from (select rownum rt,
+               b.c_id bid,
+               count(b.c_id) count,
+               b.c_cname,
+               b.c_logourl,
+               i.c_title,
+               i.c_id,
+               i.c_address,
+               i.c_sdate,
+               i.c_detailurl,
+               i.c_edate,
+               i.c_imageurl
+          from T_ACTIVITY_RECOMMEND_SCHEME   s,
+               T_ACTIVITY_RECOMMEND_SCHEME_D d,
+               T_ACTIVITY_CITY_CONTENT       c,
+               t_activity_content_type       t,
+               t_activity_content_activity   a,
+               t_activity_base_info          i,
+               t_activity_brand_info         b
+         where s.c_cityid = #cityid#
+           and s.c_type = 1
+           and d.c_schemeid = s.c_id
+           and c.c_id = d.c_typeid
+           and t.c_id = c.c_contentid
+           and a.c_schemeid = d.c_typeid
+           and i.c_id = a.c_activtyid
+           and i.c_brandid = b.c_id
+           and t.c_islive = 1
+           and a.c_islive = 1
+           and b.c_islive = 1
+           and i.c_edate > sysdate
+         group by b.c_id,
+                  b.c_cname,
+                  b.c_logourl,
+                  i.c_title,
+                  i.c_id,
+                  i.c_address,
+                  i.c_sdate,
+                  i.c_detailurl,
+                  i.c_edate,
+                  i.c_imageurl,
+                  rownum,
+                  a.c_order
+         order by a.c_order) a3
+ where a3.rt > #page#
+   and a3.rt <= #page#+20
+		]]> 
+	</select>
+	
+	<!-- 
+			select * from (
+select rownum rt,b.c_id bid,count(b.c_id) count,b.c_cname,b.c_logourl,i.c_title,i.c_id,i.c_address,i.c_sdate,i.c_detailurl,i.c_edate,i.c_imageurl from T_ACTIVITY_RECOMMEND_SCHEME s,
+T_ACTIVITY_RECOMMEND_SCHEME_D d,t_activity_content_type t,t_activity_content_activity a,t_activity_base_info i,t_activity_brand_info b
+ where s.c_cityid=#cityid# and s.c_type=1 and d.c_schemeid=s.c_id and t.c_id=d.c_typeid and a.c_schemeid=t.c_id and i.c_id=a.c_activtyid and i.c_brandid=b.c_id
+ and t.c_islive=1 and a.c_islive=1 and b.c_islive=1 and i.c_edate>sysdate
+ group by b.c_id,b.c_cname,b.c_logourl,i.c_title,i.c_id,i.c_address,i.c_sdate,i.c_detailurl,i.c_edate,i.c_imageurl,rownum,a.c_order order by a.c_order
+ ) a3 where a3.rt>#page# and a3.rt<=#page#+20
+	 -->
+	
+	<!-- 首页推荐小标题 -->
+	<select id="getRecommendMainPageTitle"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+ select a.c_typeid,c.c_name from (select d.c_typeid  from T_ACTIVITY_RECOMMEND_SCHEME s,
+T_ACTIVITY_RECOMMEND_SCHEME_D d
+ where s.c_cityid=#cityid# and s.c_type=2 and d.c_schemeid=s.c_id) a ,t_activity_content_type c where c.c_id in (a.c_typeid)
+		]]> 
+	</select>
+	
+	<!-- 
+     select * from (
+ select rownum rt,t.c_id,t.c_name,d.c_typeid from T_ACTIVITY_RECOMMEND_SCHEME s,
+T_ACTIVITY_RECOMMEND_SCHEME_D d,T_ACTIVITY_CITY_CONTENT c,t_activity_content_type t
+ where s.c_cityid=#cityid# and s.c_type=2 and d.c_schemeid=s.c_id and c.c_id=d.c_typeid and t.c_id=c.c_contentid
+ and t.c_islive=1 and c.c_islive=1  order by t.c_order , t.c_name 
+ ) a3 where a3.rt>#page# and a3.rt<=#page#+20
+	 -->
+	
+		<!-- 首页推荐小标题活动 -->
+	<select id="getRecommendMainPage"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		     select c_id,c_title,c_grade,c_sdate,c_edate,c_imageurl,bid,c_cname,nvl(counts,0) count from (
+      select i.c_id,i.c_title,i.c_grade,i.c_sdate,i.c_edate,i.c_imageurl,b.c_id as bid,b.c_cname from 
+T_ACTIVITY_CONTENT_ACTIVITY t,t_activity_base_info i,t_activity_brand_info b 
+where t.c_schemeid=#typeid# and t.c_islive=1 and t.c_activtyid=i.c_id and i.c_brandid=b.c_id and b.c_islive=1 and i.c_islive=1 and i.c_edate>sysdate order by i.C_ACTIONDATE desc) a1 left join
+(select s.c_indexid,count(s.c_indexid) counts from T_ACTIVITY_USER_SELECT s where s.c_type=1 and s.c_action=0 group by s.c_indexid ) a2
+on a1.c_id=a2.c_indexid
+		]]> 
+	</select>
+	
+	<!-- select i.c_title,i.c_id,i.c_imageurl,i.c_grade,i.c_brandid bid from 
+T_ACTIVITY_CONTENT_ACTIVITY t,t_activity_base_info i where t.c_schemeid=#typeid# and t.c_activtyid=i.c_id -->
+	
+	<!-- 城市列表 -->
+	<select id="getCityList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+        select t.c_id,t.c_cname,t.c_ename from T_ACTIVITY_CITY_INFO t where t.c_islive=1 and t.c_level=2 order by t.c_order
+		]]> 
+	</select>
+	
+	<!-- 热门城市列表 -->
+	<select id="getHotCityList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select t.c_id,t.c_cname,t.c_ename from T_ACTIVITY_CITY_INFO t where t.c_islive=1 and t.c_level=2 and t.c_type=0 order by t.c_order
+		]]> 
+	</select>
+	
+	<!-- 查询是否有推荐轮播广告 -->
+	<select id="getMainAdvert"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select count(*) from T_ACTIVITY_CITY_ADVERT t where t.c_islive=1 and t.c_cityid=#cityid# and t.c_menuid=3
+		]]> 
+	</select>
+	
+	<!-- 查询是否有推荐小广告 -->
+	<select id="getMainAdvertMin"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select count(*) from T_ACTIVITY_CITY_ADVERT t where t.c_islive=1 and t.c_cityid=#cityid# and t.c_menuid=1
+		]]> 
+	</select>
+	
+	<!-- 查询是否有推荐行业 -->
+	<select id="getMainIndustry"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select count(*) from T_ACTIVITY_CITY_INDUSTRY t where t.c_islive=1 and t.c_cityid=#cityid#
+		]]> 
+	</select>
+	
+	<!-- 查询是否有推荐或热门 方案 -->
+	<select id="getRecommend"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select count(*) from T_ACTIVITY_RECOMMEND_SCHEME t where t.c_type=#type# and t.c_cityid=#cityid#
+		]]> 
+	</select>
+	
+	<!-- 查询是否有这个城市 -->
+	<select id="getRecommendCity"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select t.c_id from T_ACTIVITY_CITY_INFO t where t.c_islive=1 and t.c_cname like '%$cityname$%' 
+		]]> 
+	</select>
+	
+	<!-- 查询是否有这个城市 -->
+	<select id="getRecommendCityFollow"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select * from T_ACTIVITY_FOLLOW_SCHEME t where t.c_islive=1 and t.c_cityid=#cityid#
+		]]> 
+	</select>
+	
+	<!-- 查询默认方案推荐 -->
+	<select id="getRecommendFollowNull"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+         select * from 
+(select t.c_id,t.c_cname,t.c_logourl from T_ACTIVITY_BRAND_INFO t,T_ACTIVITY_FOLLOW_SCHEME s,T_ACTIVITY_FOLL_SCH_DETAIL d
+where s.c_cityid=0 and s.c_islive=1 and s.c_id=d.c_schemeid and d.c_brandid=t.c_id and t.c_islive=1 
+order by t.c_order desc) a1 left join
+(select b.c_brandid,count(b.c_brandid) count from T_ACTIVITY_MEMBER_BRAND b where b.c_islive=1 group by b.c_brandid) a2 on a2.c_brandid=a1.c_id
+		]]> 
+	</select>
+	
+	
+ </sqlMap>
+

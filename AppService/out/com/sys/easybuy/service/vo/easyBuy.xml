@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="easyBuy">
+	<!-- 广告位信息 -->
+	<select id="advertInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT P.C_ID C_PID, P.C_NAME, P.C_IMG1 C_IMG
+		  FROM T_S_TOPIC T, T_S_USER U, T_S_PRODUCT P, T_S_TOPIC_PRODUCT TP
+		 WHERE T.C_UID = U.C_ID
+		   AND T.C_UID = P.C_UID
+		   AND T.C_ID = TP.C_TID
+		   AND TP.C_PID = P.C_ID
+		   AND U.C_STATUS = 1
+		   AND T.C_TYPE = 0
+		   AND T.C_ON_SALE = 1
+		   AND T.C_ISLIVE = 1
+		   AND P.C_STATUS = 1
+		   AND U.C_CODE = #UCODE#
+		 ORDER BY TP.C_ORDER
+		]]>
+	</select>
+	
+	<!-- 分类列表 -->
+	<select id="category" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT TEMP.*
+		  FROM (SELECT T.C_ID, T.C_NAME, T.C_LOGO
+		          FROM T_S_CATEGORY T
+		         WHERE T.C_ISLIVE = 1) TEMP
+		 WHERE TEMP.C_ID IN (SELECT DISTINCT (P.C_CID)
+		                       FROM T_S_PRODUCT P, T_S_USER U
+		                      WHERE P.C_UID = U.C_ID
+		                        AND U.C_STATUS = 1
+		                        AND P.C_STATUS = 1
+		                        AND U.C_CODE = #UCODE#)
+		]]>
+	</select>
+	
+	<!-- 可维护分类（专题）id -->
+	<select id="customableCate" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT TMP.C_ID, TMP.C_NAME
+		  FROM (SELECT ROWNUM, T.C_ID, T.C_NAME
+		          FROM T_S_TOPIC T, T_S_USER U
+		         WHERE T.C_ISLIVE = 1
+		           AND T.C_TYPE = 1
+		           AND T.C_UID = U.C_ID
+		           AND U.C_STATUS = 1
+		           AND T.C_ON_SALE = 1
+		           AND T.C_NAME IS NOT NULL
+		           AND U.C_CODE = #UCODE#
+		           ORDER BY T.C_ORDER) TMP
+		 WHERE ROWNUM < #CATENUM# + 1
+		]]>
+	</select>
+	
+	<!-- 查询每个分类下的前3个产品 -->
+	<select id="customableCatePro" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT TEMP.C_ID, TEMP.C_NAME, TEMP.C_IMG1, TEMP.C_RANK
+		  FROM (SELECT ROWNUM, P.C_ID, P.C_NAME, P.C_IMG1, P.C_RANK
+		          FROM T_S_PRODUCT P, T_S_TOPIC_PRODUCT TP
+		         WHERE P.C_STATUS = 1
+		           AND P.C_ID = TP.C_PID
+		           AND TP.C_TID = #CID#
+		         ORDER BY TP.C_ORDER) TEMP
+		 WHERE ROWNUM < #PRONUM# + 1
+		]]>
+	</select>
+	
+	<!-- 附近门店 -->
+	<select id="storesNearby" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		 SELECT T.C_ID,
+		       T.C_NAME,
+		       T.C_ADDRESS,
+		       T.C_PHONE,
+		       T.C_STORE_HOURS,
+		       T.C_BUS_LINES,
+		       T.C_RAIL_TRANSIT,
+		       T.C_LONGITUDE,
+		       T.C_LATITUDE
+		  FROM T_S_STORES T, T_S_USER U
+		 WHERE T.C_UID = U.C_ID
+		   AND U.C_STATUS = 1
+		   AND U.C_CODE = #UCODE#
+		]]>
+	</select>
+	
+	<!-- 不可维护分类详情（分类详情） -->
+	<select id="categoryDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME, C_IMG1, C_RANK
+		  FROM (SELECT ROWNUM RN, TEMP.*
+		          FROM (SELECT T.C_ID, T.C_NAME, T.C_IMG1, T.C_RANK
+		                  FROM T_S_PRODUCT T, T_S_USER U
+		                 WHERE T.C_STATUS = 1
+		                   AND U.C_STATUS = 1
+		                   AND T.C_UID = U.C_ID
+		                   AND U.C_CODE = #UCODE#
+		                   AND T.C_CID = #CID#
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RN > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	
+	<!-- 可维护分类详情（专题详情） -->
+	<select id="topicDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME, C_IMG1, C_RANK
+		  FROM (SELECT ROWNUM RN, TEMP.*
+		          FROM (SELECT P.C_ID, P.C_NAME, P.C_IMG1, P.C_RANK
+		                  FROM T_S_TOPIC_PRODUCT T, T_S_PRODUCT P, T_S_USER U
+		                 WHERE T.C_PID = P.C_ID
+		                   AND P.C_UID = U.C_ID
+		                   AND P.C_STATUS = 1
+		                   AND U.C_STATUS = 1
+		                   AND T.C_TID = #CID#
+		                   AND U.C_CODE = #UCODE#
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RN > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	
+	<!-- 产品详情 -->
+	<select id="productDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID,
+		       T.C_NAME,
+		       T.C_CID,
+		       T.C_IMG1,
+		       T.C_IMG2,
+		       T.C_IMG3,
+		       T.C_IMG4,
+		       T.C_H5_URI C_DESCRIPTION,
+		       T.C_SID,
+		       T.C_RANK
+		  FROM T_S_PRODUCT T
+		 WHERE T.C_ID = #ID#
+		   AND T.C_STATUS = 1
+		]]>
+	</select>
+	
+	<!-- 简明产品搜索 -->
+	<select id="simpleSearch" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME
+		  FROM T_S_PRODUCT T, T_S_USER U
+		 WHERE T.C_STATUS = 1
+		   AND U.C_STATUS = 1
+		   AND T.C_UID = U.C_ID
+		   AND U.C_CODE = #UCODE#
+		   AND T.C_NAME LIKE #CONTENT#
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	
+	<!-- 产品搜索 -->
+	<select id="search" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME, T.C_IMG1, T.C_RANK
+		  FROM T_S_PRODUCT T, T_S_USER U
+		 WHERE T.C_STATUS = 1
+		   AND U.C_STATUS = 1
+		   AND T.C_UID = U.C_ID
+		   AND U.C_CODE = #UCODE#
+		   AND T.C_NAME LIKE #CONTENT#
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	
+	<!-- 根据产品id获取其所在分类的id -->
+	<select id="cidOfPid" parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT C_CID FROM T_S_PRODUCT WHERE C_ID = #PID#
+		]]>
+	</select>
+	
+	<!-- "猜你喜欢" -->
+	<select id="guessULike" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM (SELECT T.C_ID, T.C_NAME, T.C_IMG1, T.C_RANK
+		          FROM T_S_PRODUCT T
+		         WHERE T.C_STATUS = 1
+		           AND T.C_UID =
+		               (SELECT P.C_UID
+		                  FROM T_S_PRODUCT P
+		                 WHERE P.C_ID = #PID#)
+		         ORDER BY DBMS_RANDOM.VALUE) TEMP
+		 WHERE ROWNUM < 5
+		]]>
+	</select>
+</sqlMap>
+

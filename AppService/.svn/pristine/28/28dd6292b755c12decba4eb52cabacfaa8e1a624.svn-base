@@ -1,0 +1,35 @@
+package com.sys.ekey.freecall.service;
+
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/12.
+ */
+public interface FeiyuCloudService {
+
+    /**
+     * 新增飞语云账号相关信息
+     *
+     * @param regid     e键用户的regid
+     * @param phonenum  手机号
+     * @param resultMap 返回参数
+     */
+    void addAccount(String regid, String phonenum, Map<String, Object> resultMap);
+
+    /**
+     * 新增飞语云账号出错的日志记录
+     *
+     * @param regid     e键用户的regid
+     * @param resultMap 返回参数
+     */
+    void addAccountLogError(String regid, Map<String, Object> resultMap, String type);
+
+    /**
+     * 修改绑定手机
+     *
+     * @param regId       e键用户的regid
+     * @param fyAccountId 飞语用户id
+     * @param phonenum    手机号
+     */
+    void modifyPhone(String regId, String fyAccountId, String phonenum);
+}

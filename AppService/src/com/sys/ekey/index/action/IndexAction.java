@@ -1,0 +1,341 @@
+package com.sys.ekey.index.action;
+
+import com.sys.commons.AbstractAction;
+import com.sys.ekey.index.service.IndexService;
+import com.sys.game.util.IGameConst;
+import com.sys.util.JSONUtil;
+import com.sys.util.StrUtils;
+import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/3/1.
+ */
+@Component
+public class IndexAction extends AbstractAction {
+
+    private static final long serialVersionUID = -1789133492754734851L;
+
+    @Autowired
+    private IndexService indexService;
+
+    // 键位app
+    public String appByKey() {
+        log.info("into IndexAction appByKey ...");
+        Map<String, Object> retMap = new HashMap<String, Object>();
+
+        String key = getParameter("key");
+        String supCode = getParameter("supCode");
+
+        log.info("key -->" + key + " supCode -->" + supCode);
+
+        try {
+            List<Map<String, Object>> apps = indexService.appByKey(key, supCode);
+
+            if (!apps.isEmpty()) {
+                List<Map<String, Object>> list = JSONUtil.clobToString(apps);
+                retMap.put(IGameConst.STATUS, IGameConst.YES);
+                retMap.put("apps", list);
+            } else {
+                retMap.put(IGameConst.STATUS, IGameConst.NO);
+                retMap.put("apps", new ArrayList<Map<String, Object>>());
+            }
+
+            retMap.put(IGameConst.INFO, IGameConst._1002);
+        } catch (Exception e) {
+            log.error("获取键位app出错！", e);
+            retMap.put(IGameConst.STATUS, IGameConst.NO);
+            retMap.put(IGameConst.INFO, IGameConst._1003);
+        }
+
+        try {
+            writeToResponse(JSONObject.fromObject(retMap).toString());
+        } catch (Exception ex) {
+            log.error("键位app数据写出错误！", ex);
+        }
+
+        return NONE;
+    }
+    // 键位信息 当前只有4号键有需求
+    public String keyInfo() {
+        log.info("into IndexAction keyInfo ...");
+        Map<String, Object> retMap = new HashMap<String, Object>();
+
+        String supCode = getParameter("supCode");
+
+        final String key = "4";
+
+        log.info(" supCode -->" + supCode);
+
+        if (StringUtils.isEmpty(supCode)) {
+            retMap.put(IGameConst.STATUS, IGameConst._1001);
+        } else {
+            try {
+                List<Map<String, Object>> apps = indexService.keyInfo(key,supCode);
+
+                if (!apps.isEmpty()) {
+                    List<Map<String, Object>> list = JSONUtil.clobToString(apps);
+
+                    retMap.put("apps", list);
+                    retMap.put(IGameConst.STATUS, IGameConst.YES);
+                } else {
+                    retMap.put(IGameConst.STATUS, IGameConst.NO);
+                    retMap.put("apps", new ArrayList<Map<String, Object>>());
+                }
+
+                retMap.put(IGameConst.INFO, IGameConst._1002);
+            } catch (Exception e) {
+                log.error("获取键位信息出错！", e);
+                retMap.put(IGameConst.STATUS, IGameConst.NO);
+                retMap.put(IGameConst.INFO, IGameConst._1003);
+            }
+        }
+
+        try {
+            writeToResponse(JSONObject.fromObject(retMap).toString());
+        } catch (Exception ex) {
+            log.error("键位信息数据写出错误！", ex);
+        }
+
+        return NONE;
+    }
+
+    public String more() {
+        log.info("into IndexAction more ...");
+        Map<String, Object> retMap = new HashMap<String, Object>();
+
+        String uid = getParameter("uid");
+        String supCode = getParameter("supCode");
+
+        log.info("uid -->" + uid + " supCode -->" + supCode);
+
+        try {
+            List<Map<String, Object>> apps = indexService.more(uid, supCode);
+
+            if (!apps.isEmpty()) {
+                List<Map<String, Object>> list = JSONUtil.clobToString(apps);
+
+                retMap.put("apps", list);
+            } else {
+                retMap.put("apps", new ArrayList<Map<String, Object>>());
+            }
+
+            retMap.put(IGameConst.STATUS, IGameConst.YES);
+            retMap.put(IGameConst.INFO, IGameConst._1002);
+        } catch (Exception e) {
+            log.error("获取更多应用出错！", e);
+            retMap.put(IGameConst.STATUS, IGameConst.NO);
+            retMap.put(IGameConst.INFO, IGameConst._1003);
+        }
+
+
+        try {
+            writeToResponse(JSONObject.fromObject(retMap).toString());
+        } catch (Exception ex) {
+            log.error("数据写出错误！", ex);
+        }
+
+        return NONE;
+    }
+
+    public String customHis() {
+        log.info("into IndexAction customHis ...");
+        Map<String, Object> retMap = new HashMap<String, Object>();
+
+        String uid = getParameter("uid");
+        String aid = getParameter("aid");
+        // 0 add / 1 subtract
+        String op = getParameter("op");
+
+        log.info("uid -->" + uid + " aid -->" + aid + " op -->" + op);
+
+        if (StringUtils.isEmpty(uid) || StringUtils.isEmpty(aid) || StringUtils.isEmpty(op)) {
+            retMap.put(IGameConst.STATUS, IGameConst._1001);
+        } else {
+            try {
+                boolean flag = indexService.customHis(uid, aid, op);
+
+                retMap.put("flag", flag);
+
+                retMap.put(IGameConst.STATUS, IGameConst.YES);
+                retMap.put(IGameConst.INFO, IGameConst._1002);
+            } catch (Exception e) {
+                log.error("用户定制出错！", e);
+                retMap.put(IGameConst.STATUS, IGameConst.NO);
+                retMap.put(IGameConst.INFO, IGameConst._1003);
+            }
+        }
+
+        try {
+            writeToResponse(JSONObject.fromObject(retMap).toString());
+        } catch (Exception ex) {
+            log.error("数据写出错误！", ex);
+        }
+
+        return NONE;
+    }
+
+    // 用户首页APP布局接口
+    public String indexAppLayout() {
+        Map<String, Object> reqMap = new HashMap();
+        String uid = this.getParameter("uid");
+        String supCode = this.getParameter("supCode");// 用户供应商代码
+        log.info("into IndexAction.indexAppLayout");
+        log.info("uid = " + uid + ", supCode = " + supCode);
+        try {
+            List<Map<String, Object>> apps = indexService.indexAppLayout(uid, supCode);
+            reqMap.put("status", "Y");
+            reqMap.put("apps", apps);
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003," + e.getMessage());
+            log.error("IndexAction.indexAppLayout failed,e : " + e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            log.error(e);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return NONE;
+    }
+
+    // 首页广告
+    public String advertInfo() {
+        Map<String, Object> reqMap = new HashMap();
+        log.info("into IndexAction.advertInfo");
+        try {
+            List<Map<String, Object>> advert = indexService.advertInfo();
+            reqMap.put("status", "Y");
+            reqMap.put("advert", advert);
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003," + e.getMessage());
+            log.error("IndexAction.advertInfo failed,e : " + e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            log.error(e);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return NONE;
+    }
+
+    // 用户点击APP历史纪录
+    public String appUsingHis() {
+        Map<String, Object> reqMap = new HashMap();
+        String uid = this.getParameter("uid");
+        String imei = this.getParameter("imei");
+        log.info("into IndexAction.appUsingHis");
+        log.info("uid = " + uid + ", imei = " + imei);
+        try {
+            List<Map<String, Object>> history = indexService.appUsingHis(uid, imei);
+            reqMap.put("status", "Y");
+            reqMap.put("history", history);
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003," + e.getMessage());
+            log.error("IndexAction.appUsingHis failed,e : " + e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            log.error(e);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return NONE;
+    }
+
+    // 记录用户点击APP的行为
+    public String appUsingRecord() {
+        Map<String, Object> reqMap = new HashMap();
+        String aid = this.getParameter("aid");
+        String uid = this.getParameter("uid");
+        String imei = this.getParameter("imei");
+        log.info("into IndexAction.appUsingRecord");
+        log.info("aid = " + aid + ", uid = " + uid + ", imei = " + imei);
+        try {
+            indexService.appUsingRecord(aid, uid, imei);
+            reqMap.put("status", "Y");
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003," + e.getMessage());
+            log.error("IndexAction.appUsingRecord failed,e : " + e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            log.error(e);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return NONE;
+    }
+
+    // 查询所有按键的点击次数
+    public String countOfEachKeys() {
+        Map<String, Object> reqMap = new HashMap();
+        String imei = this.getParameter("imei");
+        String date = this.getParameter("date");
+        log.info("into IndexAction.countOfEachKeys");
+        log.info("imei = " + imei + ", date = " + date);
+        try {
+            Map<String, Integer> count = indexService.countOfEachKeys(imei, date);
+            reqMap.put("status", "Y");
+            reqMap.put("count", count);
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003," + e.getMessage());
+            log.error("IndexAction.countOfEachKeys failed,e : " + e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            log.error(e);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return NONE;
+    }
+
+    // 查询现有的所有首页应用总数，如果总数于参数不相等则返回所有应用，否则返回0
+    public String getAllAppOrNot() {
+        Map<String, Object> reqMap = new HashMap();
+        String cnt = this.getParameter("count");
+        log.info("into IndexAction.getAllAppOrNot");
+        log.info("cnt = " + cnt);
+        try {
+            List<Map<String, Object>> count = indexService.getAllAppOrNot(cnt);
+            if (StrUtils.isEmpty(count)) {
+                reqMap.put("count", new ArrayList<>());
+            } else {
+                reqMap.put("count", count);
+            }
+            reqMap.put("status", "Y");
+        } catch (Exception e) {
+            reqMap.put("status", "N");
+            reqMap.put("info", "1003," + e.getMessage());
+            log.error("IndexAction.getAllAppOrNot failed,e : " + e);
+        }
+        try {
+            writeToResponse(JSONObject.fromObject(reqMap).toString());
+        } catch (IOException e) {
+            log.error(e);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return NONE;
+    }
+}

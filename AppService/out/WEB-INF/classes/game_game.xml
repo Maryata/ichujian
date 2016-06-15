@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="game" namespace="/game-bak" extends="struts-default">
+		
+		<!-- 根据合集id获取单个游戏合集 -->
+		<action name="gamecollection" method="gameCollection" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取游戏APP信息（游戏名、LOGO、包名） -->
+		<action name="gameinfo" method="gameInfo" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 用户个人信息 -->
+		<action name="userinfo" method="userInfo" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 根据合集id获取单个游戏合集 -->
+		<action name="advertinfo" method="advertInfo" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 第三方登录 -->
+		<action name="external" method="external" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 第三方绑定 -->
+		<action name="bindexternal" method="bindExternal" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 触键注册 -->
+		<action name="register" method="register" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 手机号登录 -->
+		<action name="login" method="login" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 修改密码 -->
+		<action name="modifypwd" method="modifyPwd" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 编辑用户信息（只修改昵称和性别） -->
+		<action name="edituserinfo" method="editUserInfo" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 绑定手机 -->
+		<action name="bindphone" method="bindPhone" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取验证码 -->
+		<action name="getvalicode" method="getValiCode" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 忘记密码-判断验证码的有效性 -->
+		<action name="isvalidcode" method="isValidCode" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 忘记密码-设置新密码 -->
+		<action name="setpwdoffgt" method="setPwdOfFgt" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 修改用户头像 -->
+		<action name="userhead" method="userHead" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取游戏提示语 -->
+		<action name="gameCue" method="gameCue" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 解绑第三方账号 -->
+		<action name="unBindExternal" method="unBindExternal" class="gameAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 快速登录 -->
+<!-- 		<action name="quickLogin" method="quickLogin" class="gameAction"> -->
+<!-- 			<result name="input">/JsonData.jsp</result> -->
+<!-- 			<result name="success">/JsonData.jsp</result> -->
+<!-- 		</action> -->
+		
+		<!--持久化用户行为-->
+	<action name="persistentUserBehavior" method="persistentUserBehavior" class="gameAction"></action>
+	
+	<!-- 持久化用户子项行为 -->
+	<action name="persistentUserBehavior2" method="persistentUserBehavior2" class="gameAction"></action>
+	
+	<!--通过游戏ID获取游戏详情-->
+	<action name="getGameDetailByGameId" method="getGameDetailByGameId" class="gameAction"></action>
+	
+	<!--用户评分-->
+	<action name="userRating" method="userRating" class="gameAction"></action>
+	
+	<!--用户评论-->
+	<action name="userComments" method="userComments" class="gameAction"></action>
+	
+	<!--统计游戏星级评论-->
+	<action name="starGameStatistics" method="starGameStatistics" class="gameAction"></action>
+	
+	<!--通过游戏id获取游戏评论列表-->
+	<action name="getThroughTheGameIdGameReviewList" method="getThroughTheGameIdGameReviewList" class="gameAction"></action>
+	
+	<!-- 通过用户ID和游戏ID获取用户对该游戏的评分 -->
+	<action name="getUserRating" method="getUserRating" class="gameAction"></action>
+	
+	<!-- 通过游戏ID获取游戏活动列表 -->
+	<action name="getAListOfGamesByGameId" method="getAListOfGamesByGameId" class="gameAction"></action>
+	
+	<!-- 通过游戏ID获取游戏资讯列表 -->
+	<action name="getGameInformationThroughGameId" method="getGameInformationThroughGameId" class="gameAction"></action>
+	
+	<!-- 根据合集id获取单个H5游戏合集 -->
+	<action name="h5Gamecollection" method="h5GameCollection" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- H5广告位数据 -->
+	<action name="h5AdvertInfo" method="h5AdvertInfo" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 所有游戏礼包 -->
+	<action name="gameGiftList" method="gameGiftList" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 单个游戏礼包 -->
+	<action name="gameGift" method="gameGift" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 礼包领取 -->
+	<action name="getGift" method="getGift" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 礼包淘号 -->
+	<action name="drawGiftCode" method="drawGiftCode" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 礼包详情 -->
+	<action name="giftDetail" method="giftDetail" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- "我的礼包" -->
+	<action name="usersGifts" method="usersGifts" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- "H5游戏弹幕" -->
+	<action name="h5Barrage" method="h5Barrage" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- "校验手机号是否可用" -->
+	<action name="validatePhone" method="validatePhone" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 根据JAR包名获取游戏LOGO -->
+	<action name="getLogo" method="getLogo" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 礼包推荐 -->
+	<action name="recommendGift" method="recommendGift" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 最近在玩 -->
+	<action name="recentlyPlaying" method="recentlyPlaying" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 游戏分类列表 -->
+	<action name="categoryList" method="categoryList" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- H5游戏分类列表 -->
+	<action name="h5CategoryList" method="h5CategoryList" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 根据分类id获取具体某一分类中的游戏 -->
+	<action name="gamesInCategory" method="gamesInCategory" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 根据分类id获取具体某一分类中的游戏(H5) -->
+	<action name="h5GamesInCategory" method="h5GamesInCategory" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 游戏推荐 -->
+	<action name="gameRecommend" method="gameRecommend" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 游戏推荐(H5) -->
+	<action name="h5GameRecommend" method="h5GameRecommend" class="gameAction">
+		<result name="input">/JsonData.jsp</result>
+		<result name="success">/JsonData.jsp</result>
+	</action>
+	
+	<!-- 游戏攻略列表 -->
+	<action name="raiders" method="raiders" class="gameAction"></action>
+	<!-- 通过活动ID获取活动信息 -->
+	<action name="getActivityById" method="getActivityById" class="gameAction"></action>
+	<!-- 通过资讯ID获取资讯信息 -->
+	<action name="getInformationById" method="getInformationById" class="gameAction"></action>
+	<!-- 通过攻略ID获取攻略信息 -->
+	<action name="getRaidersById" method="getRaidersById" class="gameAction"></action>
+	<action name="islike" method="isLike" class="gameAction"></action>
+	<action name="getPopularSearchesApp" method="getPopularSearchesApp" class="gameAction"></action>
+	<action name="getPopularSearchesH5" method="getPopularSearchesH5" class="gameAction"></action>
+	<action name="searchApp" method="searchApp" class="gameAction"></action>
+	<action name="searchH5" method="searchH5" class="gameAction"></action>
+	<action name="boutiqueAppIndex" method="boutiqueAppIndex" class="gameAction"></action>
+	<action name="boutiqueH5Index" method="boutiqueH5Index" class="gameAction"></action>
+	<action name="giftsIndex" method="giftsIndex" class="gameAction"></action>
+	<action name="boutiqueAppCategoryDetail" method="boutiqueAppCategoryDetail" class="gameAction"></action>
+	<action name="boutiqueH5CategoryDetail" method="boutiqueH5CategoryDetail" class="gameAction"></action>
+	<action name="giftsCategoryDetail" method="giftsCategoryDetail" class="gameAction"></action>
+	
+	</package>
+</struts>

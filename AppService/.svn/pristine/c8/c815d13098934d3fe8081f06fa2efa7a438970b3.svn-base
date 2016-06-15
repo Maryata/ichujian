@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- struts.objectFactory.spring.autoWire是
+	用spring插件通过覆盖(override)Struts2的ObjectFactory来增强核心框架对象的创建 -->
+    <constant name="struts.objectFactory.spring.autoWire" value="type" />
+	<constant name="struts.objectFactory" value="spring" />
+	<!--<constant name="struts.action.extension" value="action"/>-->
+	<!-- Struts2的action由Spring来负责进行实例化 -->
+	<include file="struts-default.xml" />
+	<!-- value="204857600" -->
+	<constant name="struts.multipart.maxSize" value="1490823609" />
+	
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	
+	<package name="app" extends="struts-default">
+	
+	<!-- 激活  更新 -->
+		<action name="appstart" method="AppStart" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	
+	    <action name="appactive" method="AppActive" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	
+		<action name="update" method="Update" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="log" method="LogInfo" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+        <!-- 意见反馈 -->
+		<action name="feedback" method="Feedback" class="UserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		
+	<!-- 使用 记录 -->	
+		<action name="useapp" method="UseApp" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	
+		<action name="useonekey" method="Usekey" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="usecommon" method="UseCommon" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="supplierurl" method="getSuppListUrl" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		
+		<!-- 设置记录 -->
+		<!-- 
+		<action name="test" method="Test" class="SetAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		 -->
+		<action name="click" method="Click" class="SetAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="hold" method="Hold" class="SetAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="sos" method="Sos" class="SetAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		
+		<!-- 新闻 -->
+		<action name="goodnews" method="GoodNews" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="othernews" method="OtherNews" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="installed" method="Installed" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="downapp" method="DownApp" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<action name="unloadapp" method="UnloadApp" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 广告 -->
+		<action name="advert" method="Advert" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 首页广告 -->
+		<action name="mainadvert" method="MainAdvert" class="NewsAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 帮助信息 -->
+		<action name="helpinfo" method="HelpInfo" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取供应商的用户注册协议或免费通话问题帮助 -->
+		<action name="ekHelpInfo" method="ekHelpInfo" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		
+		<!-- 测试100万条数据
+		<action name="test" method="Test" class="UseAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		 -->
+		 <!-- 校验激活码是否存在、是否可用 -->
+		<action name="validActCode" method="validActCode" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!-- 获取所有手机品牌信息 -->
+		<action name="getAllBrandsOfPhone" method="getAllBrandsOfPhone" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!-- 根据品牌id获取该品牌下的所有型号信息 -->
+		<action name="getSubBrandByBrandId" method="getSubBrandByBrandId" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!-- 查询所有物流信息 -->
+		<action name="expressInfo" method="expressInfo" class="AppAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+	</package>
+
+
+	<include file="activity_user.xml"/>
+	<include file="activity_industry.xml"/>
+	<include file="activity_recommend.xml"/>
+	<include file="activity_classified.xml"/>
+	<include file="activity_activity.xml"/>
+	<include file="activity_search.xml"/>
+    <include file="activity_useactivity.xml"/>
+    <include file="activity_web.xml"/>
+    
+    <include file="activity_usernotify.xml" />
+    
+<!--     <include file="game_game.xml"/> -->
+    <include file="game_activity.xml"/>
+    <include file="game_app.xml"/>
+    <include file="game_gift.xml"/>
+    <include file="game_h5.xml"/>
+    <include file="game_infomation.xml"/>
+    <include file="game_strategy.xml"/>
+    <include file="game_user.xml"/>
+    <include file="game_task.xml"/>
+    <include file="game_mall.xml"/>
+    
+    <!--免费换膜-->
+    <include file="exchange.xml"></include>
+    
+    <include file="phonerecord.xml"/>
+    
+    <include file="mcrapp_all.xml"></include>
+    
+    <include file="weixin_h5.xml"></include>
+    
+    <!-- 一键购膜 -->
+    <include file="easyBuy.xml"></include>
+    
+    <!-- 触键用户 -->
+    <include file="member.xml"></include>
+
+	<!-- e键 -->
+	<include file="ekey/ek_index.xml"/>
+	<include file="ekey/ek_activity.xml"/>
+	<include file="ekey/ek_user.xml"/>
+	<include file="ekey/ek_game_gift.xml"/>
+	<include file="ekey/ek_game_activity.xml"/>
+	<include file="ekey/ek_game_app.xml"/>
+	<include file="ekey/ek_game_h5.xml"></include>
+	<include file="ekey/ek_game_strategy.xml"></include>
+	<include file="ekey/ek_freeCall.xml"/>
+	<include file="ekey/ek_task.xml"/>
+	<include file="ekey/ek_shop.xml"/>
+
+</struts>

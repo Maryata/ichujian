@@ -1,0 +1,17 @@
+package com.sys.ekey.shop.action;
+
+import com.sys.commons.AbstractAction;
+import com.sys.ekey.shop.service.ShopService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * 商城 接口
+ * Created by vpc on 2016/4/15.
+ */
+@Component
+public class ShopAction extends AbstractAction {
+
+    @Autowired
+    private ShopService shopService;
+}

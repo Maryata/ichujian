@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_index">
+
+    <!--定制历史记录-->
+    <insert id="customHis" parameterClass="java.util.HashMap">
+        insert into t_ek_index_user_custom_his
+        (c_id, c_uid, c_aid, c_op, c_date)
+        values
+        (seq_ek_index_u_custom_his.nextval, #uid#, #aid#, #op#, #v_date#)
+    </insert>
+    <!--用户添加app-->
+    <insert id="appAdd" parameterClass="java.util.HashMap">
+        insert into t_ek_index_user_app
+  (c_id, c_uid, c_aid, c_order, c_date)
+values
+      (seq_ek_index_app_info.nextval,
+   #uid#,
+   #aid#,
+   (select nvl(max(c_order),0) from t_ek_index_user_app where c_uid = #uid#) + 1,
+   #v_date#)
+    </insert>
+    <!--用户删除app-->
+    <delete id="appDel" parameterClass="java.util.HashMap">
+        DELETE FROM t_ek_index_user_app WHERE c_uid=#uid# and c_aid in
+        <iterate property="ids" open="(" conjunction="," close=")">
+            #ids[]#
+        </iterate>
+    </delete>
+    <!--键位信息-->
+    <select id="keyInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+         select c_id, c_name, c_logo,C_SUPURL
+           from t_ek_index_key_app
+          where c_key = #key#
+            and c_islive = '1'
+            and c_supcode = #supCode#
+    </select>
+    <!--键位app-->
+    <select id="appByKey" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+              select c_id,
+               c_name,
+               c_title,
+               c_logo,
+               c_img,
+               c_appurl,
+               c_jar,
+               c_size,
+               c_menu,
+               c_menutel,
+               c_abstract,
+               c_version,
+               c_download,
+               c_grade,
+               c_h5url,
+               c_source,
+               c_supcode,
+               c_supurl,
+               c_edate
+          from t_ek_index_key_app
+         where c_key = #key#
+           and c_islive = '1'
+           and c_supcode = #supCode#
+         order by c_order
+    </select>
+    <!--更多app 用户未登录的情况-->
+    <select id="more" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select c_id, c_name, c_img, c_url, c_type
+        from t_ek_index_app_info
+        where c_id not in (select c_aid from t_ek_index_model)
+        <isEqual property="showExchange" compareValue="false">
+            and c_type != 5
+        </isEqual>
+        <isEqual property="easyBuy" compareValue="false">
+            and c_type != 3
+        </isEqual>
+        and c_islive = 1
+    </select>
+    <!--更多app 用户登录的情况-->
+    <select id="more0" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select c_id, c_name, c_img, c_url, c_type
+        from t_ek_index_app_info
+        where c_id not in (select c_aid
+        from t_ek_index_model
+        where c_editable = 0
+        union
+        select c_aid
+        from t_ek_index_user_app
+        where c_uid = #uid#)
+        <isEqual property="showExchange" compareValue="false">
+            and c_type != 5
+        </isEqual>
+        <isEqual property="easyBuy" compareValue="false">
+            and c_type != 3
+        </isEqual>
+        and c_islive = 1
+    </select>
+
+    <!-- 用户首页APP -->
+    <select id="usersApp" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+
+		SELECT A.C_ID, A.C_NAME, A.C_IMG, A.C_URL, A.C_TYPE
+		  FROM T_EK_INDEX_USER_APP T, T_EK_INDEX_APP_INFO A
+		 WHERE A.C_ISLIVE = '1'
+		   AND T.C_UID = #UID#
+		   AND T.C_AID = A.C_ID
+		 ORDER BY T.C_ORDER
+
+        ]]>
+	</select>
+
+    <!-- 查询模板APP -->
+    <select id="modelApp" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT A.C_ID, A.C_NAME, A.C_IMG, A.C_URL, A.C_TYPE, T.C_EDITABLE
+        FROM T_EK_INDEX_MODEL T, T_EK_INDEX_APP_INFO A
+        WHERE T.C_AID = A.C_ID
+        AND A.C_ISLIVE = '1'
+        <isNotEqual property="UID" compareValue="-1">
+            AND T.C_EDITABLE = '0'
+        </isNotEqual>
+        ORDER BY T.C_ORDER
+    </select>
+
+    <!-- 查询模板APP -->
+    <select id="supplierApp" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT A.C_ID, A.C_NAME, A.C_IMG, A.C_URL, A.C_TYPE
+          FROM T_EK_INDEX_SUPPLIER_INDEXAPP T, T_EK_INDEX_APP_INFO A
+         WHERE T.C_ISLIVE = '1'
+           AND A.C_ISLIVE = '1'
+           AND T.C_INDEX_AID = A.C_ID
+           AND T.C_CODE = #SUPCODE#
+         ORDER BY T.C_ORDER
+        ]]>
+	</select>
+
+    <!-- 查询当前供应商是否显示“免费换膜”和“周边数码” -->
+    <select id="showInternal" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+
+		SELECT T.C_ISEXCHANGE, T.C_URL FROM T_BASE_SUPPLIER T WHERE T.C_ISLIVE = '1' AND T.C_SUPPLIER_CODE = #SUPCODE#
+
+        ]]>
+	</select>
+
+    <!-- 首页广告 -->
+    <select id="advertInfo" resultClass="java.util.HashMap">
+		<![CDATA[
+
+		SELECT T.C_AID C_ID, T.C_IMG, T.C_NAME, T.C_ORDER, A.C_URL
+          FROM T_EK_INDEX_ADVERT T, T_EK_INDEX_APP_INFO A
+         WHERE T.C_AID = A.C_ID
+         ORDER BY T.C_ORDER
+
+        ]]>
+	</select>
+
+    <!-- 用户点击APP历史纪录 -->
+    <select id="appUsingHis" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT T2.C_ID, T2.C_NAME, T2.C_IMG, T2.C_URL, T2.C_TYPE
+        FROM (SELECT T1.*, A.C_ID, A.C_NAME, A.C_IMG, A.C_URL, A.C_TYPE
+        FROM (SELECT T.C_AID, MAX(T.C_DATE) C_DATE
+        FROM T_EK_INDEX_APP_HIS T
+        WHERE 1 = 1
+        <isNotEmpty property="UID">
+            AND T.C_UID = #UID#
+        </isNotEmpty>
+        <isNotEmpty property="IMEI">
+            AND T.C_IMEI = #IMEI#
+        </isNotEmpty>
+        GROUP BY T.C_AID) T1,
+        T_EK_INDEX_APP_INFO A
+        WHERE T1.C_AID = A.C_ID
+        AND A.C_ISLIVE = '1'
+        ORDER BY T1.C_DATE DESC) T2
+        WHERE ROWNUM &lt; 5
+    </select>
+
+    <!-- 记录用户点击APP的行为 -->
+    <insert id="appUsingRecord" parameterClass="java.util.HashMap">
+        INSERT INTO T_EK_INDEX_APP_HIS (C_ID, C_UID, C_IMEI, C_AID, C_DATE)
+        VALUES (SEQ_EK_INDEX_APP_HIS.NEXTVAL, #UID#, #IMEI#, #AID#, SYSDATE)
+    </insert>
+
+
+    <!-- 查询所有按键的点击次数 -->
+    <select id="countOfEachKeys" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+		SELECT T.C_KEY, COUNT(T.C_IMEI) CNT
+          FROM T_ACTION_USEKEY T
+         WHERE T.C_KEY <> 0
+           AND TO_CHAR(T.C_ACTIONDATE, 'yyyy-mm-dd') = #DATE#
+           AND T.C_IMEI = #IMEI#
+         GROUP BY T.C_KEY
+         ORDER BY T.C_KEY
+
+        ]]>
+    </select>
+
+    <!-- 查询所有APP总数 -->
+    <select id="getCountOfAllApp" resultClass="Integer">
+        <![CDATA[
+
+		SELECT COUNT(1) FROM T_EK_INDEX_APP_INFO WHERE C_ISLIVE = '1'
+
+        ]]>
+    </select>
+
+    <!-- 查询所有APP -->
+    <select id="getAllApp" resultClass="java.util.HashMap">
+        <![CDATA[
+
+		SELECT T.C_ID, T.C_IMG, T.C_URL, T.C_NAME, T.C_TYPE
+		  FROM T_EK_INDEX_APP_INFO T
+		 WHERE C_ISLIVE = '1'
+		 ORDER BY T.C_NAME, T.C_ID
+
+        ]]>
+    </select>
+
+</sqlMap>
+

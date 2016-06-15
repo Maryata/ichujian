@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameInfomation" namespace="/game" extends="struts-default">
+		<!-- 通过游戏ID获取游戏资讯列表 -->
+		<action name="getGameInformationThroughGameId" method="getGameInformationThroughGameId" class="gameInfoAction"></action>
+		<!-- 通过资讯ID获取资讯信息 -->
+		<action name="getInformationById" method="getInformationById" class="gameInfoAction"></action>
+	</package>
+</struts>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="class">
+
+	<!-- 查询热门品牌更多 -->
+	<select id="ClassifiedHotBrand" 
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select c_id,c_cname,c_ename ,c_logourl from T_ACTIVITY_BRAND_INFO where c_islive=1 and  c_id in(
+			   select c_brandid from T_ACTIVITY_INDUSTRY_BRAND where c_islive=1 and  
+			   		c_schemeid =(select c_schemeid from T_ACTIVITY_INDUSTRY_SCHEME where c_islive =1 and c_cityid=#cityid# 
+							and c_industryid=#industry#) 
+					 and c_type =#type# 
+			   )
+		]]>
+	</select>
+	<!-- 查询活动内容的类型 -->
+	<select id="ClassifiedPropertyType"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select c_id,c_name from T_ACTIVITY_PROPERTY_TYPE order by c_order 
+		]]>
+	</select>
+	<!-- 按行业内容类别首页接口 -->
+	<select id="ClassifiedBaseInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 <![CDATA[ 			select t.c_title,t.c_sdate,t.c_edate,t.c_imageurl,b.c_name,b.c_url,b.c_imageurl from T_ACTIVITY_BASE_INFO t inner join T_ACTIVITY_BUSINESS_INFO b ON t.c_businessid =b.c_id 
+				where t.c_industryid=#industryid# and t.c_cityid=#cityid# and t.c_propertyid =#propertyid# 		
+		
+ 	 ]]>  
+  </select>
+  
+  	<!-- 分类列表 -->
+	<select id="ClassiFiedDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 <![CDATA[ 	
+         select c_id,c_title,c_sdate,c_edate,c_imageurl,c_cname,c_grade,count from(    
+ select rownum rt,c_id,c_title,c_sdate,c_edate,c_imageurl,c_cname,c_grade,nvl(counts,0) as count from
+ (select t.c_id,t.c_title,t.c_sdate,t.c_edate,t.c_imageurl,t.c_grade,b.c_cname
+ from t_activity_base_info t,t_activity_brand_info b 
+  where t.c_brandid=b.c_id
+and b.c_islive=1 and t.c_islive=1 and t.c_edate>sysdate order by t.C_ACTIONDATE desc) a1 left join
+(select i.c_indexid,count(i.c_indexid) as counts from T_ACTIVITY_USER_SELECT i where i.c_type=1 and i.c_action=0 group by i.c_indexid) a2
+on a1.c_id=a2.c_indexid
+) a3 where a3.rt>#page# and a3.rt<=#page#+20
+
+ 	 ]]> 
+  </select>
+  
+ <!-- 分类列表   按行业查询-->
+	<select id="ClassiFiedDetailbyIndustryId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 <![CDATA[ 		
+   select c_id,c_title,c_sdate,c_edate,c_imageurl,c_cname,c_grade,count from(    
+ select rownum rt,c_id,c_title,c_sdate,c_edate,c_imageurl,c_cname,c_grade,nvl(counts,0) as count from
+ (select t.c_id,t.c_title,t.c_sdate,t.c_edate,t.c_imageurl,t.c_grade,b.c_cname
+ from t_activity_base_info t,t_activity_brand_info b 
+  where b.c_industryid=#industyid# and t.c_brandid=b.c_id
+and b.c_islive=1 and t.c_islive=1 and t.c_edate>sysdate order by t.C_ACTIONDATE desc) a1 left join
+(select i.c_indexid,count(i.c_indexid) as counts from T_ACTIVITY_USER_SELECT i where i.c_type=1 group by i.c_indexid) a2
+on a1.c_id=a2.c_indexid
+) a3 where a3.rt>#page# and a3.rt<=#page#+20
+ 	 ]]> 
+  </select>
+  
+   <!-- 分类列表   按时间查询-->
+	<select id="ClassiFiedDetailbytime" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 <![CDATA[ 		
+	  select * from(		
+ select * from
+ (select rownum rt,t.c_id,t.c_title,t.c_sdate,t.c_edate,t.c_detailurl,t.c_imageurl,b.c_id as bid,b.c_cname,b.c_brandurl,b.c_logourl from t_activity_base_info t,t_activity_brand_info b 
+  where (t.c_cityid=#cityid# or t.c_cityid=0 or t.c_cityid is null) and t.c_industryid=#industyid# and t.c_brandid=b.c_id
+and b.c_islive=1 and t.c_edate>sysdate and t.c_sdate>=sysdate and t.c_sdate<=to_date(#time#,'yyyy-mm-dd') order by t.c_sdate,t.c_edate,t.c_title) a1, 
+(select i.c_brandid,count(i.c_brandid) as count from t_activity_base_info i group by i.c_brandid) a2
+where a1.bid=a2.c_brandid order by a1.c_sdate ) a3 where a3.rt>#page# and a3.rt<=#page#+20
+ 	 ]]> 
+  </select>
+  
+     <!-- 分类列表   按方式和时间查询-->
+	<select id="ClassiFiedDetailbytimetype" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 <![CDATA[ 
+	  select * from(				
+ select * from
+ (select rownum rt,t.c_id,t.c_title,t.c_sdate,t.c_edate,t.c_detailurl,t.c_imageurl,b.c_id as bid,b.c_cname,b.c_brandurl,b.c_logourl from t_activity_base_info t,t_activity_brand_info b 
+  where (t.c_cityid=#cityid# or t.c_cityid=0 or t.c_cityid is null) and t.c_industryid=#industyid# and t.c_propertyid=#type# and t.c_brandid=b.c_id
+and b.c_islive=1 and t.c_edate>sysdate and t.c_sdate>=sysdate and t.c_sdate<=to_date(#time#,'yyyy-mm-dd') order by t.c_sdate,t.c_edate,t.c_title) a1, 
+(select i.c_brandid,count(i.c_brandid) as count from t_activity_base_info i group by i.c_brandid) a2
+where a1.bid=a2.c_brandid order by a1.c_sdate ) a3 where a3.rt>#page# and a3.rt<=#page#+20
+ 	 ]]> 
+  </select>
+  
+	
+	
+	
+	
+	
+	<insert  id="ClassiFiedUserSearchRecordSave" parameterClass="java.util.HashMap">
+	<![CDATA[ 		
+	insert  into t_Activity_User_Search (c_id,c_uid,c_type,c_indexid,c_date)  values (SEQ_Activity_User_Search.nextval,#c_uid#,#c_type#,#c_indexid#,sysdate)
+	]]>
+	</insert>
+	
+	<!-- 分类区域查询 -->
+	<select id="getBusinessArea" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select t.c_id,t.c_name from T_ACTIVITY_BUSINESS_AREA t where t.c_cityid =#cityid# and t.c_islive =1
+		]]>
+	</select>
+	
+		<!-- 分类商圈查询 -->
+	<select id="getBusinessZone" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select t.c_id,t.c_name from T_ACTIVITY_BUSINESS_ZONE t ,T_ACTIVITY_BUSINESS_AREA b where t.c_bus_areaid=b.c_id and t.c_bus_areaid =#areaid# and t.c_islive =1
+		]]>
+	</select>
+ </sqlMap>
+

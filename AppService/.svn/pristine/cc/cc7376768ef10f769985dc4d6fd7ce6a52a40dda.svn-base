@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="ekeyUser" namespace="/ekeyUser" extends="struts-default">
+
+        <!-- 注册 -->
+        <action name="register" method="register" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 登录 -->
+        <action name="login" method="login" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 修改密码 -->
+        <action name="modifyPwd" method="modifyPwd" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 获取验证码 -->
+        <action name="getValiCode" method="getValiCode" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 忘记密码-判断验证码的有效性 -->
+        <action name="isValidCode" method="isValidCode" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 忘记密码-修改密码 -->
+        <action name="setPwdOfFgt" method="setPwdOfFgt" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 校验手机号是否可用 -->
+        <action name="validatePhone" method="validatePhone" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 校验手机号是否可用 -->
+        <action name="gameCue" method="gameCue" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 获取个人信息 -->
+        <action name="userInfo" method="userInfo" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 修改用户头像 -->
+        <action name="userHead" method="userHead" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 修改用户信息 -->
+        <action name="modify" method="modify" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 新增/修改用户地址 -->
+        <action name="usersAddress" method="usersAddress" class="eKMemberAction">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+
+        <!--用户和客服交互的信息-->
+        <action name="getMessage" method="getMessage" class="eKMemberAction"></action>
+        <!--用户发送消息给客服-->
+        <action name="contactServiceRoute" method="contactServiceRoute" class="eKMemberAction"></action>
+
+    </package>
+</struts>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="easybuy" namespace="/easybuy" extends="struts-default">
+		
+		<!-- 广告位数据 -->
+		<action name="advertInfo" method="advertInfo" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 分类列表 -->
+		<action name="category" method="category" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 可维护分类详情 -->
+		<action name="customableCategory" method="customableCategory" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- "附近门店" -->
+		<action name="storesNearby" method="storesNearby" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 分类详情 -->
+		<action name="categoryDetail" method="categoryDetail" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 产品详情 -->
+		<action name="productDetail" method="productDetail" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 简明产品搜索 -->
+		<action name="simpleSearch" method="simpleSearch" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 产品搜索 -->
+		<action name="search" method="search" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- "猜你喜欢" -->
+		<action name="guessULike" method="guessULike" class="easyBuyAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	
+	</package>
+</struts>

@@ -1,0 +1,152 @@
+package com.weixinpay;
+
+import com.sys.ekey.freecall.service.FeiyuCloudService;
+import com.unionpay.acp.sdk.LogUtil;
+import com.weixinpay.config.WeixinPayConfig;
+import com.weixinpay.util.MD5Util;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * Created by vpc on 2016/3/2.
+ */
+public class Notify extends HttpServlet {
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        LogUtil.writeLog("接收微信后台通知开始");
+        SAXReader reader = new SAXReader();
+        String return_code = "FAIL";
+        String return_msg = "签名失败";
+        // 接受微信通知的数据
+        Document document = null;
+        // 返回给微信的结果
+        Document result = DocumentHelper.createDocument();
+        Element resultRoot = result.addElement("xml");
+
+        result.setXMLEncoding(WeixinPayConfig.CHARSET);
+        try {
+            document = reader.read(req.getInputStream());
+
+            Element root = document.getRootElement();
+
+            return_code = root.elementText("return_code");
+            return_msg = root.elementText("return_msg");
+
+            FeiyuCloudService feiyuCloudService = WebApplicationContextUtils
+                    .getRequiredWebApplicationContext(getServletContext()).getBean(FeiyuCloudService.class);
+
+            Map<String,String> parameterMap = new TreeMap<String,String>();
+            StringBuilder stringBuilder = new StringBuilder();
+            for(Iterator<Element> iterator = root.elementIterator(); iterator.hasNext();) {
+                Element element = iterator.next();
+                String name = element.getName();
+                String text = element.getText();
+
+                if("sign".equals(name)) {
+                    continue;
+                }
+
+                if (stringBuilder.length() == 0) {
+                    stringBuilder.append(name).append("=")
+                            .append(text);
+                } else {
+                    stringBuilder.append("&").append(name).append("=")
+                            .append(text);
+                }
+                parameterMap.put(name, text);
+            }
+            stringBuilder.append("&").append("key=").append(WeixinPayConfig.KEY);
+
+            String sign = MD5Util.MD5Encode(stringBuilder.toString(), WeixinPayConfig.CHARSET).toUpperCase();
+
+            // 把没有的字段补上
+            fillNullProperties(parameterMap);
+
+            if ("SUCCESS".equals(return_code)) {
+                String result_code = root.elementText("result_code");
+                if ("SUCCESS".equals(result_code)) {
+                    // 校验签名
+                    if(sign.equals(root.elementText("sign"))) {
+                        // 查询订单状态
+                        // 成功直接返回
+                        // 更新订单信息
+                        // 记录微信支付日志
+                        Map<String,String> r = feiyuCloudService.updatePayStatus(parameterMap, "0");
+                        resultRoot.addElement("return_code").addCDATA(r.get("return_code"));
+                        resultRoot.addElement("return_msg").addCDATA(r.get("return_msg"));
+                    } else {
+                        resultRoot.addElement("return_code").addCDATA("FAIL");
+                        resultRoot.addElement("return_msg").addCDATA("签名失败");
+                    }
+                } else {
+                    String r_err_code = root.elementText("err_code");
+
+                    feiyuCloudService.logWeChartPay(parameterMap);
+                    resultRoot.addElement("return_code").addCDATA(result_code);
+                    resultRoot.addElement("return_msg").addCDATA(r_err_code);
+                }
+            } else {
+                resultRoot.addElement("return_code").addCDATA(return_code);
+                resultRoot.addElement("return_msg").addCDATA(return_msg);
+            }
+        } catch (DocumentException e) {
+            LogUtil.writeErrorLog("解析微信返回结果出错！", e);
+
+            resultRoot.addElement("return_code").addCDATA("FAIL");
+            resultRoot.addElement("return_msg").addCDATA("解析xml出错");
+        }
+
+        LogUtil.writeLog("微信通知结束!");
+        LogUtil.writeLog("返回微信通知结果" + result.getRootElement().asXML());
+
+        resp.setContentType("text/html;charset=UTF-8");
+        resp.getWriter().write(result.getRootElement().asXML());
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        doPost(req, resp);
+    }
+
+    private void fillNullProperties(Map<String,String> parameterMap) {
+        String[] keys = new String[] {
+                "device_info",
+                "err_code",
+                "err_code_des",
+                "is_subscribe",
+                "fee_type",
+                "cash_fee_type",
+                "coupon_fee",
+                "coupon_count",
+                "attach"
+        };
+
+        for(int i = 0; i < keys.length; ++i) {
+            if(!parameterMap.containsKey(keys[i])) {
+                parameterMap.put(keys[i],"");
+            }
+        }
+    }
+}

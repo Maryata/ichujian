@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	
+
+	<bean id="gameService" class="com.sys.game.service.impl.GameServiceImpl" scope="prototype"/>
+	<bean id="miPushService" class="com.sys.game.service.impl.MiPushServiceImpl" scope="prototype"/>
+	
+	<bean id="gameAction" class="com.sys.game.action.GameAction" scope="prototype">
+		<property name="gameService">
+			<ref bean="gameService"/>
+		</property>
+		<property name="miPushService">
+			<ref bean="miPushService"/>
+		</property>
+	</bean>
+</beans>

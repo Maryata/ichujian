@@ -1,0 +1,50 @@
+package com.sys.service.impl;
+
+import com.sys.service.ExchangeService;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
+import java.util.*;
+
+/**
+ * Created by vpc on 2016/3/2.
+ */
+@Service
+public class ExchangeServiceImpl implements ExchangeService {
+
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public int save(String phone, String express, String address, String consignee, String telNum,String imei,String pCode, String expressCode,String out_trade_no) {
+        final String sql = "insert into t_order (c_id, c_phone, c_address, c_express, c_consignee, c_telnum,c_imei,c_date,c_pCode,c_expressCode,c_outTradeNo,c_status) values (seq_order.nextVal, ?, ?, ?, ?, ?,?,?,?,?,?,0)";
+        return jdbcTemplate.update(sql,new Object[]{phone,address,express,consignee,telNum,imei,new Date(),pCode,expressCode,out_trade_no});
+    }
+
+    @Override
+    public Map<String, Object> record(String imei) {
+        if(StringUtils.isEmpty(imei)) {
+            imei = "-1";
+        }
+
+        Map<String,Object> result = new HashMap<String,Object>();
+        final String sql = "select c_id, c_phone, c_address, c_express, c_consignee, c_telnum, c_imei, c_date from t_order where c_imei=? and c_status=1 order by c_date desc";
+
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,imei);
+        if(list == null) {
+            list = new ArrayList<Map<String,Object>>();
+        }
+
+        result.put("list", list);
+
+        return  result;
+    }
+
+    @Override
+    public int update(String out_trade_no) {
+        final String sql = "UPDATE t_order SET c_status=1 WHERE c_outTradeNo=?";
+        return jdbcTemplate.update(sql,new Object[]{out_trade_no});
+    }
+}

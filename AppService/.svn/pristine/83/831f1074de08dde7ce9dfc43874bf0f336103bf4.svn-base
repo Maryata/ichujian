@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="exchange" namespace="/exchange" extends="struts-default">
+		<!-- 根据合集id获取单个游戏合集 -->
+		<action name="success" class="exchangeAction"></action>
+		<action name="record" method="record" class="exchangeAction"></action>
+	</package>
+</struts>

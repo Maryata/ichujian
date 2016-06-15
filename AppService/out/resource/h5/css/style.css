@@ -1,0 +1,68 @@
+@charset "utf-8";
+/* CSS Document */
+input,button,select,textarea{outline:none}
+textarea{resize:none}
+body {
+    line-height:1;
+	font-family:"微软雅黑","宋体";
+	font-size:14px;	
+}
+.title_box{width:100%;height:60px; line-height:60px; background:#ff6b21;color:#fff; font-size:24px; font-size:1.5rem;}
+.title_box .btn_arr{ float:left;width:60px;height:60px; background:url(../images/ico-arr.png) center center no-repeat;background-size:30% 30%;}
+.title_box .btn_close{ float:left;width:60px;height:60px; background:url(../images/ico-close.png) center center no-repeat;background-size:30% 30%;}
+.title_box .btn_reg{float:right;width:60px;height:60px; text-align:center;color:#fff;font-size:18px; font-size:1.125rem;}
+.title_box .btn_arr:active,.title_box .btn_reg:active,.title_box .btn_close:active{background-color:#ffad7a;}
+.content{width:90%; margin:0 auto; overflow:hidden;}
+input[type="text"],input[type="password"]{ width:90%;height:60px; border:none;font-size:18px; font-size:1.125rem;}
+.phone-ico{ padding-left:30px;background:url(../images/ico-call3.png) 0 20px no-repeat;background-size:20px 80px;}
+.phone-ico:focus{background:url(../images/ico-call3.png) 0 -40px no-repeat;background-size:20px 80px;}
+.pass-ico{ padding-left:30px;background:url(../images/ico-lock3.png) 0 20px no-repeat;background-size:20px 80px;}
+.pass-ico:focus{background:url(../images/ico-lock3.png) 0 -40px no-repeat;background-size:20px 80px;}
+.close-btn { position:absolute;right:0;top:0;width: 30px;height:60px;border: none;display: none;background:url(../images/close-btn.png) center center no-repeat;background-size:20px 20px; cursor:pointer;}
+.content  p.line{ border-bottom:1px #ddd solid;}
+.content p{ position:relative; }
+.enter-btn{ width:100%; padding:10px 0; background:#ff6b21; border-radius:3px;margin-top:10px; color:#fff;font-size:18px; font-size:1.125rem; border:none; cursor:pointer; }
+.enter-btn:active{background:#d84800;}
+input[disabled],input:disabled{ cursor:default; background:#ccc;}
+
+.forget{ float:left; padding:10px 5px; font-size:18px; font-size:1.125rem;color:#777;}
+.hint{ float:left; padding:10px 5px 5px 5px; font-size:18px; font-size:1.125rem;color:#aaa;}
+.ico-cue{ display:block; width:100%;height:80px; background:url(../images/ico-cue.png) center center no-repeat;background-size:56px 56px;}
+.ico-pass{ display:block; width:100%;height:80px; background:url(../images/ico-pass.png) center center no-repeat;background-size:56px 56px;}
+.forget .orange{ color:#ff7d28;}
+.verify-bg{ background:#ebebeb;}
+.verify-bg input[type="text"]{ background:#ebebeb;}
+.verify-bg .hint{ width:100%; display:block; text-align:center;font-size:18px; font-size:1.125rem; color:#333; padding:30px 0; }
+.verify-bg  .bor-bot{border-bottom:1px #ddd solid; margin-top:-50px;}
+.f-w{ font-weight:bold;}
+.f-s18{font-size:18px;}
+.width100{ width:100%;}
+.dis-b{display:block;}
+.color777{color:#777; }
+.m-l20{ margin-left:20px;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;user-select:none;}
+.protocol{ margin-top:20px; line-height:1.5em; text-indent:2em;}
+.verify-time{position:absolute;right:0;bottom:0;font-size:18px; font-size:1.125rem; color:#4385f4; line-height:65px; font-weight:bold;}
+
+/*礼包列表*/
+.content dl{  width:100%; border-bottom:1px #eee solid; margin-top:15px; float:right; position:relative;padding-bottom: 15px}
+.content img{ width:65px; height:65px;}
+.content dl dt{ width:65px;height:65px; float:left;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;user-select:none;}
+dl .play{ position:absolute; top:0px; right:0px; border:1px #ff6b21 solid; border-radius:5px; color:#ff6b21; padding:3px 10px;font-size:14px; font-size:0.875rem; cursor:pointer; background:#fff;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;user-select:none;}
+dl .play-hover{ position:absolute; top:0px; right:0px; border:1px #ccc solid; border-radius:5px; color:#ccc; padding:3px 10px;font-size:14px; font-size:0.875rem; cursor:default; background:#fff;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;user-select:none;}
+dl dd{ width:70%; float:left;overflow: hidden; margin-left:10px; padding-top:4px;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;user-select:none;}
+dl dd h1{width:60%; color:#555; font-size:16px; font-size:1rem;  overflow: hidden;  text-overflow: ellipsis;  white-space: nowrap; font-weight:100; }
+dl dd span{width:100%; display:block;margin-top:9px;overflow: hidden;  text-overflow: ellipsis;  white-space: nowrap;}
+dl dd .online{ color:#999; font-size:12px; font-size:0.75rem;}
+dl dd .intr{ color:#555; font-size:13px; font-size:0.813rem;}
+.code-tip{float: left;width: 100%;margin-top: 5px; color:#999; font-size:12px; font-size:0.75rem;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;user-select:none;}
+.code-tip p{ line-height:1.8em;}
+.code-tip .nub{  padding:0 5px;background:#ededed;font-size:14px; font-size:0.875rem; color:#666; position:relative}
+.code-tip .nub em{ color:#0080ff; font-style:inherit;-webkit-user-select:text;-moz-user-select:text;-o-user-select:text;user-select:text;}
+.code-tip .txt{ color:#0080ff;position: absolute;top: 97px; left: 60px;}
+.jhm{color:#0080ff;background:#ededed; padding:5px ; float:left;}
+.jhm-k{width:100%;height:1px; float:left;}
+
+
+.ajax_loading{ text-align:center; width:100%; float:right;margin:10px auto;height:25px;}
+.ajax_loading  img{display: inline-block;margin-right: 6px; width:18px; height:18px;}
+.ajax_loading span{font-size:16px; font-size:1rem; color:#888;}

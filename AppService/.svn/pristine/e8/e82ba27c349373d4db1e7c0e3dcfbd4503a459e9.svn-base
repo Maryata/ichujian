@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_freeCall">
+
+    <!--获取用户剩余通话时长-->
+    <select id="getUserTimeByFyCallId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        select t1.c_time_temp, t1.c_time_perpetual,t1.c_fyaccountid,t1.c_id
+          from t_fy_auth t
+         right join t_fy_user_time t1
+            on t.c_fyaccountid = t1.c_fyaccountid
+         where t.c_fycallid = #fyCallId#
+           and t1.c_validity >= #sTime#
+           order by t1.c_validity
+    </select>
+    <!--插入消息记录-->
+    <insert id="insertCallHis" parameterClass="java.util.HashMap">
+insert into t_fy_callhis
+  (c_id,
+   c_fycallid,
+   c_action,
+   c_appid,
+   c_appcallid,
+   c_callstarttime,
+   c_callendtime,
+   c_stopreason,
+   c_trueshownumbertype,
+   c_trueifrecord,
+   c_ti,
+   c_au,
+   c_stime,
+   c_etime)
+values
+  (SEQ_FY_CALLHIS.NEXTVAL,
+   #fyCallId#,
+   #action#,
+   #appId#,
+   #appCallId#,
+   #callStartTime#,
+   #callEndTime#,
+   #stopReason#,
+   #trueShowNumberType#,
+   #trueIfRecord#,
+   #ti#,
+   #au#,
+   #sTime#,
+   #eTime#)
+    </insert>
+    <!--授权锁定状态-->
+    <select id="isLocked" resultClass="java.lang.Integer">
+        select count(1) FROM t_fy_auth WHERE c_status = '0' AND c_fyaccountid=#fyAccountId#
+    </select>
+     <!--插入授权记录-->
+    <insert id="insertAuth" parameterClass="java.util.HashMap">
+        insert into t_fy_auth
+  (c_id,
+   c_fycallid,
+   c_calltype,
+   c_shownumbertype,
+   c_caller,
+   c_callee,
+   c_fyaccountid,
+   c_channelid,
+   c_ifrecord,
+   c_time_millis,
+   c_time,
+   c_status,
+   C_APPEXTRADATA)
+values
+  (SEQ_FY_AUTH.NEXTVAL,
+   #fyCallId#,
+   #callType#,
+   #showNumberType#,
+   #caller#,
+   #callee#,
+   #fyAccountId#,
+   #channelId#,
+   #ifRecord#,
+   #time_millis#,
+   #time#,
+   1,
+   #appExtraData#)
+    </insert>
+    <select id="callHistory" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT *
+        FROM (SELECT T.*, ROWNUM RN
+        FROM (select t.c_globalmobilephone,
+          t1.c_callee,
+          t2.c_callstarttime,
+          t2.c_callendtime,
+          t1.c_appextradata
+     from t_fy_user t
+     left join t_fy_auth t1
+       on t.c_fyaccountid = t1.c_fyaccountid
+     left join t_fy_callhis t2
+       on t1.c_fycallid = t2.c_fycallid
+    where t.c_fyaccountid = #fyAccountId#) T
+        WHERE ROWNUM &lt;= #maxRows#)
+        WHERE RN &gt;= #startingIndex#
+    </select>
+    <!--更新授权状态-->
+    <update id="updateAuth">
+      update t_fy_auth set c_status = '1' where c_fycallid = #fycallid#
+    </update>
+
+    <insert id="insertWeChartPayLog" parameterClass="java.util.TreeMap">
+        insert into t_fy_wechatpay_log
+  (c_id,
+   c_out_trade_no,
+   c_return_code,
+   c_return_msg,
+   c_appid,
+   c_mch_id,
+   c_device_info,
+   c_result_code,
+   c_err_code,
+   c_err_code_des,
+   c_openid,
+   c_is_subscribe,
+   c_trade_type,
+   c_bank_type,
+   c_total_fee,
+   c_fee_type,
+   c_transaction_id,
+   c_time_end)
+values
+  (SEQ_WECHARTPAY_LOG.Nextval,
+   #out_trade_no#,
+   #return_code#,
+   #return_msg#,
+   #appid#,
+   #mch_id#,
+   #device_info#,
+   #result_code#,
+   #err_code#,
+   #err_code_des#,
+   #openid#,
+   #is_subscribe#,
+   #trade_type#,
+   #bank_type#,
+   #total_fee#,
+   #fee_type#,
+   #transaction_id#,
+   #time_end#)
+    </insert>
+
+    <!--获取飞语帐号状态-->
+    <select id="getStatusByFyAccountId" resultClass="java.lang.String">
+        SELECT C_STATUS FROM T_FY_USER WHERE c_fyaccountid = #id#
+    </select>
+    <!--获取飞语帐号允许的最大通话分钟数-->
+    <select id="getMaxCallMinuteByFyAccountId" resultClass="java.lang.Integer">
+       SELECT nvl(sum(t2.c_time_temp) + sum(t2.c_time_perpetual), 0) as ti
+      FROM T_FY_USER T
+      LEFT JOIN T_FY_USER_TIME T2
+        on T.C_FYACCOUNTID = T2.C_FYACCOUNTID
+     WHERE T.C_FYACCOUNTID = #id#
+       AND T.C_STATUS = '1'
+   AND T2.C_VALIDITY &gt;= sysdate
+    </select>
+
+    <!-- 查询飞语账号是否存在 -->
+    <select id="existsAccount" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+        SELECT COUNT(1) FROM T_FY_USER T WHERE T.C_GLOBALMOBILEPHONE = #C_GLOBALMOBILEPHONE#
+		]]>
+    </select>
+    <!-- 新增飞语云账号相关信息 -->
+    <insert id="addAccount" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_USER
+          (C_ID,
+           C_APPACCOUNTID,
+           C_FYACCOUNTID,
+           C_FYACCOUNTPWD,
+           C_CREATEDATE,
+           C_STATUS,
+           C_GLOBALMOBILEPHONE)
+        VALUES
+          (SEQ_FY_USER.NEXTVAL,
+           #C_APPACCOUNTID#,
+           #C_FYACCOUNTID#,
+           #C_FYACCOUNTPWD#,
+           #C_CREATEDATE#,
+           #C_STATUS#,
+           #C_GLOBALMOBILEPHONE#)
+		]]>
+    </insert>
+
+    <!-- 新增飞语云账号相关信息 -->
+    <insert id="grantUserCallTime" parameterClass="java.util.HashMap">
+        INSERT INTO T_FY_USER_TIME
+          (C_ID,
+           C_FYACCOUNTID,
+           C_TIME_TEMP,
+           C_TIME_PERPETUAL,
+           C_VALIDITY
+           )
+        VALUES
+          (SEQ_FY_USER_TIME.NEXTVAL,
+           #C_FYACCOUNTID#,
+           #C_TIME_TEMP#,
+           #C_TIME_PERPETUAL#,
+           #C_VALIDITY#
+           )
+    </insert>
+
+    <!-- 查询供应商的临时通话时长 -->
+    <select id="getTempTimeBySupCode" parameterClass="String" resultClass="Integer">
+        <![CDATA[
+        SELECT T.C_FY_TIME_TEMP FROM T_BASE_SUPPLIER T WHERE T.C_SUPPLIER_CODE = #supcode#
+		]]>
+    </select>
+
+    <!-- 更新飞语云账号相关信息 -->
+    <update id="updateAccount" parameterClass="java.util.HashMap">
+        <![CDATA[
+        UPDATE T_FY_USER
+           SET C_GLOBALMOBILEPHONE = #C_GLOBALMOBILEPHONE#,
+               C_FYACCOUNTPWD = #C_FYACCOUNTPWD#
+         WHERE C_APPACCOUNTID = #C_APPACCOUNTID#
+           AND C_FYACCOUNTID = #C_FYACCOUNTID#
+		]]>
+    </update>
+
+    <!-- 新增飞语云账号出错的日志记录 -->
+    <insert id="addAccountLogError" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_LOG
+          (C_ID, C_APPACCOUNTID, C_RESULTCODE, C_RESULTMSG, C_DATE, C_TYPE)
+        VALUES
+          (SEQ_FY_LOG.NEXTVAL,
+           #C_APPACCOUNTID#,
+           #C_RESULTCODE#,
+           #C_RESULTMSG#,
+           #C_DATE#,
+           #C_TYPE#)
+		]]>
+    </insert>
+
+    <!-- 修改绑定手机 -->
+    <update id="modifyPhone" parameterClass="java.util.HashMap">
+        <![CDATA[
+        UPDATE T_FY_USER
+           SET C_GLOBALMOBILEPHONE = #C_GLOBALMOBILEPHONE#
+         WHERE C_APPACCOUNTID = #C_APPACCOUNTID#
+           AND C_FYACCOUNTID = #C_FYACCOUNTID#
+		]]>
+    </update>
+
+    <!-- 套餐列表 -->
+    <select id="combo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT * FROM T_FY_COMBO ORDER BY C_ID
+		]]>
+    </select>
+
+    <!-- 个人信息 -->
+    <select id="userInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT U.C_GLOBALMOBILEPHONE,
+               T.C_TIME_PERPETUAL,
+               T.C_TIME_TEMP,
+               M.C_HEADIMAGE,
+               U.C_FYACCOUNTID,
+               U.C_FYACCOUNTPWD
+          FROM T_FY_USER U, T_FY_USER_TIME T, T_EK_MEMBER_INFO M
+         WHERE U.C_FYACCOUNTID = T.C_FYACCOUNTID
+           AND U.C_APPACCOUNTID = M.C_REGID
+           AND M.C_ISLIVE = 1
+           AND U.C_STATUS = 1
+		   AND (TO_CHAR(T.C_VALIDITY, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM') OR TO_CHAR(T.C_VALIDITY, 'YYYY') = '9999')
+           AND M.C_ID = #UID#
+         ORDER BY T.C_VALIDITY
+		]]>
+    </select>
+
+
+    <!-- 获取手机号归属地 -->
+    <select id="phoneArea" parameterClass="String" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT T.C_PROVINCE, T.C_CITY FROM T_BASE_PHONE_EREA T WHERE T.C_PHONE = #phone#
+		]]>
+    </select>
+
+    <!-- 老用户一次性注册飞语云账号 -->
+    <select id="getExistsUserIsNotFyAcc" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT T.C_REGID, T.C_PHONENUM
+          FROM T_EK_MEMBER_INFO T
+         WHERE T.C_ISLIVE = 1
+           AND NOT EXISTS (SELECT F.C_APPACCOUNTID
+                  FROM T_FY_USER F
+                 WHERE F.C_APPACCOUNTID = T.C_REGID)
+		]]>
+    </select>
+
+    <!-- 查询所有没有通话时间的飞语用户 -->
+    <select id="feiyuAccHasntTime" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT T.C_FYACCOUNTID
+          FROM T_FY_USER T
+         WHERE NOT EXISTS (SELECT TT.C_FYACCOUNTID
+                  FROM T_FY_USER_TIME TT
+                 WHERE T.C_FYACCOUNTID = TT.C_FYACCOUNTID)
+		]]>
+    </select>
+
+    <!-- 查询套餐详情 -->
+    <select id="getComboById" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT * FROM T_FY_COMBO WHERE C_ID = #ID#
+		]]>
+    </select>
+
+    <!-- 生成订单 -->
+    <insert id="insertOrder" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_ORDER
+          (C_ID,
+           C_TRADE_NO,
+           C_FYACCOUNTID,
+           C_AMOUNT,
+           C_MINUTE,
+           C_CREATE_TIME,
+           C_PAY_STATUS,
+           C_PAY_TYPE)
+        VALUES
+          (SEQ_FY_ORDER.NEXTVAL,
+           #C_TRADE_NO#,
+           #C_FYACCOUNTID#,
+           #C_AMOUNT#,
+           #C_MINUTE#,
+           SYSDATE,
+           '0',
+           #C_PAY_TYPE#)
+		]]>
+    </insert>
+
+    <!-- 更新订单支付状态 -->
+    <update id="updatePayStatus" parameterClass="java.util.HashMap">
+        <![CDATA[
+        UPDATE T_FY_ORDER
+           SET C_PAY_STATUS = 1
+         WHERE C_TRADE_NO = #C_TRADE_NO#
+		]]>
+    </update>
+
+    <!-- 更新订单支付状态 -->
+    <insert id="logAlipayNotify" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_ALIPAY_LOG
+          (C_ID,
+           C_OUT_TRADE_NO,
+           C_TRADE_NO,
+           C_NOTIFY_TIME,
+           C_NOTIFY_TYPE,
+           C_NOTIFY_ID,
+           C_SUBJECT,
+           C_PAYMENT_TYPE,
+           C_TRADE_STATUS,
+           C_BUYER_ID,
+           C_BUYER_EMAIL,
+           C_TOTAL_FEE,
+           C_GMT_CREATE,
+           C_GMT_PAYMENT)
+        VALUES
+          (SEQ_FY_ALIPAY_LOG.NEXTVAL,
+           #out_trade_no#,
+           #trade_no#,
+           #notify_time#,
+           #notify_type#,
+           #notify_id#,
+           #subject#,
+           #payment_type#,
+           #trade_status#,
+           #buyer_id#,
+           #buyer_email#,
+           #total_fee#,
+           #gmt_create#,
+           #gmt_payment#)
+		]]>
+    </insert>
+
+    <!-- 记录用户点击“免费电话”按钮的行为 -->
+    <insert id="callingRec" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_CALLING_REC T
+          (C_ID, C_UID, C_IMEI, C_FYACCID, C_DATE, C_FLAG, C_SUP, C_CALLER, C_CALLEE)
+        VALUES
+          (SEQ_FY_CALLING_REC.NEXTVAL, #UID#, #IMEI#, #FYACCID#, #DATE#, #FLAG#, #SUP#, #CALLER#, #CALLEE#)
+		]]>
+    </insert>
+
+    <!-- 更新通话记录 -->
+    <update id="updateCallingRec" parameterClass="java.util.HashMap">
+        <![CDATA[
+        UPDATE T_FY_CALLING_REC T
+           SET T.C_STIME = #STIME#, T.C_ETIME = #ETIME#
+         WHERE T.C_FLAG = #FLAG#
+		]]>
+    </update>
+</sqlMap>
+

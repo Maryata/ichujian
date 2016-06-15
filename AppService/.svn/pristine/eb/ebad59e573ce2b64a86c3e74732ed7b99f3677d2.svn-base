@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="soft_sql1">
+
+
+    <!-- code -->
+	<insert id="inscode" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_product_serial (c_id,c_activecode,c_actiondate)
+		values
+		(SEQ_PRODUCT_SERIAL.nextval,#code#,#actiondate#)
+		]]> 
+	</insert>
+
+    <!-- APP首次使用 -->
+	<insert id="AppStart" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_action_start (c_id,c_imei,c_source,c_version,c_actiondate)
+		values
+		(SEQ_START.nextval,#imei#,#source#,#version#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 查询是否有启动记录 -->
+	<select id="FindStart"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from t_action_start where c_imei=#imei#
+		]]> 
+	</select>	
+		
+	<!-- 首次使用-设备 -->
+	<insert id="Device" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_base_device (c_id,c_imei,c_brand,c_model,c_size,c_system,c_nettype,c_longitude,c_latitude)
+		values
+		(SEQ_DEVICE.nextval,#imei#,#brand#,#model#,#size#,#system#,#nettype#,#longitude#,#latitude#)		
+		]]> 
+	</insert>
+	
+	<!-- 查询设备 -->
+	<select id="FindDevice"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from t_base_device where c_imei=#imei#
+		]]> 
+	</select>
+	
+	
+	<!-- 设备版本对照表 -->
+	<insert id="Device_Version" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_base_device_version (c_id,c_imei,c_version,c_actiondate)
+		values
+		(SEQ_DEVICE_VERSION.nextval,#imei#,#version#,#actiondate#)		
+		]]> 
+	</insert>
+	
+	<!-- 根据IMEI查询激活码 -->
+	<select id="FindCodeByImei"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select c_id,c_activecode from t_action_active where c_imei=#imei#
+		]]> 
+	</select>
+	
+    <!-- APP激活 -->
+	<insert id="AppActive" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_action_active (c_id,c_activecode,c_jobnumber,c_imei,c_actiondate,c_code_imei,c_actioncount)
+		values
+		(SEQ_ACTIVE.nextval,#activecode#,#jobnumber#,#imei#,#actiondate#,#code_imei#,#actioncount#)
+		]]> 
+	</insert>
+	
+	<!-- 激活更新次数 -->
+	<update id="UpdateActiveCount" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_action_active set c_actioncount=c_actioncount+1 where c_imei=#imei#
+		]]> 
+	</update>
+	
+	
+	<!-- 查询激活码是否使用 -->
+	<select id="FindCode"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from t_action_active where c_activecode=#activecode#
+		]]> 
+	</select>
+	
+	<!-- 查询工号是否有效 -->
+	<select id="FindJobNumber"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from T_BASE_JOB_CODE where C_JOBCODE=#jobnumber# and C_ISVALID=1
+		]]> 
+	</select>
+	
+	
+    <!-- 查询激活码是否有效 -->
+    <select id="FindProductSerial"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from t_base_active_code where c_code=#activecode#
+		]]> 
+	</select>
+	
+     
+	<!-- 激活工号对照 -->
+	<insert id="ActiveJob" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_base_job_active (c_id,C_ACTIVECODEID,c_jobid)
+		values
+		(SEQ_ACTIVEJOB.nextval,#activeid#,#jobid#)
+		]]> 
+	</insert>
+
+	
+	<!-- APP更新 -->
+	<select id="Update"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from t_action_update where c_islive=1 and c_version>#version# and c_source = '0001'
+		]]> 
+	</select>
+	
+	<!-- 渠道APP更新 -->
+	<select id="Updates"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+        select * from t_action_update where c_islive=1 and c_source=#source# and c_version>#version#
+		]]> 
+	</select>
+	
+	<!-- 设置点击 -->
+	<insert id="Click" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_set_click (c_id,c_imei,c_clicktype,c_newest,c_key,c_choosetype)
+		values
+		(SEQ_SETCLICK.nextval,#imei#,#clicktype#,1,#key#,#choosetype#)
+		]]> 
+	</insert>
+	
+	<!-- 设置长按 -->
+	<insert id="Hold" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_set_hold (c_id,c_imei,c_holdtype,c_newest)
+		values
+		(SEQ_SETHOLD.nextval,#imei#,#holdtype#,1)
+		]]> 
+	</insert>
+	
+	<!-- 设置长按 -->
+	<insert id="Hold1" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_set_hold (c_id,c_imei,c_holdtype,c_key,c_newest,c_choosetype)
+		values
+		(SEQ_SETHOLD.nextval,#imei#,#holdtype#,#key#,1,#choosetype#)
+		]]> 
+	</insert>
+	
+	<!-- 设置Sos 数据库暂无 -->
+	<insert id="Sos" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_setsos (c_id,c_userid,c_imei,c_sostype,c_behavior,c_soscontent,c_objective,c_actiondate)
+		values
+		(SEQ_SETSOS.nextval,#userid#,#imei#,#sostype#,#behavior#,#soscontent#,#objective#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 查询点击设置 -->
+	<select id="FindClick"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_set_click where c_imei=#imei# and c_clicktype=#clicktype# and c_key=#key# and c_choosetype=#choosetype#
+		]]> 
+	</select>
+	
+	<!-- 查询长按设置 -->
+	<select id="FindHold"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_set_hold where c_holdtype=#holdtype# and c_imei=#imei# and c_key=#key# and c_choosetype=#choosetype#
+		]]> 
+	</select>
+	
+	<!-- 查询长按设置 -->
+	<select id="FindHold1"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_set_hold where c_holdtype=#holdtype# and c_imei=#imei#
+		]]> 
+	</select>
+	
+	<!-- 查询Sos设置 -->
+	<select id="FindSos"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_setsos where c_userid=#userid# and c_imei=#imei#
+		]]> 
+	</select>
+	
+	<!-- 更新点击设置 -->
+	<update id="UpdateClick" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_set_click set  c_newest=1 
+		where c_clicktype=#clicktype# and c_key=#key# and c_imei=#imei# and c_choosetype=#choosetype#
+		]]> 
+	</update>
+	
+	<!-- 更改其他模式为0 -->
+	<update id="UpdateOtherClick" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 update t_set_click set c_newest=0 where c_clicktype!=#clicktype# and c_key=#key# and c_imei=#imei# and c_choosetype=#choosetype#
+		]]> 
+	</update>
+	
+	<!-- 更改单击历史 -->
+	<update id="UpdateClickHis" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 update t_set_click_his set c_newest=0 where c_clicktype=#clicktype# and c_key=#key# and c_imei=#imei# and c_choosetype=#choosetype#
+		]]> 
+	</update>
+	
+	<!-- 新增单击设置历史 -->
+	<insert id="ClickHis" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_set_click_his (c_id,c_imei,c_clicktype,C_PACKAGE_NAME,C_APP_NAME,c_actiondate,c_key,c_newest,c_choosetype)
+		values
+		(SEQ_CLICKHIS.nextval,#imei#,#clicktype#,#packageName#,#appName#,#actiondate#,#key#,1,#choosetype#)
+		]]> 
+	</insert>
+	
+	<!-- 更改长按历史 -->
+	<update id="UpdateHoldHis" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 update t_set_hold_his set c_newest=0 where c_imei=#imei# and c_choosetype=#choosetype#
+		]]> 
+	</update>
+	
+	<!-- 新增长按设置历史 -->
+	<insert id="HoldHis" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_set_hold_his (c_id,c_imei,c_holdtype,c_actiondate,c_key,c_newest,c_choosetype,c_package_name,c_app_name)
+		values
+		(SEQ_HOLDHIS.nextval,#imei#,#holdtype#,#actiondate#,#key#,1,#choosetype#,#apppackage#,#appname#)
+		]]> 
+	</insert>
+	
+	
+	
+	<!-- 更新长按设置 -->
+	<update id="UpdateHold" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_set_hold set c_newest=1 where c_imei=#imei# and c_holdtype=#holdtype#
+		]]> 
+	</update>
+	
+	
+	<!-- 更改其他模式为0 -->
+	<update id="UpdateOtherHold" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 update t_set_hold set c_newest=0 where c_key=#key# and c_imei=#imei# and c_holdtype!=#holdtype# and c_choosetype=#choosetype#
+		]]> 
+	</update>
+	
+	<!-- 更改其他模式为0 旧版-->
+	<update id="UpdateOtherHold1" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 update t_set_hold set c_newest=0 where c_imei=#imei# and c_holdtype!=#holdtype#
+		]]> 
+	</update>
+	
+	<!-- 更新长按设置 -->
+	<update id="UpdateHold1" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_set_hold set c_newest=1  where c_imei=#imei# and c_key=#key# and c_holdtype=#holdtype# and c_choosetype=#choosetype#
+		]]> 
+	</update>
+	
+	<!-- 更新Sos设置 -->
+	<update id="UpdateSos" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_setsos set c_sostype=#sostype# , c_appname=#appname# , c_apppackage=#apppackage# , c_actiondate=#actiondate# where c_userid=#userid#
+		]]> 
+	</update>
+	
+	<!-- 第三方登录查询 -->
+	<select id="FindExternal"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_external where c_userid=#userid#
+		]]> 
+	</select>
+	
+	<!-- 第三方登录记录 -->
+	<insert id="ExternalLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_external (c_id,c_userid,c_username,c_externalname,c_imei,c_age,c_sex,c_actiondate)
+		values
+		(SEQ_EXTERNAL.nextval,#userid#,#username#,#externalname#,#imei#,#age#,#sex#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 普通登录 -->
+	<select id="Login"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_userbase where c_userid=#userid# and c_password=#password# and c_email=#email#
+		]]> 
+	</select>
+	
+	<!-- 意见反馈 -->
+	<insert id="Feedback" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_action_feedback (c_id,c_imei,c_content,c_actiondate,c_type) 
+		values (SEQ_FEEDBACK.nextval,#imei#,#content#,#actiondate#,#type#)
+		]]> 
+	</insert>
+	
+	
+	<!-- 意见反馈 -->
+	<insert id="Feedback1" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_action_feedback (c_id,c_content,c_actiondate,c_imei,c_type) 
+		values (SEQ_FEEDBACK.nextval,#content#,#actiondate#,#imei#,#type#)
+		]]> 
+	</insert>
+	
+	<!-- 修改email -->
+	<update id="Modifyemail" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_userbase set c_email=#newemail# where c_userid=#userid# and c_email=#oldemail# 
+		]]> 
+	</update>
+	
+	<!-- 查询原密码 -->
+	<select id="Findpd"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_userbase where c_userid=#userid# and c_email=#email# and c_password=#password#
+		]]> 
+	</select>
+	
+	<!-- 修改密码 -->
+	<update id="Modifypd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update t_userbase set c_password=#newpassword# where c_userid=#userid# and c_email=#email# and  c_password=#oldpassword# 
+		]]> 
+	</update>
+	
+	<!-- 注册 -->
+	<insert id="Reg" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_userbase (c_id,c_userid,c_imei,c_phone,c_password,c_nickname,c_email,c_actiondate,c_activecode) 
+		values 
+		(SEQ_USERBASE.nextval,#userid#,#imei#,#phone#,#password#,#nickname#,#email#,#actiondate#,#activecode#)
+		]]> 
+	</insert>
+	
+	<!-- 查询email是否注册 -->
+	<select id="Findemail"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_userbase where c_email=#email#
+		]]> 
+	</select>
+	
+	<!-- 产品用户 -->
+		<insert id="Product_User" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_product_user (c_id,c_userid,c_activecode,c_actiondate) values (SEQ_PRODUCT_USER.nextval,#userid#,#activecode#,#actiondate#)
+		]]> 
+	</insert>
+	
+	
+	<!-- 设备用户 -->
+		<insert id="Device_User" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_device_user (c_id,c_userid,c_imei,c_actiondate) values (SEQ_DEVICE_USER.nextval,#userid#,#imei#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 用户使用的APP -->
+	<insert id="UseApp" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTION_USEAPP (c_id,c_imei,c_type,c_key,c_clicktype,c_package_name,c_app_name,c_actiondate,c_choosetype) 
+		values 
+		(SEQ_USEAPP.nextval,#imei#,#type#,#key#,#clicktype#,#package_name#,#app_name#,#actiondate#,#choosetype#)
+		]]> 
+	</insert>
+	
+	<!-- 用户使用按键的情况 -->
+	<insert id="Usekey" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_action_usekey (c_id,c_imei,c_type,c_key,c_actiondate) 
+		values (SEQ_USEKEY.nextval,#imei#,#type#,#key#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 用户使用按键的情况 -->
+	<insert id="Usekey1" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into t_action_usekey (c_id,c_imei,c_type,c_key,c_actiondate,c_clicktype,c_choosetype) 
+		values (SEQ_USEKEY.nextval,#imei#,#type#,#key#,#actiondate#,#clicktype#,#choosetype#)
+		]]> 
+	</insert>
+	
+	<!-- 精品推荐 -->
+	<select id="GoodNews"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_base_app_info where C_ISLIVE=1 and C_CATEGORY=0 and (c_type=0 or c_type=2) ORDER BY C_ORDER
+		]]> 
+	</select> 
+	
+    <!-- 精品推荐  -->
+	<select id="GoodNews1"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_base_app_info where C_ISLIVE=1 and C_CATEGORY=#category# 
+		and (c_type=#type# or c_type=2 or c_type=4) ORDER BY C_ORDER
+		]]> 
+	</select> 
+	
+	<!-- 新品上线 -->
+	<select id="GoodNews2"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_base_app_info where C_ISLIVE=1 and C_CATEGORY=#category# 
+		and (c_type=#type# or c_type=2) ORDER BY C_ORDER
+		]]> 
+	</select> 
+	
+	<!-- 大牛最爱 -->
+	<select id="GoodNews3"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_base_app_info where C_ISLIVE=1 and C_CATEGORY=#category# 
+		and (c_type=#type# or c_type=4) ORDER BY C_ORDER
+		]]> 
+	</select> 
+	
+	<!-- 已安装-->
+	<insert id="Installed" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTION_INSTALLED_APPINFO (c_id,c_imei,c_type,c_package_name,c_app_name,c_actiondate) 
+		values 
+		(SEQ_INSTALLED.nextval,#imei#,#type#,#package_name#,#app_name#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 公共按键使用 -->
+	<insert id="UseCommon" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTION_USECOMMON (c_id,c_imei,c_type,c_actiondate) 
+		values 
+		(SEQ_USECOMMON.nextval,#imei#,#type#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 下载的新闻 阅读 -->
+	<insert id="DownApp" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTION_DOWN_OTHERAPP (c_id,c_imei,c_type,c_key,c_package_name,c_app_name,c_actiondate) 
+		values 
+		(SEQ_DOWN_OTHERAPP.nextval,#imei#,#type#,#key#,#package_name#,#app_name#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 卸载的新闻 阅读 -->
+	<insert id="UnloadApp" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTION_UNLOAD_OTHERAPP (c_id,c_imei,c_type,c_key,c_package_name,c_app_name,c_actiondate) 
+		values 
+		(SEQ_UNLOAD_OTHERAPP.nextval,#imei#,#type#,#key#,#package_name#,#app_name#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 广告信息 -->
+	<select id="Advert"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select ad.c_picurl as adpicurl,ad.c_type as adtype,ad.c_name as adname,
+        t.c_name,t.c_manu,t.c_size,t.c_logourl,t.c_appurl,t.c_jarname,t.c_abstract,t.c_type,t.c_version,t.c_picurl
+        from t_base_advert_info ad,T_BASE_APP_INFO t  
+        where ad.c_appid=t.c_id and ad.c_type=#type# and t.c_islive=1 
+        order by ad.c_order
+		]]> 
+	</select>
+	
+	<!-- 首页广告信息 -->
+	<select id="MainAdvert"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_base_advert_info ad  
+        where ad.c_type=#type#
+        order by ad.c_order
+		]]> 
+	</select>
+	
+	<!-- 详情页面 -->
+	<select id="NewsDetails"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from t_base_app_info where c_id=#id#
+		]]> 
+	</select>
+
+	<!-- 查询是否有记录 -->
+	<select id="findList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_ACTION_INSTALLED_APPINFO where c_imei=#imei# and c_type=#type# 
+		and c_package_name=#package_name# and c_app_name=#app_name#
+		]]> 
+	</select>
+	
+	<!-- 修改已安装记录 -->
+	<update id="updateList" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_ACTION_INSTALLED_APPINFO set c_package_name=#package_name# , c_app_name=#app_name# 
+		, c_actiondate=#actiondate# ,c_imei=#imei# , c_type=#type#
+		where c_id=#id#
+		]]> 
+	</update>
+	
+	<!-- 删除安装表记录 -->
+	<delete id="deleteAppInfo" parameterClass="java.util.HashMap">
+		<![CDATA[
+		delete from T_ACTION_INSTALLED_APPINFO where c_id=#id#
+		]]> 
+	</delete>
+	
+	<!-- 记录app日志信息 -->
+	<insert id="AppLog" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTION_APPLOG (c_id,c_imei,c_model,c_system,c_log,c_actiondate) 
+		values 
+		(SEQ_APP_LOG.nextval,#imei#,#model#,#system#,#loginfo#,#actiondate#)
+		]]> 
+	</insert>
+	
+	<!-- 查询供应商URL -->
+	<select id="getSupplierUrl"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select c_url,c_type from T_BASE_SUPPLIER where c_supplier_code=#code#
+		]]> 
+	</select>
+	
+	<!-- 修改激活码状态 -->
+		<update id="UpdateActivecodeStatus" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_ACTIVE_CODE set C_ISVALID=0 where C_CODE=#activecode#
+		]]> 
+	</update>
+	<!-- 查询热门品牌更多 -->
+	<select id="ClassifiedHotBrand" 
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select c_name ,c_logourl from T_ACTIVITY_BRAND_INFO where c_id =(
+			   select c_brandid from T_ACTIVITY_INDUSTRY_BRAND where 
+			   		c_schemeid =(select c_schemeid from T_ACTIVITY_INDUSTRY_SCHEME where c_cityid=#cityid# 
+							and c_industryid=#industry#) 
+					 and c_type =#type#
+			   )
+		]]>
+	
+	</select>
+	
+	<!-- 查询帮助信息 -->
+	<select id="getHelpInfo"
+		resultClass="String" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select c_url from T_BASE_HELPINFO where c_type = #type# and c_num=#num#
+		]]> 
+	</select>
+
+	<!-- 查询帮助信息 -->
+	<select id="ekHelpInfo" resultClass="String" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_url from T_BASE_HELPINFO_EK t WHERE t.C_SUP = #sup# AND t.C_TYPE = #type#
+		]]>
+	</select>
+
+	<select id="islive" resultClass="Integer" parameterClass="java.lang.String">
+	SELECT COUNT(1) FROM T_BASE_SUPPLIER WHERE C_SUPPLIER_CODE = #code# AND C_ISLIVE='1'
+	</select>
+
+	<!-- 获取所有手机品牌信息 -->
+	<select id="getAllBrandsOfPhone" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME FROM T_BASE_PHONE_BRAND T WHERE T.C_ISLIVE = 1 ORDER BY T.C_ORDER
+		]]>
+	</select>
+
+	<!-- 根据品牌id获取该品牌下的所有型号信息 -->
+	<select id="getSubBrandByBrandId" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		SELECT T.C_ID, T.C_CODE, T.C_NAME
+		  FROM T_BASE_PHONE_MODEL T
+		 WHERE T.C_ISLIVE = 1
+		   <isNotEqual property="ID" compareValue="-1">
+		   AND T.C_BRAND_ID = #ID#
+		   </isNotEqual>
+		 ORDER BY T.C_NAME
+	</select>
+
+	<!-- 查询所有物流信息 -->
+	<select id="expressInfo" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME, T.C_CODE FROM T_BASE_EXPRESS T ORDER BY T.C_ORDER
+		]]>
+	</select>
+
+	<!-- 记录免费换膜行为 -->
+	<insert id="recExchange" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_EK_RECEXCHANGE (C_ID, C_IMEI, C_UID, C_DATE)
+		VALUES (SEQ_EK_RECEXCHANGE.NEXTVAL, #IMEI#, #UID#, SYSDATE)
+		]]>
+	</insert>
+
+	<!-- 查询是否有过“免费购膜”行为 -->
+	<select id="hasExchanged" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_EK_RECEXCHANGE T WHERE T.C_IMEI = #imei#
+		]]>
+	</select>
+ </sqlMap>
+

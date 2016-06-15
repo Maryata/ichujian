@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_gameApp">
+	<!-- 通过游戏id获取游戏详情 -->
+	<select id="getGameDetailByGameId" parameterClass="java.lang.Long"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.c_id,
+       T.c_name,
+       T.c_manu,
+       T.c_logourl,
+       nvl(T.C_SOURCE,T.c_appurl) as c_appurl,
+       T.c_jarname,
+       T.c_abstract,
+       T.c_type,
+       T.c_version,
+       T.c_publish_date,
+       T.c_islive,
+       T.c_picurl,
+       T.c_order,
+       T.c_size,
+       T.c_source,
+       T.c_level,
+       T.c_title,
+       T.c_share_path,
+       T.c_download,
+       T.c_state,
+       T.c_phone, TT.C_NAME AS CATNAME, NVL(T99.NUMBEROFDOWNLOADS,0) + NVL(T.c_download,0) as NUMBEROFDOWNLOADS, NVL(T98.GRADE,C_LEVEL) GRADE
+  FROM T_GAME_APP_INFO T left join T_EK_GAME_CATEGORY TT
+         on T.c_type = TT.c_id,
+       (SELECT COUNT(T1.C_ID) AS NUMBEROFDOWNLOADS
+          FROM T_EK_GAME_MEMBER_ACTION T1
+         WHERE T1.C_TYPE = 0
+           AND T1.C_GID = #gid#) T99,
+       (SELECT AVG(T3.C_GRADE) AS GRADE
+          FROM T_EK_GAME_MEMBER_GRADE T3
+         WHERE T3.C_GID = #gid#) T98
+ WHERE T.C_ID = #gid#
+		]]>
+	</select>
+
+	<!-- 根据jar名称获取游戏id -->
+	<select id="getGidByJarname" resultClass="java.util.HashMap" parameterClass="java.lang.String">
+		SELECT C_ID FROM T_GAME_APP_INFO T WHERE T.C_JARNAME=#jarname#
+	</select>
+	<!-- 持久化用户行为 -->
+	<insert id="persistentUserBehavior" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_EK_GAME_MEMBER_ACTION(C_ID, C_UID, C_GID,C_TYPE, C_DATE,C_SOURCE) VALUES(SEQ_EK_GAME_MEMBER_ACTION.nextval,#uid#,#gid#,#type#,#date#,#source#)
+		]]>
+	</insert>
+	<!-- 获取游戏APP信息（包名） -->
+	<select id="gameInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_JARNAME,C_VERSION FROM T_GAME_APP_INFO T WHERE T.C_ISLIVE = 1
+		]]>
+	</select>
+	<!-- 根据JAR包名获取游戏LOGO -->
+	<select id="getLogo" parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT T.C_LOGOURL FROM T_GAME_APP_INFO T WHERE T.C_ISLIVE = 1 AND T.C_JARNAME LIKE #JARNAME#
+		]]>
+	</select>
+	<!-- 游戏分类列表 -->
+	<select id="categoryList" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME, T.C_LOGO
+		  FROM T_EK_GAME_CATEGORY T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_TYPE = 01
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	<!-- 根据合集id查询游戏信息 -->  
+	<select id="gamesInCategory" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID,C_NAME,C_LOGOURL,C_SIZE,C_TITLE,C_APPURL,C_JARNAME,C_VERSION,C_DOWNLOAD,C_GRADE
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT TG.C_ID,
+		                       TG.C_NAME,
+		                       TG.C_LOGOURL,
+		                       TG.C_SIZE,
+		                       TG.C_TITLE,
+		                       NVL(TG.C_SOURCE,TG.C_APPURL) C_APPURL,
+		                       TG.C_JARNAME,
+		                       TG.C_VERSION,
+		                       TG.C_DOWNLOAD,
+		                       TG.C_LEVEL C_GRADE
+		                  FROM T_EK_GAME_APP_CATEGORY TC, T_GAME_APP_INFO TG
+		                 WHERE TC.C_CID = #CID#
+		                   AND TG.C_ID = TC.C_GID
+		                   AND TG.C_ISLIVE = 1
+		                 ORDER BY TC.C_ORDER, TC.C_CNTRORDER, TG.C_ID) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	<!-- 根据游戏id查询真实下载量 -->  
+	<select id="realDownload" parameterClass="java.lang.String" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT COUNT(C.C_TYPE)
+		  FROM T_EK_GAME_MEMBER_ACTION C
+		 WHERE C.C_TYPE = 0
+		   AND C.C_GID = #id#
+		 GROUP BY C.C_GID	
+		]]>
+	</select>
+	<!-- 根据游戏id查询真实评分 -->  
+	<select id="realGrade" parameterClass="java.lang.String" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT CEIL(SUM(C_GRADE) / COUNT(C_GID))
+		  FROM T_EK_GAME_MEMBER_GRADE T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_GID = #GID#
+		]]>
+	</select>
+	<!-- 根据游戏id查询是否有礼包 -->  
+	<select id="hasGift" parameterClass="java.lang.String" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(*)
+		  FROM T_EK_GAME_GIFTS_INFO T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_GID = #ID#
+		]]>
+	</select>
+	<!-- 游戏推荐 -->  
+	<!-- 取查询结果中的前八个 -->
+	<select id="gameRecommend" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME, C_LOGOURL
+		  FROM (SELECT ROWNUM, TEMP.*
+		          FROM (SELECT G.C_ID, G.C_NAME, G.C_LOGOURL
+		                  FROM T_EK_GAME_APP_RECOMMEND T, T_GAME_APP_INFO G
+		                 WHERE G.C_ISLIVE = 1
+		                   AND T.C_GID = G.C_ID
+		                   AND T.C_TYPE = 1
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM < 9)
+		]]>
+	</select>
+	<select id="procUserComments" parameterClass="java.util.HashMap">
+		<![CDATA[
+			CALL PKG_EK_GAME.PROC_MEMBER_COMMENT(#uid#,#gid#,#date#,#comment#,#islive#)
+		]]>
+	</select>
+	<!--获取用户游戏评分-->
+	<select id="getGrade" resultClass="java.util.HashMap">
+		SELECT C_UID,C_GRADE FROM T_EK_GAME_MEMBER_GRADE WHERE C_GID=#gid# AND C_UID IN 
+		<iterate property="uids" conjunction="," open="(" close=")">
+              #uids[]#
+          </iterate>
+	</select>
+	<!--用户评分-->
+	<insert id="userRating" parameterClass="java.util.HashMap">
+		<![CDATA[
+			INSERT INTO T_EK_GAME_MEMBER_GRADE(C_ID,C_UID,C_GID,C_GRADE,C_DATE,C_ISLIVE) VALUES (SEQ_EK_GAME_MEMBER_GRADE.nextval,#uid#,#gid#,#grade#,#date#,#islive#)
+		]]>
+	</insert>
+	<update id="updateUserRating" parameterClass="java.util.HashMap">
+		<![CDATA[
+			UPDATE T_EK_GAME_MEMBER_GRADE SET C_GRADE=#grade#,C_DATE=#date#,C_ISLIVE=#islive# WHERE C_GID=#gid# AND C_UID=#uid#
+		]]>
+	</update>
+	<!-- 游戏星级评论统计 -->
+	<select id="starGameStatistics" resultClass="java.util.HashMap" >
+		<![CDATA[
+			SELECT COUNT(C_ID) AS C_COUNT,C_GRADE FROM T_EK_GAME_MEMBER_GRADE T WHERE T.C_GID=#gid# AND T.C_ISLIVE=1 GROUP BY T.C_GRADE
+		]]>
+	</select>
+	<!-- 通过游戏id获取游戏评论列表 -->
+	<select id="getThroughTheGameIdGameReviewList" resultClass="java.util.HashMap">
+		<![CDATA[
+		 SELECT *
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (   
+                SELECT t0.*, t3.c_headimage,t3.c_nickname,t3.C_REGID,t3.C_PHONENUM
+                  FROM T_EK_GAME_MEMBER_COMMENT t0
+                  left join T_EK_MEMBER_INFO t3
+                    on t0.c_uid = t3.c_id
+                 WHERE t0.C_GID = #gid# and t0.c_comment is not null
+                   and t0.c_islive=1 and t3.c_state = 1 order by t0.c_date desc
+                ) A
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 通过用户id和游戏id获取用户对该游戏的评论 -->
+	<select id="getGameReviewsByUidAndGid" resultClass="java.util.HashMap">
+		<![CDATA[	 
+ SELECT t0.*,t3.c_headimage, t3.c_nickname,t3.C_REGID,t3.C_PHONENUM
+                  FROM T_EK_GAME_MEMBER_COMMENT t0
+                  left join T_EK_MEMBER_INFO t3
+                    on t0.c_uid = t3.c_id
+                 WHERE t0.C_GID = #gid# and t0.c_uid =#uid# and t0.c_comment is not null
+                   and t0.c_islive=1 and t3.c_state = 1
+		]]>
+	</select>
+	<!-- 通过游戏id获取游戏评论列表(剔除当前用户评论) -->
+	<select id="getThroughTheGameIdGameReviewList2" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (   
+                SELECT t0.*, t3.c_headimage,t3.c_nickname,t3.C_REGID,t3.C_PHONENUM
+                  FROM T_EK_GAME_MEMBER_COMMENT t0 
+                  left join T_EK_MEMBER_INFO t3
+                    on t0.c_uid = t3.c_id
+                 WHERE t0.C_GID = #gid# and t0.c_uid<>#uid# and t0.c_comment is not null
+                   and t0.c_islive=1 and t3.c_state = 1 order by t0.c_date desc
+                ) A
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 活动、资讯、攻略是否点赞 -->
+	<select id="isLike" resultClass="java.util.HashMap">
+		select count(1) as flag from T_EK_GAME_CHILD_ACTION where c_indexid=#id# and c_uid=#uid# and c_source=#source# and c_type=2
+	</select>
+	<!-- 持久化用户行为 -->
+	<insert id="persistentUserBehavior2" parameterClass="java.util.HashMap">
+		insert into T_EK_GAME_CHILD_ACTION
+  (c_id, c_uid, c_gid, c_indexid, c_date, c_type, c_source)
+values
+  (SEQ_EK_GAME_CHILD_ACTION.nextval, #uid#, #gid#, #indexid#, #date#, #type#, #source#)
+	</insert>
+	<!-- 查询广告信息 -->
+	<select id="advertInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_APPID  AS ID,
+			   T.C_PICURL AS ADPICURL,
+			   T.C_NAME   AS ADNAME,
+			   T.C_TYPE   AS TYPE,
+			   T.C_ORDER
+		  FROM T_EK_GAME_ADVERT_INFO T
+		 WHERE T.C_ORDER BETWEEN #ST# AND #ED#
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	<!-- 首页分类 -->
+	<!--<select id="gameColIndex" parameterClass="java.util.HashMap"-->
+			<!--resultClass="java.util.HashMap" remapResults="true">-->
+		<!--SELECT *-->
+		  <!--FROM (SELECT ROWNUM RM, TEMP1.*-->
+		          <!--FROM (SELECT T.*-->
+		                  <!--FROM $TBNAME$ T, T_EK_GAME_COLLECTION_DETAIL D-->
+		                 <!--WHERE T.C_ISLIVE = 1-->
+		                   <!--AND D.C_ISLIVE = 1-->
+		                   <!--AND T.C_ID = D.C_GID-->
+		                   <!--AND D.C_CID = #CID#-->
+						   <!--<isEqual property="TBNAME" compareValue="T_EK_GAME_ACTIVITY_INFO">-->
+							<!--AND T.C_EDATE > SYSDATE-->
+						   <!--</isEqual>-->
+		                 <!--ORDER BY D.C_ORDER, D.C_CNTRORDER, T.C_ID) TEMP1-->
+		         <!--WHERE ROWNUM &lt;= (#PAGE#) * #PSIZE#)-->
+		 <!--WHERE RM > (#PAGE# - 1) * #PSIZE#-->
+	<!--</select>-->
+	<select id="gameColIndex" parameterClass="java.util.HashMap"
+			resultClass="java.util.HashMap" remapResults="true">
+		SELECT T.*
+		  FROM $TBNAME$ T, T_EK_GAME_COLLECTION_DETAIL D
+		 WHERE T.C_ISLIVE = 1
+		   AND D.C_ISLIVE = 1
+		   AND T.C_ID = D.C_GID
+		   AND D.C_CID = #CID#
+		   <isEqual property="TBNAME" compareValue="T_EK_GAME_ACTIVITY_INFO">
+			AND T.C_EDATE > SYSDATE
+		   </isEqual>
+		 ORDER BY D.C_ORDER, D.C_CNTRORDER, T.C_ID
+	</select>
+	<!-- 搜索游戏 -->
+	<select id="searchApp" resultClass="java.util.HashMap">
+		select t1.c_id,
+		t1.C_SIZE,
+		t1.C_TITLE,t1.c_jarname,
+		nvl(t.numberofdownloads, 0) + nvl(t1.c_download, 0) as C_DOWNLOAD,
+		nvl(t.grade, t1.c_level) as c_grade,
+		t1.c_name,
+		t1.c_logourl,
+		nvl(t1.C_SOURCE,t1.c_appurl) as c_appurl,
+		t1.c_abstract,
+		t1.c_publish_date
+		from T_GAME_APP_INFO t1
+		left join (select t.c_id,
+		COUNT(T2.C_ID) as numberofdownloads,
+		avg(t3.c_grade) as grade
+		from T_GAME_APP_INFO t
+		left join T_EK_GAME_MEMBER_ACTION t2
+		on t.c_id = t2.c_gid
+		left join T_EK_GAME_MEMBER_GRADE t3
+		on t.c_id = t3.c_gid
+		where (t2.c_type = 0 or t2.c_type is null)
+		group by t.c_id) t
+		on t.c_id = t1.c_id
+		where t1.c_islive = '1'
+		and t1.c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<select id="searchApp1" resultClass="java.util.HashMap">
+		select c_id, c_name from T_GAME_APP_INFO where c_islive='1' AND c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+    <!-- 游戏搜索行为 -->
+    <insert id="searchBehavior" parameterClass="java.util.HashMap">
+        <![CDATA[
+		INSERT INTO T_EK_GAME_MEMBER_ACTION(C_ID, C_UID, C_TYPE, C_DATE,C_SOURCE,C_IMEI,C_CONTENT) VALUES(SEQ_EK_GAME_MEMBER_ACTION.nextval,#uid#,#type#,#date#,#source#,#imei#,#content#)
+		]]>
+    </insert>
+</sqlMap>
+

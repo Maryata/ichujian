@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekeyShop" namespace="/ekeyShop" extends="struts-default">
+		<!--签到奖励列表-->
+		<action name="shopSign" method="shopSign" class="shopAction"></action>
+        <!--我的任务-->
+		<action name="task" method="task" class="shopAction"></action>
+		<!--分享赢好礼-->
+		<action name="share" method="share" class="shopAction"></action>
+		<!--邀请详情-->
+		<action name="inviteDetail" method="inviteDetail" class="shopAction"></action>
+		<!-- 商品兑换 -->
+		<action name="exchangeList" method="exchangeList" class="shopAction"></action>
+		<!-- 商品首页广告 -->
+		<action name="advert" method="advert" class="shopAction"></action>
+	</package>
+</struts>

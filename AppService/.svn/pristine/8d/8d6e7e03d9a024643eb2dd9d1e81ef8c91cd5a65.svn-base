@@ -1,0 +1,11 @@
+# get table name by collection id
+tbName.1=T_GAME_MALL_PRODUCT
+tbName.2=T_GAME_ACTIVITY_INFO
+tbName.3=T_GAME_MALL_PRODUCT
+tbName.4=T_GAME_MALL_PRODUCT
+
+# get table name by collection id --- for eKey
+ek.tbName.1=T_GAME_APP_INFO
+ek.tbName.2=T_GAME_H5_INFO
+ek.tbName.3=T_EK_GAME_STRATEGY_INFO
+ek.tbName.4=T_GAME_H5_INFO

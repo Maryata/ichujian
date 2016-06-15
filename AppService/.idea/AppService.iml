@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/game.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_search.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_industry.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/phone_record.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_user.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_activity.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_usernotify.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/web-action.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_classified.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_recommend.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_useactivity.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/h5.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/easyBuy.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/activity_web.xml</file>
+          <file>file://$MODULE_DIR$/WebRoot/WEB-INF/conf/spring/mcrapp.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+    <facet type="web" name="Web">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/WebRoot/WEB-INF/web.xml" />
+        </descriptors>
+        <webroots>
+          <root url="file://$MODULE_DIR$/WebRoot" relative="/" />
+        </webroots>
+      </configuration>
+      <facet type="Struts2" name="Struts 2">
+        <configuration>
+          <fileset id="s2fileset" name="My Fileset " removed="false">
+            <file>file://$MODULE_DIR$/src/activity_activity.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_classified.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_industry.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_recommend.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_search.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_useactivity.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_user.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_usernotify.xml</file>
+            <file>file://$MODULE_DIR$/src/activity_web.xml</file>
+            <file>file://$MODULE_DIR$/src/easyBuy.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_activity.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_freeCall.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_game_activity.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_game_app.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_game_gift.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_game_h5.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_game_strategy.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_index.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_task.xml</file>
+            <file>file://$MODULE_DIR$/src/ekey/ek_user.xml</file>
+            <file>file://$MODULE_DIR$/src/exchange.xml</file>
+            <file>file://$MODULE_DIR$/src/game_activity.xml</file>
+            <file>file://$MODULE_DIR$/src/game_app.xml</file>
+            <file>file://$MODULE_DIR$/src/game_game.xml</file>
+            <file>file://$MODULE_DIR$/src/game_gift.xml</file>
+            <file>file://$MODULE_DIR$/src/game_h5.xml</file>
+            <file>file://$MODULE_DIR$/src/game_infomation.xml</file>
+            <file>file://$MODULE_DIR$/src/game_mall.xml</file>
+            <file>file://$MODULE_DIR$/src/game_strategy.xml</file>
+            <file>file://$MODULE_DIR$/src/game_task.xml</file>
+            <file>file://$MODULE_DIR$/src/game_user.xml</file>
+            <file>file://$MODULE_DIR$/src/mcrapp_all.xml</file>
+            <file>file://$MODULE_DIR$/src/member.xml</file>
+            <file>file://$MODULE_DIR$/src/phonerecord.xml</file>
+            <file>file://$MODULE_DIR$/src/struts.xml</file>
+            <file>file://$MODULE_DIR$/src/weixin_h5.xml</file>
+          </fileset>
+          <propertiesKeys disabled="false" />
+        </configuration>
+      </facet>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/out" />
+    <output-test url="file://$MODULE_DIR$/../test/AppService/out" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/WebRoot" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="lib" level="project" />
+  </component>
+</module>

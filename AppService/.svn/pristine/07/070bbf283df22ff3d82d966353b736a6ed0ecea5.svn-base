@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+	<!--  -->
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>AppService11.root</param-value>
+	</context-param>
+
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			/WEB-INF/conf/spring/applicationContext.xml
+		</param-value>
+	</context-param>
+
+	<distributable />
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>requestDispatcher</filter-name>
+		<filter-class>com.sys.commons.ServletFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>requestDispatcher</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>struts-prepare</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareFilter</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>struts-execute</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsExecuteFilter</filter-class>
+	</filter>
+
+	<!-- encodingFilter Config -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
+	<!-- perview Filter Config -->
+	<filter>
+		<filter-name>loginFilter</filter-name>
+		<filter-class>com.sys.commons.LoginFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>struts-prepare</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>loginFilter</filter-name>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>struts-execute</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!--加载配置文件-->
+	<servlet>
+		<servlet-name>autoLoadServlet</servlet-name>
+		<servlet-class>com.web.AutoLoadServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>autoLoadServlet</servlet-name>
+		<url-pattern>/autoLoadServlet</url-pattern>
+	</servlet-mapping>
+
+	<!--后台接收通知处理-->
+	<servlet>
+		<servlet-name>backRcvResponse</servlet-name>
+		<servlet-class>com.unionpay.acp.demo.BackRcvResponse</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>backRcvResponse</servlet-name>
+		<url-pattern>/servlet/backRcvResponse</url-pattern>
+	</servlet-mapping>
+
+	<!--获取调用控件的tn号-->
+	<servlet>
+		<servlet-name>form05_6_2_AppConsume</servlet-name>
+		<servlet-class>com.unionpay.acp.demo.Form05_6_2_AppConsume</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>form05_6_2_AppConsume</servlet-name>
+		<url-pattern>/servlet/form05_6_2_AppConsume</url-pattern>
+	</servlet-mapping>
+
+	<!--支付宝签名-->
+	<servlet>
+		<servlet-name>alipaySign</servlet-name>
+		<servlet-class>com.alipay.servlet.Sign</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>alipaySign</servlet-name>
+		<url-pattern>/servlet/alipaySign</url-pattern>
+	</servlet-mapping>
+
+	<!--支付宝回调-->
+	<servlet>
+		<servlet-name>alipayNotify</servlet-name>
+		<servlet-class>com.alipay.servlet.Notify</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>alipayNotify</servlet-name>
+		<url-pattern>/servlet/alipayNotify</url-pattern>
+	</servlet-mapping>
+
+    <!--微信统一下单-->
+	<servlet>
+		<servlet-name>unifiedOrder</servlet-name>
+		<servlet-class>com.weixinpay.UnifiedOrderServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>unifiedOrder</servlet-name>
+		<url-pattern>/servlet/unifiedOrder</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>weixinPayNotify</servlet-name>
+		<servlet-class>com.weixinpay.Notify</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>weixinPayNotify</servlet-name>
+		<url-pattern>/servlet/weixinPayNotify</url-pattern>
+	</servlet-mapping>
+
+	<!-- 飞语云签名 -->
+	<servlet>
+		<servlet-name>FeiyuCloudSign</servlet-name>
+		<servlet-class>com.alipay.servlet.FeiyuCloudSign</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FeiyuCloudSign</servlet-name>
+		<url-pattern>/servlet/AliFeiyuCloudSign</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>FeiyuCloudNotify</servlet-name>
+		<servlet-class>com.alipay.servlet.FeiyuCloudNotify</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FeiyuCloudNotify</servlet-name>
+		<url-pattern>/servlet/AliFeiyuCloudNotify</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>
+				/WEB-INF/conf/spring/*application*.xml
+			</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+		<url-pattern>/spring/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- 设置需要认证的范围 -->
+	<!--
+	<security-constraint>
+		<display-name>Auth</display-name>
+		<web-resource-collection>
+			<web-resource-name>Protected Area</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>ADMIN</role-name>
+			<role-name>USER</role-name>
+		</auth-constraint>
+	</security-constraint>
+	 -->
+	<!-- 设置该Web应用使用到的角色 -->
+	<!--
+	<security-role>
+		<role-name>ADMIN</role-name>
+	</security-role>
+	<security-role>
+		<role-name>USER</role-name>
+	</security-role>
+	<security-role>
+		<role-name>GUEST</role-name>
+	</security-role>
+	  -->
+	<!-- 设置认证方式 -->
+	<!--
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>Basic Authentication</realm-name>
+	</login-config>
+
+	<login-config>
+		<auth-method>DIGEST</auth-method>
+		<realm-name>Digest Authentication</realm-name>
+	</login-config>
+	-->
+	<session-config>
+		<session-timeout>1</session-timeout>
+	</session-config>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+</web-app>

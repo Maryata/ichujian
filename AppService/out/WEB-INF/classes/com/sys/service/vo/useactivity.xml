@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="useactivity">
+
+    <!-- 选择行为记录 -->
+	<insert id="ChooseInfo" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTIVITY_USER_CHOOSE (c_id,c_uid,c_date,c_type,c_indexid)
+		values
+		(SEQ_ACTIVITY_CHOOSE.nextval,#regid#,#actiondate#,#type#,#indexid#)
+		]]> 
+	</insert>
+	
+	 <!-- 查看行为记录 -->
+	<insert id="SelectInfo" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTIVITY_USER_SELECT (c_id,c_uid,c_date,c_type,c_indexid,c_action)
+		values
+		(SEQ_ACTIVITY_SELECT.nextval,#regid#,#actiondate#,#type#,#indexid#,#action#)
+		]]> 
+	</insert>
+	
+	
+	
+ </sqlMap>
+

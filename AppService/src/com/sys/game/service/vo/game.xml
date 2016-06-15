@@ -1,0 +1,1458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="game">
+	<!-- 持久化用户行为 -->
+	<insert id="persistentUserBehavior" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_ACTION(C_ID, C_UID, C_GID,C_TYPE, C_DATE,C_SOURCE) VALUES(SEQ_GAME_MEMBER_ACTION.nextval,#uid#,#gid#,#type#,#date#,#source#)
+		]]>
+	</insert>
+	<!-- 游戏搜索行为 -->
+	<insert id="searchBehavior" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_ACTION(C_ID, C_UID, C_TYPE, C_DATE,C_SOURCE,C_IMEI,C_CONTENT) VALUES(SEQ_GAME_MEMBER_ACTION.nextval,#uid#,#type#,#date#,#source#,#imei#,#content#)
+		]]>
+	</insert>
+	<!-- 持久化用户行为 -->
+	<insert id="persistentUserBehavior2" parameterClass="java.util.HashMap">
+		insert into t_game_child_action
+  (c_id, c_uid, c_gid, c_indexid, c_date, c_type, c_source)
+values
+  (SEQ_GAME_CHILD_ACTION.nextval, #uid#, #gid#, #indexid#, #date#, #type#, #source#)
+	</insert>
+	
+	<!--用户评分-->
+	<insert id="userRating" parameterClass="java.util.HashMap">
+		<![CDATA[
+			INSERT INTO T_GAME_MEMBER_GRADE(C_ID,C_UID,C_GID,C_GRADE,C_DATE,C_ISLIVE) VALUES (SEQ_GAME_MEMBER_GRADE.nextval,#uid#,#gid#,#grade#,#date#,#islive#)
+		]]>
+	</insert>
+	<!-- 用户评论 -->
+	<insert id="userComments" parameterClass="java.util.HashMap">
+		<![CDATA[
+			INSERT INTO T_GAME_MEMBER_COMMENT (C_ID,C_UID,C_GID,C_COMMENT,C_DATE,C_ISLIVE) VALUES (SEQ_GAME_MEMBER_COMMENT.nextval,#uid#,#gid#,#comment#,#date#,#islive#)
+		]]>
+	</insert>
+	<select id="procUserComments" parameterClass="java.util.HashMap">
+		<![CDATA[
+			CALL PKG_GAME.PROC_MEMBER_COMMENT(#uid#,#gid#,#date#,#comment#,#islive#)
+		]]>
+	</select>
+	<update id="updateUserComments" parameterClass="java.util.HashMap">
+		<![CDATA[
+			UPDATE T_GAME_MEMBER_COMMENT SET C_COMMENT=#comment#,C_DATE=#date#,C_ISLIVE=#islive# WHERE C_GID=#gid# AND C_UID=#uid#
+		]]>
+	</update>
+	<update id="updateUserRating" parameterClass="java.util.HashMap">
+		<![CDATA[
+			UPDATE T_GAME_MEMBER_GRADE SET C_GRADE=#grade#,C_DATE=#date#,C_ISLIVE=#islive# WHERE C_GID=#gid# AND C_UID=#uid#
+		]]>
+	</update>
+	<!-- 用户反馈 -->
+	<!--<insert id="userFeedback">
+		<![CDATA[
+			
+		]]>
+	</insert>
+	--><!-- 游戏星级评论统计 -->
+	<select id="starGameStatistics" resultClass="java.util.HashMap" >
+		<![CDATA[
+			SELECT COUNT(C_ID) AS C_COUNT,C_GRADE FROM T_GAME_MEMBER_GRADE T WHERE T.C_GID=#gid# AND T.C_ISLIVE=1 GROUP BY T.C_GRADE
+		]]>
+	</select>
+	<!-- 通过游戏id获取游戏评论列表 -->
+	<select id="getThroughTheGameIdGameReviewList" resultClass="java.util.HashMap">
+		<![CDATA[
+		 SELECT *
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (   
+                SELECT t0.*, t3.c_headimage,t3.c_nickname,t3.C_REGID,t3.C_PHONENUM
+                  FROM T_GAME_MEMBER_COMMENT t0
+                  left join t_game_member_info t3
+                    on t0.c_uid = t3.c_id
+                 WHERE t0.C_GID = #gid# and t0.c_comment is not null
+                   and t0.c_islive=1 and t3.c_state = 1 order by t0.c_date desc
+                ) A
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	
+	<!-- 通过游戏id获取游戏评论列表(剔除当前用户评论) -->
+	<select id="getThroughTheGameIdGameReviewList2" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (   
+                SELECT t0.*, t3.c_headimage,t3.c_nickname,t3.C_REGID,t3.C_PHONENUM
+                  FROM T_GAME_MEMBER_COMMENT t0 
+                  left join t_game_member_info t3
+                    on t0.c_uid = t3.c_id
+                 WHERE t0.C_GID = #gid# and t0.c_uid<>#uid# and t0.c_comment is not null
+                   and t0.c_islive=1 and t3.c_state = 1 order by t0.c_date desc
+                ) A
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 通过用户id和游戏id获取用户对该游戏的评论 -->
+	<select id="getGameReviewsByUidAndGid" resultClass="java.util.HashMap">
+		<![CDATA[	 
+ SELECT t0.*,t3.c_headimage, t3.c_nickname,t3.C_REGID,t3.C_PHONENUM
+                  FROM T_GAME_MEMBER_COMMENT t0
+                  left join t_game_member_info t3
+                    on t0.c_uid = t3.c_id
+                 WHERE t0.C_GID = #gid# and t0.c_uid =#uid# and t0.c_comment is not null
+                   and t0.c_islive=1 and t3.c_state = 1
+		]]>
+	</select>
+	<!--获取用户游戏评分-->
+	<select id="getGrade" resultClass="java.util.HashMap">
+		SELECT C_UID,C_GRADE FROM T_GAME_MEMBER_GRADE WHERE C_GID=#gid# AND C_UID IN 
+		<iterate property="uids" conjunction="," open="(" close=")">
+              #uids[]#
+          </iterate>
+	</select>
+	<!-- 根据jar名称获取游戏id -->
+	<select id="getGidByJarname" resultClass="java.util.HashMap" parameterClass="java.lang.String">
+		SELECT C_ID FROM T_GAME_APP_INFO T WHERE T.C_JARNAME=#jarname#
+	</select>
+	
+	<!-- 通过游戏id获取游戏详情 -->
+	<select id="getGameDetailByGameId" parameterClass="java.lang.Long"
+		resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.c_id,
+       T.c_name,
+       T.c_manu,
+       T.c_logourl,
+       nvl(T.C_SOURCE,T.c_appurl) as c_appurl,
+       T.c_jarname,
+       T.c_abstract,
+       T.c_type,
+       T.c_version,
+       T.c_publish_date,
+       T.c_islive,
+       T.c_picurl,
+       T.c_order,
+       T.c_size,
+       T.c_source,
+       T.c_level,
+       T.c_title,
+       T.c_share_path,
+       T.c_download,
+       T.c_state,
+       T.c_phone, TT.C_NAME AS CATNAME, NVL(T99.NUMBEROFDOWNLOADS,0) + NVL(T.c_download,0) as NUMBEROFDOWNLOADS, NVL(T98.GRADE,C_LEVEL) GRADE
+  FROM T_GAME_APP_INFO T left join t_game_category TT
+         on T.c_type = TT.c_id,
+       (SELECT COUNT(T1.C_ID) AS NUMBEROFDOWNLOADS
+          FROM T_GAME_MEMBER_ACTION T1
+         WHERE T1.C_TYPE = 0
+           AND T1.C_GID = #gid#) T99,
+       (SELECT AVG(T3.C_GRADE) AS GRADE
+          FROM T_GAME_MEMBER_GRADE T3
+         WHERE T3.C_GID = #gid#) T98
+ WHERE T.C_ID = #gid#
+		]]>
+	</select>
+	<!--游戏活动列表-->
+	<select id="listActivity" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT C_ID,
+                       C_GID,
+                       C_NAME,
+                       C_DATE,
+                       C_ISLIVE,
+                       C_ORDER,
+                       C_SHAREURL,
+                       C_LOGOURL
+                  FROM T_GAME_ACTIVITY_INFO
+                 WHERE C_GID = #gid# AND C_ISLIVE=1
+                 ORDER BY C_ORDER DESC, C_DATE DESC) T
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 游戏资讯列表 -->
+	<select id="listInformation" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			SELECT *
+			FROM (SELECT T.*, ROWNUM RN
+					FROM (SELECT C_ID,
+								 C_GID,
+								 C_NAME,
+								 C_DATE,
+								 C_ISLIVE,
+								 C_ORDER,
+								 C_SHAREURL,
+								 C_LOGOURL
+							FROM T_GAME_INFORMATION_INFO
+						   WHERE C_GID = #gid# AND C_ISLIVE=1
+						   ORDER BY C_ORDER DESC, C_DATE DESC) T
+				   WHERE ROWNUM <= #maxRows#)
+			WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 游戏攻略列表 -->
+	<select id="raiders" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT C_ID,
+                       C_GID,
+                       C_NAME,
+                       C_DATE,
+                       C_ISLIVE,
+                       C_ORDER,
+                       C_SHAREURL,
+                       C_LOGOURL
+                  FROM T_GAME_STRATEGY_INFO
+                 WHERE C_GID = #gid#
+                   AND C_ISLIVE = 1
+                 ORDER BY C_ORDER DESC, C_DATE DESC) T
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 通过活动ID获取活动信息  --> 
+	<select id="getActivityById" resultClass="java.util.HashMap">
+		SELECT C_ID,
+       C_GID,
+       C_NAME,
+       C_DATE,
+       C_ISLIVE,
+       C_ORDER,
+       C_SHAREURL,(select count(1) from t_game_child_action where c_indexid=#id# and c_source=#source# and c_type=2) as c_count,(select count(1) from t_game_child_action where c_indexid=#id# and c_source=#source# and c_uid=#uid# and c_type=2) as flag
+  FROM T_GAME_ACTIVITY_INFO
+ WHERE C_ID = #id#
+	</select>
+	<!-- 通过资讯ID获取资讯信息 -->
+	<select id="getInformationById" resultClass="java.util.HashMap">
+	SELECT C_ID,
+       C_GID,
+       C_NAME,
+       C_DATE,
+       C_ISLIVE,
+       C_ORDER,
+       C_SHAREURL,(select count(1) from t_game_child_action where c_indexid=#id# and c_source=#source# and c_type=2) as c_count,(select count(1) from t_game_child_action where c_indexid=#id# and c_source=#source# and c_uid=#uid# and c_type=2) as flag
+  FROM T_GAME_INFORMATION_INFO
+ WHERE C_ID = #id#
+	</select>
+	<!-- 通过攻略ID获取攻略信息 -->
+	<select id="getRaidersById" resultClass="java.util.HashMap">
+	SELECT C_ID,
+       C_GID,
+       C_NAME,
+       C_DATE,
+       C_ISLIVE,
+       C_ORDER,
+       C_SHAREURL,(select count(1) from t_game_child_action where c_indexid=#id# and c_source=#source# and c_type=2) as c_count,(select count(1) from t_game_child_action where c_indexid=#id# and c_source=#source# and c_uid=#uid# and c_type=2) as flag
+  FROM T_GAME_STRATEGY_INFO
+ WHERE C_ID = #id#
+	</select>
+	<!-- 活动、资讯、攻略是否点赞 -->
+	<select id="isLike" resultClass="java.util.HashMap">
+		select count(1) as flag from t_game_child_action where c_indexid=#id# and c_uid=#uid# and c_source=#source# and c_type=2
+	</select>
+	
+	<select id="findCategoryById" resultClass="java.util.HashMap">
+		select c_id,
+	       c_name,
+	       c_islive,
+	       c_logo,
+	       c_order,
+	       c_modifier,
+	       c_last_update,
+	       c_type
+	  from t_game_category
+	 where c_id = #cid#
+	</select>
+	<!-- 获取热门搜索游戏 -->
+	<select id="getPopularSearches" resultClass="java.util.HashMap">
+		 select c_name
+		  from t_game_popular_search t
+		  <isEqual prepend="LEFT JOIN" 
+             property="type" 
+             compareValue="1">
+			t_game_app_info t1
+		         on t.c_gid=t1.c_id
+			</isEqual>  
+		  <isEqual prepend="LEFT JOIN" 
+             property="type" 
+             compareValue="2">
+			t_game_h5_info t1
+		         on t.c_gid=t1.c_id
+			</isEqual>  
+		 where t.c_type = #type# and rownum &lt; 20 
+		 order by t.c_order
+	</select>
+	<!-- 搜索游戏 -->
+	<select id="searchApp" resultClass="java.util.HashMap">
+			select t1.c_id,
+		       t1.C_SIZE,
+		       t1.C_TITLE,t1.c_jarname,
+		       nvl(t.numberofdownloads, 0) + nvl(t1.c_download, 0) as C_DOWNLOAD,
+		       nvl(t.grade, t1.c_level) as c_grade,
+		       t1.c_name,
+		       t1.c_logourl,
+		       nvl(t1.C_SOURCE,t1.c_appurl) as c_appurl,
+		       t1.c_abstract,
+		       t1.c_publish_date
+		  from t_game_app_info t1
+		  left join (select t.c_id,
+		                    COUNT(T2.C_ID) as numberofdownloads,
+		                    avg(t3.c_grade) as grade
+		               from t_game_app_info t
+		               left join T_GAME_MEMBER_ACTION t2
+		                 on t.c_id = t2.c_gid
+		               left join T_GAME_MEMBER_GRADE t3
+		                 on t.c_id = t3.c_gid
+		              where (t2.c_type = 0 or t2.c_type is null)
+		              group by t.c_id) t
+		    on t.c_id = t1.c_id
+		 where t1.c_islive = '1'
+		and t1.c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<select id="searchApp1" resultClass="java.util.HashMap">
+		select c_id, c_name from t_game_app_info where c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<!-- 搜索小游戏 -->
+	<select id="searchH5" resultClass="java.util.HashMap">
+		SELECT t1.C_ID,
+             t1.C_NAME,
+             t1.C_LOGOURL,
+             t1.C_APPURL,
+             t1.C_TITLE,
+             nvl(t2.c, 0) as startCnts
+        from T_GAME_H5_INFO t1
+        left join (select count(1) as c, c_gid
+                     from T_GAME_MEMBER_ACTION
+                    where c_source = 4
+                      and c_type = 2
+                    group by c_gid) t2
+          on t1.c_id = t2.c_gid
+       WHERE 
+        t1.C_ISLIVE = 1 and t1.c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<select id="searchH51" resultClass="java.util.HashMap">
+		select c_id, c_name from t_game_h5_info where c_name like '%'||#content#||'%' and rownum &lt;= 10
+	</select>
+	<!-- 内容定制页 -->
+	<select id="index" resultClass="java.util.HashMap">
+		select c_id, c_cid, c_number
+		  from t_game_custom
+		 where c_type = #type#
+		 order by c_order
+	</select>
+	<select id="giftsDetail" resultClass="java.util.HashMap">
+		SELECT B.*
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (SELECT t1.C_ID ID,
+		   t1.C_NAME NAME,
+		   t1.C_DEPICT DEPICT,
+		   TO_CHAR(t1.C_SDATE, 'yyyy.MM.dd') SDATE,
+		   TO_CHAR(t1.C_EDATE, 'yyyy.MM.dd') EDATE,
+		   t1.C_METHOD METHOD,
+		   t2.C_LOGOURL LOGOURL,
+		   t2.C_NAME GNAME,
+		   t2.C_APPURL APPURL,
+		   t2.C_JARNAME JARNAME,
+		   t2.C_SIZE GSIZE from t_game_gifts_category t left join 
+		   T_GAME_GIFTS_INFO t1
+		   on t.c_gid = t1.c_id
+		   left join T_GAME_APP_INFO t2
+		   on t1.c_gid = t2.c_id
+		   where t1.c_islive = '1'
+		   and t2.c_islive = '1'
+		   and t.c_cid = #cid#
+		   order by t.c_order,t.c_cntrorder
+		   ) A
+         WHERE ROWNUM &lt;= #maxRows#) B
+ WHERE RN &gt;= #startingIndex#
+	</select>
+	<select id="h5CategoryDetail" resultClass="java.util.HashMap">
+	SELECT C_ID,C_NAME,C_LOGOURL,C_APPURL,C_TITLE,startCnts
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (
+           SELECT t1.C_ID,
+			       t1.C_NAME,
+			       t1.C_LOgOURL,
+			       t1.C_APPURL,
+			       t1.C_TITLE,
+			       nvl(t2.c, 0) as startCnts
+			  FROM t_game_h5_boutique_category t
+			  left join T_GAME_H5_INFO t1
+			    on t.c_gid = t1.C_ID
+			  left join (select count(1) as c, c_gid
+			               from T_GAME_MEMBER_ACTION
+			              where c_source = 4
+			                and c_type = 2
+			              group by c_gid) t2
+			    on t.c_gid = t2.c_gid
+			 WHERE t.c_cid = #cid#
+			   AND t1.C_ISLIVE = 1
+			 ORDER BY t.c_order, t.c_cntrorder
+          ) A
+         WHERE ROWNUM &lt;= #maxRows#) B
+ WHERE RN &gt;= #startingIndex#
+	</select>
+	<!-- 分类详情 -->
+	<select id="categoryDetail" resultClass="java.util.HashMap">
+		SELECT B.c_name,B.c_logourl, nvl(B.C_SOURCE,B.c_appurl) as c_appurl,B.c_abstract,B.c_publish_date,B.c_id,B.C_DOWNLOAD,B.c_grade,B.C_SIZE,B.C_TITLE,B.c_jarname
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (
+           select t1.c_id,t1.C_SIZE,t1.C_TITLE,t1.c_jarname,
+        nvl(t.numberofdownloads, 0) + nvl(t1.c_download, 0) as C_DOWNLOAD,
+        nvl(t.grade, t1.c_level) as c_grade,
+        t1.c_name,t1.c_logourl, t1.c_appurl,t1.c_abstract,t1.c_publish_date,t1.C_SOURCE
+   from (select t.c_gid,
+                COUNT(T2.C_ID) as numberofdownloads,
+                avg(t3.c_grade) as grade
+           from t_game_boutique_category t
+           left join T_GAME_MEMBER_ACTION t2
+             on t.c_gid = t2.c_gid
+           left join T_GAME_MEMBER_GRADE t3
+             on t.c_gid = t3.c_gid
+          where t.c_cid = #cid# and (t2.c_type = 0 or t2.c_type is null)
+          group by t.c_gid,t.c_order,t.c_cntrorder
+          order by t.c_order,t.c_cntrorder
+          ) t
+   left join t_game_app_info t1
+     on t.c_gid = t1.c_id
+      where t1.c_islive='1'
+          ) A
+         WHERE ROWNUM &lt;= #maxRows#) B
+ WHERE RN &gt;= #startingIndex#
+	</select>
+	<!-- 微信礼包 -->
+	<select id="wechatGiftList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT ID, GID, NAME, DEPICT, C_LOGOURL, APPURL, GSIZE, JARNAME, GNAME
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT T.C_ID      ID,
+       T.C_GID     GID,
+       T.C_NAME    NAME,
+       T.C_DEPICT  DEPICT,
+       G.C_LOGOURL C_LOGOURL,
+       G.C_APPURL  APPURL,
+       G.C_SIZE    GSIZE,
+       G.C_JARNAME JARNAME,
+       G.C_NAME    GNAME
+  FROM T_GAME_GIFTS_CATEGORY T0 LEFT JOIN T_GAME_GIFTS_INFO T
+  ON T0.C_GID = T.C_ID LEFT JOIN
+   T_GAME_APP_INFO G
+   ON T.C_GID = G.C_ID
+ WHERE T0.C_CID=-1 
+   AND T.C_ISLIVE = 1
+   AND G.C_ISLIVE = 1
+   AND T.C_EDATE > SYSDATE
+ ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		 ]]>
+	</select>
+	
+	<!-- 根据合集id查询游戏信息 -->  
+	<select id="gameCollection" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID,C_NAME,C_LOGOURL,C_SIZE,C_TITLE,C_APPURL,C_JARNAME,C_VERSION,C_DOWNLOAD,C_GRADE
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT TG.C_ID,
+		                       TG.C_NAME,
+		                       TG.C_LOGOURL,
+		                       TG.C_SIZE,
+		                       TG.C_TITLE,
+		                       NVL(TG.C_SOURCE,TG.C_APPURL) C_APPURL,
+		                       TG.C_JARNAME,
+		                       TG.C_VERSION,
+		                       TG.C_DOWNLOAD,
+		                       TG.C_LEVEL C_GRADE
+		                  FROM T_GAME_COLLECTION_GAME TC, T_GAME_APP_INFO TG
+		                 WHERE TC.C_CID = #CID#
+		                   AND TG.C_ID = TC.C_GID
+		                   AND TC.C_ISLIVE = 1
+		                   AND TG.C_ISLIVE = 1
+		                 ORDER BY TC.C_ORDER, TC.C_CNTRORDER, TG.C_ID) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	
+	<!-- 根据游戏id查询真实下载量 -->  
+	<select id="realDownload" parameterClass="java.lang.String" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT COUNT(C.C_TYPE)
+		  FROM T_GAME_MEMBER_ACTION C
+		 WHERE C.C_TYPE = 0
+		   AND C.C_GID = #id#
+		 GROUP BY C.C_GID	
+		]]>
+	</select>
+	
+	<!-- 根据游戏id查询真实评分 -->  
+	<select id="realGrade" parameterClass="java.lang.String" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT CEIL(SUM(C_GRADE) / COUNT(C_GID))
+		  FROM T_GAME_MEMBER_GRADE T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_GID = #GID#
+		]]>
+	</select>
+	
+	<!-- 根据游戏id查询是否有礼包 -->  
+	<select id="hasGift" parameterClass="java.lang.String" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(*)
+		  FROM T_GAME_GIFTS_INFO T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_GID = #ID#
+		]]>
+	</select>
+	
+	<!-- 获取游戏APP信息（包名） -->
+	<select id="gameInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_JARNAME,C_VERSION FROM T_GAME_APP_INFO T WHERE T.C_ISLIVE = 1
+		]]>
+	</select>
+	
+	<!-- 查询用户信息 -->
+	<select id="getUserInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_id,t.c_regid,t.c_nickname,t.c_logintype,t.c_phonenum,t.c_sex,t.c_headimage from T_GAME_MEMBER_INFO t 
+		where t.c_id=#uid# and t.c_islive=1 and t.c_state=1
+		]]>
+	</select>
+	
+	<!-- 查询第三方绑定状态 -->
+	<select id="getBindingInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_LOGINTYPE,T.C_STATE FROM T_GAME_MEMBER_INFO T 
+		WHERE T.C_ID=#UID# AND T.C_ISLIVE=1
+		]]> 
+	</select>
+	
+	<!-- 查询是否存在logintype为0的信息 -->
+	<select id="existChujianUser" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		<![CDATA[
+		SELECT COUNT(*) FROM T_GAME_MEMBER_INFO T WHERE T.C_ID = #UID# AND T.C_LOGINTYPE = #LOGINTYPE# AND T.C_ISLIVE=1 
+		]]> 
+	</select>
+	
+	<!-- 查询广告信息 -->
+	<select id="advertInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT
+			AD.C_PICURL AS ADPICURL,
+			AD.C_NAME AS ADNAME,
+			AD.C_TYPE AS TYPE,
+			AD.C_APPID AS ID
+		FROM
+			T_GAME_ADVERT_INFO AD
+		ORDER BY
+			AD.C_ORDER
+		]]>
+	</select>
+	
+	<!-- 根据第三方登录状态和regid查询用户id -->
+	<select id="getExternal" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_LOGINTYPE = #LOGINTYPE#
+		   AND T.C_REGID = #REGID#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	
+	<!-- 根据regid和imei查询登录与手机对应关系信息 -->
+	<select id="findInfoByRegidNImei" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		<![CDATA[
+		SELECT count(*)
+		  FROM T_GAME_MEMBER_IMEI T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_IMEI = #IMEI#
+		]]> 
+	</select>
+	
+	<!-- 更新当前第三方登录为最新    2015-12-16 不修改 C_ISFIRSTLOGIN = 0 -->
+	<update id="updateIsLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_IMEI T
+  		   SET T.C_ISLOGIN = 1
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_REGID = #REGID#
+		]]> 
+	</update>
+	
+	<!-- 更新其他第三方登录非最新 -->
+	<update id="updateIsNotLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_IMEI T
+  		   SET T.C_ISLOGIN = 0
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_REGID != #REGID#
+		]]> 
+	</update>
+	
+	<!-- 新增当前第三方登录记录（IMEI） -->
+	<insert id="insertExternalNImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_IMEI
+		  (C_ID,
+		   C_REGID,
+		   C_IMEI,
+		   C_ISLOGIN,
+		   C_ISPWD,
+		   C_ISFIRSTLOGIN,
+		   C_ACTIONDATE,
+		   C_UID)
+		VALUES
+		  (SEQ_GAME_MEMBER_IMEI.NEXTVAL,
+		   #REGID#,
+		   #IMEI#,
+		   1,
+		   0,
+		   1,
+		   #ACTIONDATE#,
+		   #UID#)
+		]]> 
+	</insert>
+	
+	<!-- 新增第三方绑定信息 -->
+	<insert id="insertExternal" parameterClass="java.util.HashMap">
+		<!-- 返回用户id -->
+		<selectKey resultClass="java.lang.String" keyProperty="ID" type="pre"> 
+			SELECT SEQ_GAME_MEMBER_INFO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO T_GAME_MEMBER_INFO
+		  (C_ID,
+		   C_REGID,
+		   C_NICKNAME,
+		   C_LOGINTYPE,
+		   C_SEX,
+		   C_AGE,
+		   C_HEADIMAGE,
+		   C_ISLIVE,
+		   C_ACTIONDATE,
+		   C_STATE)
+		VALUES
+		  (#ID#,
+		   #REGID#,
+		   #NICKNAME#,
+		   #LOGINTYPE#,
+		   #SEX#,
+		   #AGE#,
+		   #HEADIMAGE#,
+		   1,
+		   #ACTIONDATE#,
+		   1)
+	</insert>
+	<!-- 根据用户id查询是否已注册 -->
+	<select id="isRegistered" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_ID = #UID#
+		   AND T.C_LOGINTYPE = #LOGINTYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 根据注册id和第三方登录状态查询是否已经绑定过第三方账号 -->
+	<select id="isBinding" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_LOGINTYPE = #LOGINTYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 保存第三方数据（无手机号） -->
+	<insert id="bindExternal" parameterClass="java.util.HashMap">
+		INSERT INTO T_GAME_MEMBER_INFO
+		  (C_ID,
+		   C_REGID,
+		   C_NICKNAME,
+		   C_LOGINTYPE,
+		   C_SEX,
+		   C_AGE,
+		   C_HEADIMAGE,
+		   C_ISLIVE,
+		   C_ACTIONDATE,
+		   C_STATE)
+		VALUES
+		  (#UID#,
+		   #REGID#,
+		   #NICKNAME#,
+		   #LOGINTYPE#,
+		   #SEX#,
+		   #AGE#,
+		   #HEADIMAGE#,
+		   1,
+		   #ACTIONDATE#,
+		   0)
+	</insert>
+	<!-- 保存第三方数据（有手机号） -->
+	<insert id="bindExternalWithPhone" parameterClass="java.util.HashMap">
+		INSERT INTO T_GAME_MEMBER_INFO
+		  (C_ID,
+		   C_REGID,
+		   C_NICKNAME,
+		   C_LOGINTYPE,
+		   C_PHONENUM,
+		   C_SEX,
+		   C_AGE,
+		   C_HEADIMAGE,
+		   C_ISLIVE,
+		   C_ACTIONDATE,
+		   C_STATE)
+		VALUES
+		  (#UID#,
+		   #REGID#,
+		   #NICKNAME#,
+		   #LOGINTYPE#,
+		   #PHONENUM#,
+		   #SEX#,
+		   #AGE#,
+		   #HEADIMAGE#,
+		   1,
+		   #ACTIONDATE#,
+		   0)
+	</insert>
+	
+	<!-- 查询当前第三方账号是否是第一次登录的账号 -->
+	<select id="isFirstInfo" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT C_STATE FROM T_GAME_MEMBER_INFO T WHERE T.C_ID = #UID# AND T.C_LOGINTYPE = #LOGINTYPE# AND T.C_ISLIVE=1 
+		]]> 
+	</select>
+	
+	<!-- 解绑第三方账号 -->
+	<delete id="unBindExternal" parameterClass="java.util.HashMap">
+		<![CDATA[
+		DELETE FROM T_GAME_MEMBER_INFO WHERE C_ID=#UID# AND C_LOGINTYPE=#LOGINTYPE#
+		]]> 
+	</delete>	
+	
+	<!-- 校验验证码是否正确 -->
+	<select id="isUsableCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_VALIDATE_CODE T
+		 WHERE T.C_DATE >= TO_DATE(#DATE#, 'yyyy-MM-dd HH24:MI:SS')
+		   AND T.C_CODE = #VALICODE#
+		   AND T.C_TYPE = #TYPE#
+		   AND T.C_PHONENUM = #PHONENUM#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 用户注册 -->
+    <insert id="register" parameterClass="java.util.HashMap">     
+    <selectKey resultClass="java.lang.String" type="pre" keyProperty="ID" >     
+        SELECT SEQ_GAME_MEMBER_REG.nextval AS VALUE FROM DUAL     
+    </selectKey>     
+		INSERT INTO T_GAME_MEMBER_INFO (C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_SEX) 
+		VALUES (SEQ_GAME_MEMBER_INFO.NEXTVAL,'ICJ'||#ID#,0,#PHONENUM#,#PWD#,1,#DATE#,1,0)
+    </insert> 
+    
+    <!-- 生成默认昵称defaultNickname -->
+    <update id="defaultNickname" parameterClass="java.util.HashMap">     
+		UPDATE T_GAME_MEMBER_INFO SET C_NICKNAME = #NICKNAME# WHERE C_REGID = #REGID# 
+    </update>
+    
+    <!-- 查询用户id -->
+	<select id="getUid" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT T.C_ID
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_LOGINTYPE = #TYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 根据手机号和密码查询用户信息 -->
+	<select id="login"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_PASSWORD = #PWD#
+		   AND C_LOGINTYPE = 0
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 根据注册id和imei查询IMEI是否有记录 -->
+	<select id="getMemberImei"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_IMEI
+		 WHERE C_REGID = #REGID#
+		   AND C_IMEI = #IMEI#
+		]]> 
+	</select>
+	<!-- 查询是否是第一次登录 -->
+	<select id="isFirstLogin"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_IMEI
+		 WHERE C_REGID = #REGID#
+		   AND C_IMEI = #IMEI#
+		   AND C_UID = #UID#
+		]]> 
+	</select>
+	<!-- 新增当前第三方登录记录（IMEI） -->
+	<insert id="insertImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_IMEI
+		  (C_ID,
+		   C_REGID,
+		   C_IMEI,
+		   C_ISLOGIN,
+		   C_ISPWD,
+		   C_ISFIRSTLOGIN,
+		   C_ACTIONDATE,
+		   C_UID)
+		VALUES
+		  (SEQ_GAME_MEMBER_IMEI.NEXTVAL,
+		   #REGID#,
+		   #IMEI#,
+		   1,
+		   0,
+		   #ISFIRSTLOGIN#,
+		   #ACTIONDATE#,
+		   #UID#)
+		]]> 
+	</insert>
+	<!-- 根据用户id和密码查询用户信息 -->
+	<select id="findUserByUidNPwd"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO
+		 WHERE C_ID = #UID#
+		   AND C_PASSWORD = #PWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	
+	<!-- 修改密码 -->
+	<update id="modifyPwd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_PASSWORD = #NPWD#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_LOGINTYPE = 0
+		   AND C_PASSWORD = #OPWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 编辑用户信息（只修改昵称和性别） -->
+	<update id="editUserInfo" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_NICKNAME = #NICKNAME#, C_SEX = #SEX#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 根据手机号查询用户信息 -->
+	<select id="findByPhone"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	
+	<!-- 绑定手机 -->
+	<update id="bindPhone" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_PHONENUM = #PHONENUM#, C_ACTIONDATE = #ACTIONDATE#, C_PASSWORD = #PWD#
+		 WHERE C_ID = #UID#
+		   AND C_LOGINTYPE = #LOGINTYPE#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 第三方注册账号绑定手机后，生成logintype为0的数据 -->
+	<insert id="chujianUser" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_INFO(C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_NICKNAME)
+		VALUES(#UID#,'ICJ'||SEQ_GAME_MEMBER_REG.NEXTVAL,#LOGINTYPE#,#PHONENUM#,#PWD#,1,#DATE#,0,#NICKNAME#)
+		]]> 
+	</insert>
+	
+	<!-- 获取当天发送的验证码 -->
+	<select id="getValiCode"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_VALIDATE_CODE
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_TYPE = #TYPE#
+		   AND TO_CHAR(C_DATE, 'yyyy-MM-dd') = #DATE#
+		]]> 
+	</select>
+	
+	<!-- 将指定手机号和类型对应的其他验证码置为无效 -->
+	<update id="invalidatedOther" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_VALIDATE_CODE
+		   SET C_ISLIVE = 0
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_TYPE = #TYPE#
+		]]> 
+	</update>
+	
+	<!-- 保存验证码 -->
+	<insert id="insertValicode" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_VALIDATE_CODE
+		  (C_ID,
+		   C_IMEI,
+		   C_DATE,
+		   C_CODE,
+		   C_TYPE,
+		   C_ISLIVE,
+		   C_PHONENUM)
+		VALUES
+		  (SEQ_GAME_VALIDATE_CODE.NEXTVAL,
+		   #IMEI#,
+		   #DATE#,
+		   #CODE#,
+		   #TYPE#,
+		   1,
+		   #PHONENUM#)
+		]]> 
+	</insert>
+	
+	<!-- 设置新密码 -->
+	<update id="setNewPwd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_PASSWORD = #PWD#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 修改用户头像 -->
+	<update id="updateHead" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_HEADIMAGE = #HEADIMAGE#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 获取游戏提示语 -->
+	<select id="gameCue" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_TITLE FROM T_GAME_TITLE_INFO T WHERE T.C_ISLIVE = 1
+		]]>
+	</select>
+	
+	<!-- 是否使用过“一键登录” -->
+	<select id="isLogined" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT I.C_ID
+		  FROM T_GAME_MEMBER_IMEI T, T_GAME_MEMBER_INFO I
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_UID = I.C_ID
+		   AND I.C_LOGINTYPE = 4
+		   AND I.C_ISLIVE = 1
+		]]>
+	</select>
+	
+	<!-- 获取注册ID -->
+	<select id="getRegid" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+			SELECT SEQ_GAME_MEMBER_REG.nextval AS REGID FROM DUAL
+		]]>
+	</select>
+	
+	<!-- 生成“游客”身份 -->
+    <insert id="quickLogin" parameterClass="java.util.HashMap">     
+	    <selectKey resultClass="java.lang.String" type="pre" keyProperty="ID" >     
+	        SELECT SEQ_GAME_MEMBER_INFO.NEXTVAL AS VALUE FROM DUAL     
+	    </selectKey>     
+		INSERT INTO T_GAME_MEMBER_INFO(C_ID, C_REGID, C_LOGINTYPE, C_ISLIVE, C_ACTIONDATE, C_STATE)
+		VALUES(#ID#,#REGID#,#LOGINTYPE#,1,#ACTIONDATE#,1)
+    </insert>
+    
+    <!-- 新增游客登录记录 -->
+    <insert id="quickLoginImei" parameterClass="java.util.HashMap">     
+   		<![CDATA[
+   		INSERT INTO T_GAME_MEMBER_IMEI
+		  (C_ID,C_REGID,C_IMEI,C_ISLOGIN,C_ISPWD,C_ISFIRSTLOGIN,C_ACTIONDATE,C_UID)
+		VALUES
+		  (SEQ_MEMBER_IMEI.NEXTVAL,#REGID#,#IMEI#,1,0,1,#ACTIONDATE#,#UID#)
+   		]]>
+    </insert>
+    
+    <!-- 获取用户头像 -->
+	<select id="userHeadImg" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+			SELECT T.C_NICKNAME, T.C_PHONENUM, T.C_REGID, T.C_HEADIMAGE
+			  FROM T_GAME_MEMBER_INFO T
+			 WHERE T.C_ISLIVE = 1
+			   AND T.C_ID = #UID#
+			   AND T.C_STATE = 1
+		]]>
+	</select>
+	
+	<!-- 修改手机号 -->
+	<update id="updatePhonenum" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO T
+  		   SET T.C_PHONENUM = #PHONENUM#, C_ACTIONDATE = #DATE#
+		 WHERE T.C_ID = #UID#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 保存用户登录IMEI -->
+	<insert id="regImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_IMEI (C_ID,C_REGID,C_IMEI,C_ISPWD,C_VALIDATECODE,C_ISFIRSTLOGIN,C_ACTIONDATE,C_UID) 
+		VALUES (SEQ_GAME_MEMBER_IMEI.NEXTVAL,#REGID#,#IMEI#,0,#VALICODE#,1,#DATE#,#UID#)
+		]]> 
+	</insert>
+    
+    <!-- 根据合集id查询H5游戏信息 -->  
+	<select id="h5GameCollection" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID,C_NAME,C_LOGOURL,C_APPURL,C_TITLE,C_JARNAME
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT
+							G.C_ID,G.C_NAME,G.C_LOGOURL,G.C_APPURL,G.C_TITLE,G.C_JARNAME
+						FROM
+							T_GAME_COLLECTION_H5_GAME C, T_GAME_H5_INFO G
+						WHERE
+							C.C_CID = #CID#
+						AND G.C_ID = C.C_GID
+						AND C.C_ISLIVE = 1
+						AND G.C_ISLIVE = 1
+						ORDER BY
+							C.C_ORDER, C.C_CNTRORDER, G.C_ID) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * #PAGESIZE#)
+		 WHERE RM > (#PAGE# - 1) * #PAGESIZE#
+		]]>
+	</select>
+	
+	<!-- 查询指定H5游戏被启动的次数 -->
+	<select id="startingCountH5" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(*)
+		  FROM T_GAME_MEMBER_ACTION T
+		 WHERE T.C_GID = #GID#
+		   AND T.C_SOURCE = 4
+		   AND T.C_TYPE = 2
+	  	]]>
+	</select>
+	
+	<!-- H5游戏广告信息 -->
+	<select id="h5AdvertInfo" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID     ID,
+		       T.C_APPID  APPID,
+		       T.C_PICURL PICURL,
+		       T.C_NAME   NAME,
+		       G.C_APPURL APPURL
+		  FROM T_GAME_H5_ADVERT_INFO T, T_GAME_H5_INFO G
+		 WHERE T.C_APPID = G.C_ID
+		   AND G.C_ISLIVE = 1
+		 ORDER BY T.C_ORDER
+        ]]>
+	</select>
+	
+	<!-- 查询所有游戏礼包 -->
+	<select id="gameGiftList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT ID, GID, NAME, DEPICT, C_LOGOURL, APPURL, GSIZE, JARNAME, GNAME
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT T.C_ID      ID,
+		                       T.C_GID     GID,
+		                       T.C_NAME    NAME,
+		                       T.C_DEPICT  DEPICT,
+		                       G.C_LOGOURL C_LOGOURL,
+	                           G.C_APPURL  APPURL,
+	                           G.C_SIZE    GSIZE,
+	                           G.C_JARNAME JARNAME,
+	                           G.C_NAME    GNAME
+		                  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		                 WHERE T.C_ISLIVE = 1
+		                   AND G.C_ISLIVE = 1
+		                   AND T.C_GID = G.C_ID
+		                   AND T.C_EDATE > SYSDATE
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		 ]]>
+	</select>
+	
+	<!-- 当前用户是否领取过该游戏 -->
+	<select id="hasGotGame" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(*)
+		  FROM T_GAME_MEMBER_GIFTS T
+		 WHERE T.C_UID = #UID#
+		   AND T.C_GID = #GID#
+		   AND T.C_TYPE = 1
+	  	]]>
+	</select>
+	
+	<!-- 查询单个游戏的礼包 -->
+	<select id="gameGift" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID      ID,
+		       T.C_NAME    NAME,
+		       T.C_DEPICT  DEPICT,
+		       G.C_NAME    GNAME,
+		       G.C_APPURL  APPURL,
+		       G.C_JARNAME JARNAME,
+		       G.C_SIZE    GSIZE
+		  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		 WHERE T.C_ISLIVE = 1
+		   AND G.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND T.C_EDATE > SYSDATE
+		   AND T.C_GID = #GID#
+		 ORDER BY T.C_ORDER
+	    ]]>
+	</select>
+	
+	<!-- 随机获取一条礼包码 -->
+	<select id="getGiftCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM (SELECT T.C_ID, T.C_CODE
+		          FROM T_GAME_GIFTS_CODE_INFO T
+		         WHERE T.C_ISLIVE = 1
+		           AND T.C_GID = #GID#
+		           AND T.C_STATE = 0
+		         ORDER BY DBMS_RANDOM.VALUE)
+		 WHERE ROWNUM = 1
+	 	]]>	
+	</select>
+	
+	<!-- 更新礼包码 -->
+	<update id="updateGiftCode" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_GIFTS_CODE_INFO T
+		   SET T.C_SDATE = SYSDATE, T.C_EDATE = SYSDATE+1, T.C_STATE = 1
+		 WHERE T.C_ID = #CID#
+	 	]]>
+	</update>
+	
+	<!-- 添加用户对礼包的操作行为 -->
+	<insert id="updateUserActionOfGift" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_GIFTS(C_ID,C_UID,C_GID,C_TYPE,C_DATE,C_CODE)
+		VALUES(SEQ_GAME_MEMBER_GIFTS.NEXTVAL,#UID#,#GID#,#TYPE#,SYSDATE,#CODE#)
+		]]>
+	</insert>
+	
+	<!-- 查询礼包详情 -->
+	<select id="giftDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID ID,
+		       T.C_NAME NAME,
+		       T.C_DEPICT DEPICT,
+		       TO_CHAR(T.C_SDATE, 'yyyy.MM.dd') SDATE,
+		       TO_CHAR(T.C_EDATE, 'yyyy.MM.dd') EDATE,
+		       T.C_METHOD METHOD,
+		       G.C_LOGOURL LOGOURL,
+		       G.C_NAME GNAME,
+		       G.C_APPURL APPURL,
+		       G.C_JARNAME JARNAME,
+		       G.C_SIZE GSIZE
+		  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		 WHERE T.C_ISLIVE = 1
+		   AND G.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND T.C_ID = #GID#
+		]]>
+	</select>
+	
+	<!-- 查询礼包码数量 -->
+	<select id="giftCodesCnt" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[
+			SELECT NVL(REMAIN, '0') REMAIN, NVL(GOT, '0') GOT
+			  FROM (SELECT COUNT(*) REMAIN, T1.C_GID
+			          FROM T_GAME_GIFTS_CODE_INFO T1
+			         WHERE T1.C_ISLIVE = 1
+			           AND C_STATE = 0
+			           AND T1.C_GID = #GID#
+			         GROUP BY T1.C_GID) A1
+			  FULL OUTER JOIN (SELECT COUNT(*) GOT, T2.C_GID
+			               FROM T_GAME_GIFTS_CODE_INFO T2
+			              WHERE T2.C_ISLIVE = 1
+			                AND C_STATE = 1
+			                AND T2.C_GID = #GID#
+			              GROUP BY T2.C_GID) A2
+			    ON A1.C_GID = A2.C_GID
+	 	]]>
+	</select>
+	
+	<!-- 获取当前用户的礼包码 -->
+	<select id="usersGiftCode" parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT T.C_CODE FROM T_GAME_MEMBER_GIFTS T WHERE T.C_UID = #UID# AND T.C_GID = #GID#
+		]]>
+	</select>
+	
+	<!-- 礼包淘号 -->
+	<select id="drawGiftCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM (SELECT T.C_ID, T.C_CODE
+		          FROM T_GAME_GIFTS_CODE_INFO T
+		         WHERE T.C_ISLIVE = 1
+		           AND T.C_GID = #GID#
+		           AND T.C_STATE = 1
+		           AND T.C_EDATE < #DATE#
+		         ORDER BY DBMS_RANDOM.VALUE)
+		 WHERE ROWNUM = 1
+		]]>
+	</select>
+	
+	<!-- 保存用户发弹幕的行为 -->
+	<insert id="saveH5Barrage" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_ACTION(C_ID,C_UID,C_GID,C_TYPE,C_DATE,C_SOURCE)
+		VALUES(SEQ_GAME_MEMBER_ACTION.NEXTVAL,#UID#,#GID#,#TYPE#,#DATE#,#SOURCE#)
+		]]>
+	</insert>
+	
+	<!-- 获取当前用户的礼包 -->
+	<select id="usersGifts" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT G.C_ID, G.C_NAME, G.C_DEPICT, A.C_LOGOURL
+		  FROM T_GAME_MEMBER_GIFTS T, T_GAME_GIFTS_INFO G, T_GAME_APP_INFO A
+		 WHERE G.C_ISLIVE = 1
+		   AND A.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND G.C_GID = A.C_ID
+		   AND T.C_UID = #UID#
+		   AND T.C_TYPE = 1
+		]]>
+	</select>
+	
+	<!-- 根据JAR包名获取游戏LOGO -->
+	<select id="getLogo" parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT T.C_LOGOURL FROM T_GAME_APP_INFO T WHERE T.C_ISLIVE = 1 AND T.C_JARNAME LIKE #JARNAME#
+		]]>
+	</select>
+	
+	<!-- 用户下载过的游戏的礼包 -->
+	<select id="downloadedGameGifts" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID ID, T.C_NAME NAME, T.C_DEPICT DEPICT, G.C_LOGOURL, G.C_ID GID,
+			   G.C_NAME GNAME, G.C_APPURL APPURL, G.C_JARNAME JARNAME, G.C_SIZE GSIZE
+		  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		 WHERE T.C_ISLIVE = 1
+		   AND G.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND T.C_EDATE > SYSDATE
+		   AND T.C_GID IN (SELECT A.C_GID
+		                     FROM T_GAME_MEMBER_ACTION A
+		                    WHERE A.C_UID = #UID#
+		                      AND A.C_TYPE = 0)
+		]]>
+	</select>
+	
+	<!-- 后台维护的推荐礼包 -->
+	<select id="recommendGifts" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT G.C_ID ID, G.C_NAME NAME, G.C_DEPICT DEPICT, A.C_LOGOURL, A.C_ID GID,
+			   A.C_NAME GNAME, A.C_APPURL APPURL, A.C_JARNAME JARNAME, A.C_SIZE GSIZE
+		  FROM T_GAME_GIFTS_RECOMMEND T, T_GAME_GIFTS_INFO G, T_GAME_APP_INFO A
+		 WHERE G.C_ISLIVE = 1
+		   AND A.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND G.C_GID = A.C_ID
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	
+	<!-- 最近在玩 -->
+	<select id="recentlyPlaying" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT ROWNUM, TEMP2.*
+		  FROM (SELECT H.C_ID, H.C_NAME, H.C_LOGOURL, H.C_APPURL, TEMP1.D
+		          FROM T_GAME_H5_INFO H
+		         INNER JOIN (SELECT C_GID, D
+		                      FROM (SELECT C_GID, MAX(C_DATE) AS D
+		                              FROM T_GAME_MEMBER_ACTION T
+		                             WHERE T.C_UID = #UID#
+		                               AND T.C_TYPE = 2
+		                               AND T.C_SOURCE = 4
+		                             GROUP BY C_GID)
+		                     WHERE C_GID NOT IN
+		                           (SELECT C_GID
+		                              FROM T_GAME_MEMBER_ACTION T2
+		                             WHERE T2.C_UID = #UID#
+		                               AND T2.C_TYPE = 6
+		                               AND T2.C_SOURCE = 4)) TEMP1
+		            ON TEMP1.C_GID = H.C_ID
+		           AND H.C_ISLIVE = 1
+		         ORDER BY TEMP1.D DESC) TEMP2
+		 WHERE ROWNUM < 9
+		]]>
+	</select>
+	
+	<!-- 全部最近在玩 -->
+	<select id="allRecentlyPlaying" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT H.C_ID, H.C_NAME, H.C_LOGOURL, H.C_APPURL, TEMP.D
+		  FROM T_GAME_H5_INFO H
+		 INNER JOIN (SELECT C_GID, D
+		               FROM (SELECT C_GID, MAX(C_DATE) AS D
+		                       FROM T_GAME_MEMBER_ACTION T
+		                      WHERE T.C_UID = #UID#
+		                        AND T.C_TYPE = 2
+		                        AND T.C_SOURCE = 4
+		                      GROUP BY C_GID)
+		              WHERE C_GID NOT IN (SELECT C_GID
+		                                    FROM T_GAME_MEMBER_ACTION T2
+		                                   WHERE T2.C_UID = #UID#
+		                                     AND T2.C_TYPE = 6
+		                                     AND T2.C_SOURCE = 4)) TEMP
+		    ON TEMP.C_GID = H.C_ID
+		   AND H.C_ISLIVE = 1
+		 ORDER BY TEMP.D DESC
+		]]>
+	</select>
+	
+	<!-- 游戏分类列表 -->
+	<select id="categoryList" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME, T.C_LOGO
+		  FROM T_GAME_CATEGORY T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_TYPE = 01
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	
+	<!-- H5游戏分类列表 -->
+	<select id="h5CategoryList" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID, T.C_NAME, T.C_LOGO
+		  FROM T_GAME_CATEGORY T
+		 WHERE T.C_ISLIVE = 1
+		   AND T.C_TYPE = 04
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+	
+	<!-- 根据合集id查询游戏信息 -->  
+	<select id="gamesInCategory" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID,C_NAME,C_LOGOURL,C_SIZE,C_TITLE,C_APPURL,C_JARNAME,C_VERSION,C_DOWNLOAD,C_GRADE
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT TG.C_ID,
+		                       TG.C_NAME,
+		                       TG.C_LOGOURL,
+		                       TG.C_SIZE,
+		                       TG.C_TITLE,
+		                       NVL(TG.C_SOURCE,TG.C_APPURL) C_APPURL,
+		                       TG.C_JARNAME,
+		                       TG.C_VERSION,
+		                       TG.C_DOWNLOAD,
+		                       TG.C_LEVEL C_GRADE
+		                  FROM T_GAME_APP_CATEGORY TC, T_GAME_APP_INFO TG
+		                 WHERE TC.C_CID = #CID#
+		                   AND TG.C_ID = TC.C_GID
+		                   AND TG.C_ISLIVE = 1
+		                 ORDER BY TC.C_ORDER, TC.C_CNTRORDER, TG.C_ID) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	
+	<!-- 根据合集id查询游戏信息（H5） -->  
+	<select id="h5GamesInCategory" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID,C_NAME,C_LOGOURL,C_APPURL,C_TITLE
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT
+							G.C_ID,G.C_NAME,G.C_LOGOURL,G.C_APPURL,G.C_TITLE
+						FROM
+							T_GAME_H5_APP_CATEGORY C, T_GAME_H5_INFO G
+						WHERE
+							C.C_CID = #CID#
+						AND G.C_ID = C.C_GID
+						AND G.C_ISLIVE = 1
+						ORDER BY
+							C.C_ORDER, C.C_CNTRORDER, G.C_ID) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		]]>
+	</select>
+	
+	<!-- 游戏推荐 -->  
+	<!-- 取查询结果中的前八个 -->
+	<select id="gameRecommend" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME, C_LOGOURL
+		  FROM (SELECT ROWNUM, TEMP.*
+		          FROM (SELECT G.C_ID, G.C_NAME, G.C_LOGOURL
+		                  FROM T_GAME_APP_RECOMMEND T, T_GAME_APP_INFO G
+		                 WHERE G.C_ISLIVE = 1
+		                   AND T.C_GID = G.C_ID
+		                   AND T.C_TYPE = 1
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM < 9)
+		]]>
+	</select>
+	
+	<!-- 游戏推荐(H5) -->  
+	<!-- 取查询结果中的前八个 -->
+	<select id="h5GameRecommend" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME, C_LOGOURL, C_APPURL
+		  FROM (SELECT ROWNUM, TEMP.*
+		          FROM (SELECT G.C_ID, G.C_NAME, G.C_LOGOURL, G.C_APPURL
+		                  FROM T_GAME_APP_RECOMMEND T, T_GAME_H5_INFO G
+		                 WHERE G.C_ISLIVE = 1
+		                   AND T.C_GID = G.C_ID
+		                   AND T.C_TYPE = 2
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM < 9)
+		]]>
+	</select>
+	
+	<!-- 查询分类用到的所有表名 -->
+	<select id="tableNames" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_ID, C_NAME FROM T_GAME_COLLECTION_TABLENAME
+		]]>
+	</select>
+	
+	<!-- 首页分类详情 -->
+	<select id="gameColIndex" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		
+		]]>
+	</select>
+	
+</sqlMap>
+

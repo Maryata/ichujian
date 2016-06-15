@@ -1,0 +1,5 @@
+#uploadFile root path and set tomcat vic root Resource
+UPLOAD_ROOT = d:/APPResource/
+DOWNLOAD_ROOT = http://localhost/resource
+#
+_desk_path =D\:

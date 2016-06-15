@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Struts2Diagram version="2.0">
+  <package name="detail" location="10,10" size="460,490">
+    <action name="getactivitydetail" location="15,23" size="150,40" />
+    <action name="jionactivityandcollectiontoshare" location="260,23" size="150,40" />
+    <action name="activitycancle" location="15,163" size="150,40" />
+    <action name="branddetail" location="260,163" size="150,40" />
+    <action name="brandaboutactivity" location="15,303" size="150,40" />
+    <action name="brandattention" location="260,303" size="150,40" />
+    <action name="brandcancelattention" location="15,443" size="150,40" />
+    <action name="activitysort" location="260,443" size="150,40" />
+  </package>
+</Struts2Diagram>
+

@@ -1,0 +1,186 @@
+package com.sys.action;
+
+import com.sys.commons.AbstractAction;
+import com.sys.service.UseService;
+import com.sys.util.StrUtils;
+import net.sf.json.JSONObject;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class UseAction extends AbstractAction {
+	
+	private UseService useService;
+	
+	/**输出内容*/
+	private String out;
+	
+    public String UseApp(){  //用户使用了哪些APP    
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String imei=getParameter("imei");   //是否联网
+    	String type=getParameter("type");   //单击 or 长按
+    	String key=getParameter("key");
+    	String clicktype=getParameter("clicktype");
+    	String package_name=getParameter("package_name");
+    	String app_name=getParameter("app_name");
+    	String choosetype=getParameter("choosetype");  //大类
+    	log.info("into UseAPP");
+    	log.info("--imei--"+imei+"--type--"+type+"--key--"+key+"--clicktype--"+clicktype+"--package_name--"+package_name+"--app_name--"+app_name+"--choosetype--"+choosetype);
+    	try{
+	    	//log.info("--imei--"+imei+"--type--"+type+"--key--"+key+"--clicktype--"+clicktype+"--app_name--"+app_name);
+    	if(StrUtils.isEmpty(imei)||StrUtils.isEmpty(type)||StrUtils.isEmpty(key)||StrUtils.isEmpty(clicktype)||StrUtils.isEmpty(package_name)||StrUtils.isEmpty(app_name)){
+			retMap.put("status", "N");
+			retMap.put("info", "1001");
+    	}else{
+    		Date actiondate1=new Date();
+			if (!"0".equals(key)) {// 触键APP启动不用记录按键使用情况
+    			useService.Usekey(imei, type, key, actiondate1, clicktype,choosetype); //用户使用按键记录
+			}
+    		//String app_names=new String(app_name.getBytes("ISO-8859-1"),"UTF-8");  //编码处理
+			useService.UseApp(imei,type,key,clicktype,package_name,app_name,actiondate1,choosetype); //使用APP记录
+			retMap.put("status", "Y");
+    	}  	
+	    } catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.UseApp failed,",e);
+	   }
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+	
+    
+    
+    public String Usekey(){  //用户使用键的情况----没有用到
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String imei=getParameter("imei");
+    	String type=getParameter("type");     //单击 or 长按
+    	String key=getParameter("key");
+    	String clicktype=getParameter("clicktype");    //功能
+    	String choosetype=getParameter("choosetype");  //大类
+    	log.info("into UseKey");
+    	log.info("--imei--"+imei+"--type--"+type+"--key--"+key+"--choosetype--"+choosetype);
+    	try{
+    	if(StrUtils.isEmpty(imei)||StrUtils.isEmpty(type)||StrUtils.isEmpty(key)){
+			retMap.put("status", "N");
+			retMap.put("info", "1001");
+    	}else{
+    		Date actiondate1=new Date();
+    		useService.Usekey(imei, type, key, actiondate1, clicktype,choosetype);    			
+			retMap.put("status", "Y");
+    	}  	
+	    } catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.Usekey failed,",e);
+	    }
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+
+    
+    public String UseCommon(){     //公共按键的使用情况
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String imei=getParameter("imei");
+    	String type=getParameter("type");
+    	log.info("into UseCommon");
+    	log.info("--imei--"+imei+"--type--"+type);
+    	try {
+        	if(StrUtils.isEmpty(imei)||StrUtils.isEmpty(type)){
+    			retMap.put("status", "N");
+    			retMap.put("info", "1001");
+    	    	out = JSONObject.fromObject(retMap).toString();
+    	    	return "success";
+        	}
+    		Date actiondate1=new Date();
+    		useService.UseCommon(imei, type, actiondate1);
+			retMap.put("status", "Y");
+		} catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.UseCommon failed,",e);
+		}
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+    
+    public String getSuppListUrl() {    //获取供应商URL
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String activecode=getParameter("activecode");
+    	log.info("--activecode--"+activecode);
+    	try {
+			if(StrUtils.isEmpty(activecode)){
+    			retMap.put("status", "N");
+    			retMap.put("info", "1001");
+    	    	out = JSONObject.fromObject(retMap).toString();
+    	    	return "success";
+			}
+			String suppliercode=activecode.substring(5, 7);
+			List list=useService.getSupplierUrl(suppliercode);
+			retMap.put("status", "Y");
+			if(list.size()>0){
+				Map map=(Map) list.get(0);
+				if(StrUtils.isNotEmpty(map.get("C_URL"))){
+					String url=map.get("C_URL").toString()==null?"":map.get("C_URL").toString();
+					String type=map.get("C_TYPE").toString()==null?"":map.get("C_TYPE").toString();
+	    			retMap.put("url", url);
+	    			retMap.put("type", type);
+				}else{
+					retMap.put("url", "");
+				}
+
+			}else{
+				retMap.put("url", "");
+			}
+		} catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.getSuppListUrl failed,",e);
+		}
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+	}
+    
+    public String HelpInfo(){
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String num=getParameter("num");
+    	log.info("into helpinfo");
+    	log.info("--num--"+num);
+    	try {
+			if(StrUtils.isEmpty(num)){
+				retMap.put("status", "N");
+    			retMap.put("info", "1001");
+    	    	out = JSONObject.fromObject(retMap).toString();
+    	    	return "success";
+			}
+			String list=useService.getHelpInfo(num);
+			retMap.put("url", list);
+			retMap.put("status", "Y");
+		} catch (Exception e) {
+			// TODO: handle exception
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.HelpInfo failed,",e);
+		}
+		out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+    
+	public String getOut() {
+		return out;
+	}
+
+	public void setOut(String out) {
+		this.out = out;
+	}
+
+	public UseService getUseService() {
+		return useService;
+	}
+
+	public void setUseService(UseService useService) {
+		this.useService = useService;
+	}
+}

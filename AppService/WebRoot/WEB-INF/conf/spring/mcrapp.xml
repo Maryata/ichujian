@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<bean id="mcrappService" class="com.sys.mcrapp.service.impl.McrappService" scope="prototype"/>
+	
+	<bean id="mcrappAction" class="com.sys.mcrapp.action.McrappAction" scope="prototype">
+		<property name="mcrappService">
+			<ref bean="mcrappService"/>
+		</property>
+	</bean>
+</beans>

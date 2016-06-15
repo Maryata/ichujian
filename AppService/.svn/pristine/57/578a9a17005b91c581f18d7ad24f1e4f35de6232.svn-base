@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_activity">
+
+    <!--活动详情-->
+    <select id="getActivityById" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select c_id,
+                c_title,
+                c_sdate,
+                c_edate,
+                c_subtitle,
+                c_img_long,
+                c_img_thin,
+                c_url,
+                c_url_share,
+                c_img,
+                c_webviewurl,
+        nvl(c_view,0) + nvl((select count(1) from t_ek_activity_user_action where c_type='02' and c_aid=#id#),0) AS c_view,
+                nvl(c_vote,0) + nvl((select count(1) from T_EK_ACTIVITY_USER_LIKE where c_aid=#id#),0) AS c_vote,
+                nvl(c_favorite,0) + nvl((select count(1) from T_EK_ACTIVITY_USER_COLLECT where c_aid=#id#),0) AS c_favorite,
+                c_reason,
+                c_detail,
+                c_tip,
+                c_cid,
+                C_PUBLISHER,
+                nvl((SELECT COUNT(1) FROM t_ek_activity_user_like WHERE c_imei=#imei# and c_aid=#id#),0) AS  flag,
+                nvl((SELECT COUNT(1) FROM T_EK_ACTIVITY_USER_COLLECT WHERE c_uid=#uid# and c_aid=#id#),0) AS  flag1
+        from t_ek_activity_info
+        where c_audit_status = 1 and c_islive='1' AND c_id = #id#
+    </select>
+    <!--注意事项-->
+    <select id="notices" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select t2.c_name, t2.c_img
+        from t_ek_activity_notice_activity t1
+        left join t_ek_activity_notice_base t2
+        on t1.c_nid = t2.c_id
+        where t2.c_islive = '1'
+        and t1.c_aid = #id# order by t1.c_order
+    </select>
+
+
+    <!--活动用户行为-->
+	<insert id="userAction" parameterClass="java.util.HashMap">
+insert into t_ek_activity_user_action
+  (c_id, c_uid, c_aid, c_type, c_date, c_imei, c_content)
+values
+  (seq_ek_activity_user_action.nextval,
+   #uid#,
+   #aid#,
+   #type#,
+   sysdate,
+   #imei#,
+   #content#)
+	</insert>
+    <!--添加活动收藏-->
+    <insert id="userCollectAdd" parameterClass="java.util.HashMap">
+    insert into t_ek_activity_user_collect
+    (c_id, c_uid, c_aid, c_date)
+    values
+    (seq_ek_activity_user_collect.nextval, #uid#, #aid#, sysdate)
+    </insert>
+    <!--删除活动收藏-->
+    <delete id="userCollectDel" parameterClass="java.util.HashMap">
+      delete t_ek_activity_user_collect
+      where c_uid = #uid# and c_aid=#aid#
+    </delete>
+    <!--参加活动-->
+    <insert id="userJoin" parameterClass="java.util.HashMap">
+      insert into t_ek_activity_user_join
+      (c_id, c_uid, c_aid, c_date)
+      values
+      (seq_ek_activity_user_join.nextval, #uid#, #aid#, sysdate)
+    </insert>
+    <!--点赞活动-->
+    <insert id="userLikeAdd" parameterClass="java.util.HashMap">
+insert into t_ek_activity_user_like
+    (c_id, c_uid, c_aid, c_date,c_imei)
+  values
+    (seq_ek_activity_user_like.nextval, #uid#, #aid#, sysdate,#imei#)
+    </insert>
+    <!--取消点赞活动-->
+    <delete id="userLikeDel" parameterClass="java.util.HashMap">
+      delete t_ek_activity_user_like
+       where c_imei = #imei# and c_aid=#aid#
+    </delete>
+
+    <!-- 活动头条 -->
+    <!--
+        SELECT T.C_ID, T.C_EID, T.C_NAME, T.C_IMG, T.C_TYPE
+          FROM T_EK_ACTIVITY_HEADLINE T
+         ORDER BY T.C_ORDER
+    -->
+    <select id="advertInfo" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT *
+          FROM ((SELECT T.C_ID, T.C_EID, T.C_NAME, T.C_IMG, T.C_TYPE, T.C_ORDER
+                   FROM T_EK_ACTIVITY_HEADLINE T, T_EK_ACTIVITY_INFO A
+                  WHERE T.C_TYPE = 1
+                    AND T.C_EID = A.C_ID
+                    AND (A.C_EDATE > SYSDATE OR A.C_EDATE IS NULL)
+                    AND A.C_ISLIVE = 1) UNION
+                (SELECT T.C_ID, T.C_EID, T.C_NAME, T.C_IMG, T.C_TYPE, T.C_ORDER
+                   FROM T_EK_ACTIVITY_HEADLINE T, T_EK_ACTIVITY_CATEGORY_INFO C
+                  WHERE T.C_EID = C.C_ID
+                    AND C.C_ISLIVE = 1))
+         ORDER BY C_ORDER
+
+		]]>
+    </select>
+
+    <!-- 首页分类 -->
+    <select id="indexCategory" resultClass="java.util.HashMap">
+        <![CDATA[
+		SELECT C.C_ID, C.C_NAME, C.C_IMG
+          FROM T_EK_ACTIVITY_INDEX_CATEGORY T, T_EK_ACTIVITY_CATEGORY_INFO C
+         WHERE T.C_CID = C.C_ID
+           AND C.C_ISLIVE = '1'
+         ORDER BY T.C_ORDER
+		]]>
+    </select>
+
+    <!-- 分类详情 -->
+    <select id="categoryDetailIndex" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <isNotEmpty property="PAGE">
+            SELECT *
+            FROM (SELECT ROWNUM RM, TEMP1.*
+            FROM (
+        </isNotEmpty>
+        SELECT T.C_ID, T.C_TITLE NAME, T.C_IMG_LONG, T.C_IMG_THIN, T.C_VIEW, A.C_TAGID, A.C_TITLE, A.C_SUBTITLE, T.C_EDATE, T.C_IMG_INDEX_LONG
+        FROM T_EK_ACTIVITY_INFO             T,
+        T_EK_ACTIVITY_CATEGORY_ACTIVIT A,
+        T_EK_ACTIVITY_CATEGORY_INFO    C
+        WHERE T.C_ISLIVE = '1'
+        AND C.C_ISLIVE = '1'
+        AND A.C_CID = C.C_ID
+        AND A.C_AID = T.C_ID
+        AND T.C_AUDIT_STATUS = '1'
+        AND A.C_CID = #CID#
+        ORDER BY A.C_ORDER, A.C_CTRLORDER, A.C_AID
+        <isNotEmpty property="PAGE">
+            ) TEMP1
+            WHERE ROWNUM &lt;= (#PAGE#) * #PSIZE#)
+            WHERE RM &gt; (#PAGE# - 1) * #PSIZE#
+        </isNotEmpty>
+
+    </select>
+    <select id="categoryDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <isEqual property="ISINDEX" compareValue="0">
+            SELECT *
+            FROM (SELECT ROWNUM RM, TEMP1.*
+            FROM (
+        </isEqual>
+        SELECT T.C_ID, T.C_TITLE NAME, T.C_IMG_LONG, T.C_IMG_THIN, T.C_VIEW, A.C_TAGID, A.C_TITLE, A.C_SUBTITLE
+        FROM T_EK_ACTIVITY_INFO             T,
+        T_EK_ACTIVITY_CATEGORY_ACTIVIT A,
+        T_EK_ACTIVITY_CATEGORY_INFO    C
+        WHERE T.C_ISLIVE = '1'
+        AND C.C_ISLIVE = '1'
+        AND A.C_CID = C.C_ID
+        AND A.C_AID = T.C_ID
+        AND T.C_AUDIT_STATUS = '1'
+        <isEqual property="ISINDEX" compareValue="0">
+            AND (T.C_EDATE IS NULL OR T.C_EDATE > SYSDATE)
+        </isEqual>
+        AND A.C_CID = #CID#
+        ORDER BY A.C_ORDER, A.C_CTRLORDER, A.C_AID
+        <isEqual property="ISINDEX" compareValue="0">
+            ) TEMP1
+            WHERE ROWNUM &lt;= (#PAGE#) * #PSIZE#)
+            WHERE RM &gt; (#PAGE# - 1) * #PSIZE#
+        </isEqual>
+
+    </select>
+
+    <!-- 查询实际浏览数 (浏览人数) -->
+    <!--<select id="actuallyView" parameterClass="java.util.HashMap" resultClass="Integer">-->
+    <!--<![CDATA[-->
+    <!--SELECT COUNT(C_UID)-->
+    <!--FROM (SELECT T.C_UID-->
+    <!--FROM T_EK_ACTIVITY_USER_ACTION T-->
+    <!--WHERE T.C_AID = #AID#-->
+    <!--GROUP BY T.C_UID)-->
+    <!--]]>-->
+    <!--</select>-->
+
+    <!-- 查询实际浏览数 (浏览次数) -->
+    <select id="actuallyView" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+        SELECT COUNT(T.C_UID) CNT FROM T_EK_ACTIVITY_USER_ACTION T WHERE T.C_AID = #AID# AND T.C_TYPE = '02'
+		]]>
+    </select>
+
+    <!-- 查询指定活动的标签 -->
+    <select id="getTagByAid" parameterClass="java.util.HashMap" resultClass="String">
+        <![CDATA[
+        SELECT T.C_IMG FROM T_EK_ACTIVITY_TAG_BASE T WHERE T.C_ID = #ID# AND T.C_ISLIVE = '1'
+		]]>
+    </select>
+
+    <!-- 活动相关列表（收藏、参与记录） -->
+    <select id="listAboutAct" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+        SELECT *
+		  FROM (SELECT ROWNUM RM, TEMP1.*
+				  FROM (SELECT A.C_ID, A.C_TITLE, A.C_IMG, A.C_SDATE, A.C_EDATE
+						  FROM $TBNAME$ T, T_EK_ACTIVITY_INFO A
+						 WHERE T.C_UID = #UID#
+						   AND T.C_AID = A.C_ID
+						   AND A.C_ISLIVE = '1'
+						   AND A.C_AUDIT_STATUS = '1'
+						 ORDER BY T.C_DATE DESC) TEMP1
+				 WHERE ROWNUM <= (#PAGE#) * #PSIZE#)
+		 WHERE RM > (#PAGE# - 1) * #PSIZE#
+		]]>
+    </select>
+
+    <!-- 用户删除其参与的活动 -->
+    <delete id="delActAttended" parameterClass="java.util.HashMap">
+        <![CDATA[
+        DELETE FROM T_EK_ACTIVITY_USER_JOIN T WHERE T.C_UID = #UID# AND T.C_AID = #AID#
+		]]>
+    </delete>
+
+    <!-- 查询指定活动的收藏数 -->
+    <select id="countOfCollecting" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+        SELECT NVL(C_FAVORITE, 0) +
+               (SELECT COUNT(1) FROM T_EK_ACTIVITY_USER_COLLECT T WHERE T.C_AID = #AID#)
+          FROM T_EK_ACTIVITY_INFO
+         WHERE C_ID = #AID#
+		]]>
+    </select>
+
+    <!-- 查询指定活动的浏览数 -->
+    <select id="countOfViewing" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+        SELECT NVL(C_VIEW, 0) + (SELECT COUNT(T.C_UID) CNT
+                                   FROM T_EK_ACTIVITY_USER_ACTION T
+                                  WHERE T.C_AID = #AID#
+                                    AND T.C_TYPE = '02')
+          FROM T_EK_ACTIVITY_INFO
+         WHERE C_ID = #AID#
+		]]>
+    </select>
+
+</sqlMap>
+

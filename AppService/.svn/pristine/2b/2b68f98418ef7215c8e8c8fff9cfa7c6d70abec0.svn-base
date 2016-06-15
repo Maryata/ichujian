@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_freeCall">
+
+    <!-- 新增飞语云账号相关信息 -->
+    <insert id="addAccount" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_USER
+          (C_ID,
+           C_APPACCOUNTID,
+           C_FYACCOUNTID,
+           C_FYACCOUNTPWD,
+           C_CREATEDATE,
+           C_STATUS,
+           C_GLOBALMOBILEPHONE)
+        VALUES
+          (SEQ_FY_USER.NEXTVAL,
+           #C_APPACCOUNTID#,
+           #C_FYACCOUNTID#,
+           #C_FYACCOUNTPWD#,
+           #C_CREATEDATE#,
+           #C_STATUS#,
+           #C_GLOBALMOBILEPHONE#)
+		]]>
+    </insert>
+
+    <!-- 新增飞语云账号出错的日志记录 -->
+    <insert id="addAccountLogError" parameterClass="java.util.HashMap">
+        <![CDATA[
+        INSERT INTO T_FY_USER
+          (C_ID, C_APPACCOUNTID, C_RESULTCODE, C_RESULTMSG, C_DATE, C_TYPE)
+        VALUES
+          (SEQ_FY_LOG.NEXTVAL,
+           #C_APPACCOUNTID#,
+           #C_RESULTCODE#,
+           #C_RESULTMSG#,
+           #C_DATE#,
+           #C_TYPE#)
+		]]>
+    </insert>
+
+</sqlMap>
+

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="gameTask">
+	<!--随机任务-->
+	<select id="randomTask" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		select t.c_id,
+       t.c_type,
+       t.c_name,
+       t.c_subname,
+       t.c_link,
+       t.c_logo,
+       t.c_title,
+       t.c_score,
+       (select count(1)
+          from t_game_member_task
+         where c_uid = #uid#
+           and c_tid = T.C_ID
+           and c_date is not null
+           and trunc(c_date) = trunc(sysdate)) as flag
+  from t_game_rantask t0
+  left join t_game_task t
+    on t0.c_tid = t.c_id
+ where t.c_islive = '1'
+	</select>
+
+	<!-- 查询任务对应的奖励 -->
+	<select id="getScoreById"
+		parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT C_SCORE FROM T_GAME_TASK WHERE C_ID = #ID#
+		]]>
+	</select>
+	<!-- 任务奖励 -->
+	<insert id="reward" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_TASK(C_ID,C_UID,C_TID,C_COUNT,C_DATE,C_STRDATE)
+		VALUES(SEQ_GAME_MEMBER_TASK.NEXTVAL,#UID#,#ID#,#SCORE#,#DATE#,#STRDATE#)
+		]]>
+	</insert>
+	<!-- 用户积分增/减 -->
+	<update id="changeUserScore" parameterClass="java.util.HashMap">
+		<![CDATA[
+			CALL PROC_MEMBER_SCORE(#UID#,#SCORE#,#CHANGING#)
+		]]>
+	</update>
+	<!-- 查询用户的积分-->
+	<select id="userScore"
+		parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT C_SCORE FROM T_GAME_MEMBER_SCORE WHERE C_UID = #UID#
+		]]>
+	</select>
+	<!-- 新增用户积分 -->
+	<insert id="insertUserScore" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_SCORE(C_ID,C_UID,C_SCORE,C_DATE)
+		VALUES(SEQ_GAME_MEMBER_TASK.NEXTVAL,#UID#,#SCORE#,#DATE#)
+		]]>
+	</insert>
+	<!-- 减少用户积分 -->
+	<update id="plusUserScore" parameterClass="java.util.HashMap">
+		<![CDATA[
+			UPDATE T_GAME_MEMBER_SCORE 
+			   SET C_SCORE=C_SCORE+#SCORE#, C_DATE=#DATE#
+			 WHERE C_UID=#UID#
+		]]>
+	</update>
+	<!-- 减少用户积分 -->
+	<update id="reduceUserScore" parameterClass="java.util.HashMap">
+		<![CDATA[
+			UPDATE T_GAME_MEMBER_SCORE 
+			   SET C_SCORE=C_SCORE-#SCORE#, C_DATE=#DATE#
+			 WHERE C_UID=#UID#
+		]]>
+	</update>
+	<!-- 查询用户当天的签到记录 -->
+	<select id="signRecord"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_SIGN T
+		 WHERE T.C_UID = #UID#
+		   AND #DATE# = TO_CHAR(T.C_DATE, 'yyyy-MM-dd')
+		]]>
+	</select>
+	<!-- 查询用户本月所有签到日期 -->
+	<select id="signedDates"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT TO_CHAR(C_DATE, 'yyyy-MM-dd') C_DATE, C_SEQ
+		  FROM T_GAME_MEMBER_SIGN T
+		 WHERE T.C_UID = #UID#
+		   AND #DATE# = TO_CHAR(T.C_DATE, 'yyyy-MM')
+	     ORDER BY T.C_DATE DESC
+		]]>
+	</select>
+	<!-- 新增用户签到 -->
+	<insert id="signIn" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_SIGN(C_ID,C_UID,C_DATE,C_SEQ)
+		VALUES(SEQ_GAME_MEMBER_SIGN.NEXTVAL,#UID#,#DATE#,#SEQ#)
+		]]>
+	</insert>
+	<!-- 连续签到奖励 -->
+	<select id="successions" parameterClass="java.util.HashMap" resultClass="String">
+		<![CDATA[
+		SELECT C_SCORE FROM T_GAME_REWARD WHERE C_DAYS = #SEQ#
+		]]>
+	</select>
+	<!-- 查询用户是否已经做过一次性任务（上传头像、修改昵称、修改性别、修改手机号、绑定第三方） -->
+	<select id="haveCompleted" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = #TID#
+		]]>
+	</select>
+	<!-- 查询对应的登录类型的用户是否存在 -->
+	<select id="haveBound" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_INFO T WHERE T.C_UID = #UID# AND T.C_LOGINTYPE = #LOGINTYPE#
+		]]>
+	</select>
+
+</sqlMap>
+

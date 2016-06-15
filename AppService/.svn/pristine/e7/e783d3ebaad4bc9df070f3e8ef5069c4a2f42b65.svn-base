@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<!-- 飞语云 -->
+	<package name="feiyuCloud" namespace="/feiyuCloud" extends="struts-default">
+		<!-- 呼叫授权 -->
+		<action name="callAuth" method="callAuth" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 话单推送 -->
+		<action name="pushCallInfo" method="pushCallInfo" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!--通话记录-->
+		<action name="callHistory" method="callHistory" class="feiyuCloudAction"></action>
+		<!-- 语音验证码 -->
+		<action name="voiceValidateCode" method="voiceValidateCode" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 录音通知回调 -->
+		<action name="voiceRecCallback" method="voiceRecCallback" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 录音通知回调 -->
+		<action name="modifyPhone" method="modifyPhone" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 套餐列表 -->
+		<action name="combo" method="combo" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 用户信息 -->
+		<action name="userInfo" method="userInfo" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 老用户一次性注册飞语云账号 -->
+		<action name="addFeiyuAcc4ExistsUser" method="addFeiyuAcc4ExistsUser" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 获取手机号归属地 -->
+		<action name="phoneArea" method="phoneArea" class="feiyuCloudAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!-- 记录用户点击“免费电话”按钮的行为 -->
+		<action name="callingRec" method="callingRec" class="feiyuCloudAction" />
+
+		<!-- 更新通话记录 -->
+		<action name="updateCallingRec" method="updateCallingRec" class="feiyuCloudAction" />
+	</package>
+</struts>

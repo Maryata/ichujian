@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	
+
+	<bean id="phoneRecordService" class="com.sys.service.PhoneRecordServiceImpl" scope="prototype"/>
+	<bean id="phoneRecordAction" class="com.sys.action.PhoneRecordAction" scope="prototype">
+		<property name="phoneRecordService">
+			<ref bean="phoneRecordService"/>
+		</property>
+	</bean>
+</beans>

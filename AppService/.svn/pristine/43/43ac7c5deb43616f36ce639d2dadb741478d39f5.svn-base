@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameActivity" namespace="/game" extends="struts-default,json-default">
+		<!-- 通过游戏ID获取游戏活动列表 -->
+		<action name="getAListOfGamesByGameId" method="getAListOfGamesByGameId" class="gameActivityAction"></action>
+		<!-- 通过活动ID获取活动信息 -->
+		<action name="getActivityById" method="getActivityById" class="gameActivityAction"></action>
+		<!--有效期内的活动列表-->
+		<action name="eventsList" method="eventsList" class="gameActivityAction"></action>
+		<!--回复活动-->
+		<action name="campusActivities" method="campusActivities" class="gameActivityAction"></action>
+		<!--活动详情-->
+		<action name="eventDetails" method="eventDetails" class="gameActivityAction"></action>
+		<!--参加活动-->
+		<action name="campusActivities" method="campusActivities" class="gameActivityAction">
+			<!--<interceptor-ref name="json">-->
+				<!--<param name="contentType">application/json</param>-->
+			<!--</interceptor-ref>-->
+		</action>
+		<!-- 我的活动 -->
+		<action name="attendedAct" method="attendedAct" class="gameActivityAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	</package>
+</struts>

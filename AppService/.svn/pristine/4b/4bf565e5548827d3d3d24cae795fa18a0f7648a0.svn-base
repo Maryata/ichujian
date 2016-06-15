@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="user">
+	
+	<!-- 普通登录 -->
+	<select id="Login"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_BASE_MEMBER_INFO where C_PHONENUM=#phonenum# and C_PASSWORD=#password# and c_logintype = 0 and c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 查询IMEI表是否有记录 -->
+	<select id="GetMemberList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_BASE_MEMBER_IMEI where C_REGID=#regid# and C_IMEI=#imei#
+		]]> 
+	</select>
+
+	<!-- 插入member IMEI -->
+	<insert id="InsertImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_BASE_MEMBER_IMEI (c_id,c_regid,c_imei,C_ISLOGIN,C_ISPWD,C_ISFIRSTLOGIN,c_actiondate,c_uid)
+		values
+		(SEQ_MEMBER_IMEI.nextval,#regid#,#imei#,1,0,1,#actiondate#,#uid#)
+		]]> 
+	</insert>
+	
+	<!-- 修改当前为最新 -->
+	<update id="UpdateNewImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_IMEI set C_ISLOGIN=1,C_ISFIRSTLOGIN=0 where c_regid=#regid# and c_imei=#imei# 
+		]]> 
+	</update>
+	
+	<!-- 修改其他不是最新 -->
+	<update id="UpdateOtherImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_IMEI set C_ISLOGIN=0 where c_imei=#imei# and c_regid!=#regid#  
+		]]> 
+	</update>
+	
+	<!-- 查询第三方是否有记录 -->
+	<select id="GetExternalList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_id,t.c_regid,t.c_nickname,t.c_logintype,t.c_phonenum,t.c_sex,t.c_headimage from T_BASE_MEMBER_INFO t 
+		where t.c_regid=#regid# and t.c_logintype=#logintype# and t.c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 查询第三方是否有登录或绑定过-->
+	<select id="GetExternalListbystate"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_id,t.c_regid,t.c_nickname,t.c_logintype,t.c_phonenum,t.c_sex,t.c_headimage from T_BASE_MEMBER_INFO t 
+		where t.c_regid=#regid# and t.c_logintype=#logintype# and t.c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 查询UID是否有记录 -->
+	<select id="GetUserList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_id,t.c_regid,t.c_nickname,t.c_logintype,t.c_phonenum,t.c_sex,t.c_headimage from T_BASE_MEMBER_INFO t 
+		where t.c_id=#uid# and t.c_logintype=#logintype# and t.c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 查询注册用户 -->
+	<select id="GetUserList2"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_id,t.c_regid,t.c_nickname,t.c_logintype,t.c_phonenum,t.c_sex,t.c_headimage from T_BASE_MEMBER_INFO t 
+		where t.c_id=#uid# and t.c_islive=1 and t.c_state=1
+		]]> 
+	</select>
+	
+	<!-- 查询UID绑定记录 -->
+	<select id="GetUserBindList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_logintype,t.c_state from T_BASE_MEMBER_INFO t 
+		where t.c_id=#uid# and t.c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 第三方登录记录(注册) -->
+	<insert id="External" parameterClass="java.util.HashMap">
+	     <selectKey resultClass="String" type="pre" keyProperty="id" >     
+          SELECT SEQ_MEMBER_INFO.nextval AS VALUE FROM DUAL     
+         </selectKey>     
+		insert into T_BASE_MEMBER_INFO (c_id,c_regid,c_nickname,c_logintype,c_sex,c_age,c_headimage,c_islive,c_actiondate,c_state)
+		values
+		(#id#,#regid#,#nickname#,#logintype#,#sex#,#age#,#headimage#,1,#actiondate#,1)
+	</insert>
+	
+	<!-- 绑定第三方 -->
+	<insert id="BindExternal" parameterClass="java.util.HashMap">		
+		<![CDATA[
+		insert into T_BASE_MEMBER_INFO (c_id,c_regid,c_nickname,c_logintype,c_sex,c_age,c_headimage,c_islive,c_actiondate,c_state)
+		values
+		(#uid#,#regid#,#nickname#,#logintype#,#sex#,#age#,#headimage#,1,#actiondate#,0)
+		]]> 
+	</insert>
+	
+		<!-- 绑定第三方  有注册手机号-->
+	<insert id="BindExternal2" parameterClass="java.util.HashMap">		
+		<![CDATA[
+		insert into T_BASE_MEMBER_INFO (c_id,c_regid,c_nickname,c_logintype,c_sex,c_age,c_headimage,c_islive,c_actiondate,c_state,c_phonenum)
+		values
+		(#uid#,#regid#,#nickname#,#logintype#,#sex#,#age#,#headimage#,1,#actiondate#,0,#phonenum#)
+		]]> 
+	</insert>
+	
+	<!-- 查询当前第三方账号是否是第一次登录的账号 -->
+	<select id="isFirstInfo" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT C_STATE FROM T_BASE_MEMBER_INFO T WHERE T.C_ID = #UID# AND T.C_LOGINTYPE = #LOGINTYPE# AND T.C_ISLIVE=1 
+		]]> 
+	</select>
+	
+	<!-- 查询是否存在logintype为0的信息 -->
+	<select id="existChujianUser" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		<![CDATA[
+		SELECT COUNT(*) FROM T_BASE_MEMBER_INFO T WHERE T.C_ID = #UID# AND T.C_LOGINTYPE = #LOGINTYPE# AND T.C_ISLIVE=1 
+		]]> 
+	</select>
+	
+	<!-- 解绑第三方账号 -->
+	<delete id="unBindExternal" parameterClass="java.util.HashMap">
+		<![CDATA[
+		DELETE FROM T_BASE_MEMBER_INFO WHERE C_ID=#UID# AND C_LOGINTYPE=#LOGINTYPE#
+		]]> 
+	</delete>
+	
+	<!-- 更新第三方登录信息 -->
+	<update id="UpdateExternal" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_INFO set c_nickname=#nickname#,c_sex=#sex#,c_age=#age#,c_headimage=#headimage#,c_islive=1
+		where c_regid=#regid# and c_logintype=#logintype#
+		]]> 
+	</update>
+	
+	<!-- 查询第三方Imei -->
+	<select id="FindExternalImei"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_BASE_MEMBER_IMEI where c_regid=#regid# and c_imei=#imei#
+		]]> 
+	</select>
+	
+	<!-- 插入第三方IMEI -->
+	<insert id="InsertExternalImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_BASE_MEMBER_IMEI (c_id,c_regid,c_imei,C_ISLOGIN,C_ISPWD,C_ISFIRSTLOGIN,c_actiondate,c_uid)
+		values
+		(SEQ_MEMBER_IMEI.nextval,#regid#,#imei#,1,0,1,#actiondate#,#uid#)
+		]]> 
+	</insert>
+	
+	<!-- 跟新第三方登录当前为最新 -->
+	<update id="UpdateExternalNewImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_IMEI set C_ISLOGIN=1,C_ISFIRSTLOGIN=0 where c_regid=#regid# and c_imei=#imei#
+		]]> 
+	</update>
+	
+	<!-- 更新第三方登录其他不是最新 -->
+	<update id="UpdateExternalOtherImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_IMEI set C_ISLOGIN=0 where c_regid=#regid# and c_imei!=#imei#
+		]]> 
+	</update>
+	
+	<!-- 查询原密码 -->
+	<select id="Findpd"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_BASE_MEMBER_INFO where c_id=#regid# and c_password=#oldpassword# and c_logintype=0 and c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 修改密码 -->
+	<update id="Modifypd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_INFO set c_password=#newpassword#,c_actiondate=#actiondate# 
+		where c_id=#regid# and c_logintype=0 and c_password=#oldpassword# and c_islive=1
+		]]> 
+	</update>
+	
+	<!-- 编辑资料 -->
+	<update id="EditUserInfo" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_INFO set c_nickname=#nickname#,c_sex=#sex#,c_actiondate=#actiondate# where c_id=#regid# and c_islive=1
+		]]> 
+	</update>
+	
+	<!-- 查询手机是否注册 -->
+	<select id="FindPhone"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_BASE_MEMBER_INFO where c_phonenum=#phonenum# and c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 注册IMEI -->
+	<insert id="RegImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_BASE_MEMBER_IMEI (c_id,c_regid,c_imei,C_ISPWD,C_VALIDATECODE,C_ISFIRSTLOGIN,c_actiondate,c_uid) 
+		values (SEQ_MEMBER_IMEI.nextval,#regid#,#imei#,0,#validatecode#,1,#actiondate#,#uid#)
+		]]> 
+	</insert>
+	
+	<!-- 注册 -->
+    <insert id="Reg" parameterClass="java.util.HashMap">     
+    <selectKey resultClass="String" type="pre" keyProperty="id" >     
+        SELECT SEQ_T_ACTIVITY_REG.nextval AS VALUE FROM DUAL     
+    </selectKey>     
+		insert into T_BASE_MEMBER_INFO (c_id,c_regid,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,c_actiondate,c_state,c_sex) 
+		values (SEQ_MEMBER_INFO.nextval,'ICJ'||#id#,0,#phonenum#,#password#,1,#actiondate#,1,0)
+    </insert>     
+	
+	<!-- 绑定手机 -->
+	<update id="bindPhone" parameterClass="java.util.HashMap">
+		<![CDATA[
+	    UPDATE T_BASE_MEMBER_INFO
+		   SET C_PHONENUM = #PHONENUM#, C_ACTIONDATE = #ACTIONDATE#, C_PASSWORD = #PWD#
+		 WHERE C_ID = #UID#
+		   AND C_LOGINTYPE = #LOGINTYPE#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 第三方注册账号绑定手机后，生成logintype为0的数据 -->
+	<insert id="chujianUser" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_BASE_MEMBER_INFO(C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_NICKNAME)
+		VALUES(#UID#,'ICJ'||SEQ_T_ACTIVITY_REG.NEXTVAL,#LOGINTYPE#,#PHONENUM#,#PWD#,1,#DATE#,0,#NICKNAME#)
+		]]> 
+	</insert>
+	
+	<!-- 忘记密码 -修改 -->
+	<update id="ForGetpd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_INFO set c_password=#newpassword#,c_actiondate=#actiondate# where c_phonenum=#phonenum# and c_islive=1
+		]]> 
+	</update>
+	
+	<!-- 用户积分数 -->
+	<select id="GetIntegral"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_ACTIVITY_MEMBER_INTEGRAL where c_uid=#regid# and c_state=1
+		]]> 
+	</select>
+	
+	
+	<!-- 用户优惠券数 -->
+	<select id="GetPrivilege"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from T_ACTIVITY_PRIVILEGE where c_uid=#regid# and c_state=1
+		]]> 
+	</select>
+	
+	<!-- 用户活动数 -->
+	<select id="GetActivity"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+        select count(t.c_type) c_count,t.c_type from T_ACTIVITY_MEMBER_ACTIVITY t,t_activity_base_info b,t_activity_brand_info i
+        where t.c_activity_id=b.c_id and b.c_brandid=i.c_id and i.c_islive=1 and b.c_islive=1 and t.c_state=1 and t.c_uid=#regid# group by t.c_type
+		]]> 
+	</select>
+	
+	<!-- 用户关注商家数 -->
+	<select id="GetFollow"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select count(*) as count from T_ACTIVITY_MEMBER_BRAND b,T_ACTIVITY_BRAND_INFO i 
+		where b.c_uid=#regid# and b.c_brandid=i.c_id and i.c_islive=1 and b.C_ISLIVE=1 and b.C_TYPE=1 and b.C_STATE=1
+		]]> 
+	</select>
+	
+	<!-- 用户中心   个人信息-->
+	<select id="GetUserInfo"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_regid,t.c_nickname,t.c_phonenum,t.c_sex,t.c_headimage from T_BASE_MEMBER_INFO t where c_id=#regid# and c_state=1
+		]]> 
+	</select>
+	
+	<!-- 用户关注的品牌  我的活动帮-->
+	<select id="UserFollowBrand"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+    select  * from (
+    select rt,c_id,c_cname,c_logourl,counts,nvl(activitycount,0) activitycount from (
+    select * from (
+select rownum rt,t.c_id,t.c_cname,t.c_logourl from T_ACTIVITY_BRAND_INFO t,T_ACTIVITY_MEMBER_BRAND f 
+where f.c_uid=#uid# and f.c_islive=1 and t.c_islive=1 and f.c_type=1 and f.c_state=1 and f.c_brandid=t.c_id
+) a1,(select t.c_brandid,count(t.c_brandid) counts from T_ACTIVITY_MEMBER_BRAND t where t.c_islive=1 and t.c_state=1
+group by t.c_brandid) a2 where a1.c_id=a2.c_brandid
+) a3 left join (select i.c_brandid,count(i.c_brandid) as activitycount from t_activity_base_info i group by i.c_brandid) a4 on a3.c_id=a4.c_brandid
+) a5 where a5.rt>#page# and a5.rt<=#page#+20
+		]]> 
+	</select>
+	
+		<!-- 用户关注的品牌数量 -->
+	<select id="UserFollowBrandNum"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+select count(*) count from T_ACTIVITY_MEMBER_BRAND f,T_ACTIVITY_BRAND_INFO b where f.c_brandid=b.c_id and b.c_islive=1 and f.c_islive=1 and f.c_type=1 and f.c_state=1 and f.c_uid=#regid#
+		]]> 
+	</select>
+	
+	
+	<!-- 用户关注的品牌  首页-->
+	<select id="UserMainFollowBrand"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select  c_id,c_cname,c_brandidea,c_logourl,nvl(counts,0) count from (
+		select * from (
+select rownum rt,t.c_id,t.c_cname,t.c_brandidea,t.c_logourl from T_ACTIVITY_BRAND_INFO t,T_ACTIVITY_MEMBER_BRAND f 
+where f.c_uid=#uid# and f.c_islive=1 and f.c_type=1 and f.c_state=1 and f.c_brandid=t.c_id
+) a1 left join (select t.c_brandid,count(t.c_brandid) counts from t_activity_base_info t where t.c_edate>sysdate group by t.c_brandid) a2 on a1.c_id=a2.c_brandid )
+ a3 where a3.rt>#page# and a3.rt<=#page#+20
+		]]> 
+	</select>
+	
+	<!-- 用户关注的品牌的活动  首页-->
+	<select id="UserFollowBrandActivity"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		select * from (
+select rownum rt,a1.c_id,a1.c_brandid bid,a1.c_title,a1.c_sdate,a1.c_detailurl,a1.c_edate,a1.c_imageurl,a1.c_cname,a1.c_logourl,a2.count from
+(select b.c_id,b.c_brandid,b.c_title,b.c_sdate,b.c_detailurl,b.c_edate,b.c_imageurl,t.c_cname,t.c_logourl from T_ACTIVITY_BRAND_INFO t,T_ACTIVITY_MEMBER_BRAND f,t_activity_base_info b
+where b.c_islive=1 and f.c_uid=#regid# and f.c_islive=1 and f.c_type=1 and f.c_state=1 and f.c_brandid=t.c_id and f.c_brandid=b.c_brandid order by b.C_ACTIONDATE) a1,
+(select i.c_brandid,count(i.c_brandid) as count from t_activity_base_info i group by i.c_brandid) a2
+ where a1.c_brandid=a2.c_brandid and a1.c_edate>sysdate ) a3 where a3.rt>#page# and a3.rt<=#page#+20
+		]]> 
+	</select>
+	
+	<!-- 用户参加或者收藏的活动 -->
+	<select id="UserCollectingActivity"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+				select c_id,c_title,c_sdate,c_edate,c_imageurl,c_cname,c_grade,nvl(counts,0) as count,state from (
+select * from 
+(select rownum rt,i.c_id,i.c_title,i.c_sdate,i.c_edate, case when i.c_edate>sysdate then 1 else 0 end state ,i.c_imageurl,i.c_grade,b.c_cname 
+from T_ACTIVITY_MEMBER_ACTIVITY t,t_activity_base_info i,t_activity_brand_info b where i.c_islive=1 and b.c_islive=1 and t.c_uid=#regid#  and t.c_type=#type# and t.c_state=1 
+and t.c_activity_id=i.c_id and i.c_brandid=b.c_id) a1 left join
+(select i.c_indexid,count(i.c_indexid) as counts from T_ACTIVITY_USER_SELECT i where i.c_type=1 and i.c_action=0 group by i.c_indexid) a2
+ on a2.c_indexid=a1.c_id
+ ) a3 where a3.rt>#page# and a3.rt<=#page#+20
+		]]> 
+	</select>
+	
+	<!-- 用户参加或者收藏活动的数量 -->
+	<select id="UserCollectingActivityNum"
+		resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+select count(*) count from T_ACTIVITY_MEMBER_ACTIVITY f,t_activity_base_info i,t_activity_brand_info b
+where f.c_activity_id=i.c_id and i.c_brandid=b.c_id and b.c_islive=1 and f.c_state=1 and f.c_type=#type# and f.c_uid=#regid#
+		]]> 
+	</select>
+	
+	
+	<!-- 已发送验证码数量 -->
+	<select id="getValidateList"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select * from T_ACTIVITY_VALIDATE_CODE where c_phonenum=#phonenum# and c_type=#type# and to_char(c_date,'yyyy-MM-dd')=#date#
+		]]> 
+	</select>
+	
+	
+	<!-- 插入验证码 -->
+	<insert id="InsertValidate" parameterClass="java.util.HashMap">
+		<![CDATA[
+		insert into T_ACTIVITY_VALIDATE_CODE (c_id,c_imei,c_date,c_code,c_type,c_islive,c_phonenum) 
+		values (SEQ_T_ACTIVITY_VALIDATE_CODE.nextval,#imei#,#date#,#code#,#type#,1,#phonenum#)
+		]]> 
+	</insert>
+	
+	<!-- 更新验证码状态 -->
+		<!-- 忘记密码 -修改 -->
+	<update id="UpdateValidate" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_ACTIVITY_VALIDATE_CODE set c_islive=0 where c_phonenum=#phonenum# and c_type=#type#
+		]]> 
+	</update>
+	
+	<!-- 查询验证码 -->
+	<select id="GetValidate"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+select * from T_ACTIVITY_VALIDATE_CODE where c_phonenum=#phonenum# and c_type=#type# and c_islive=1
+		]]> 
+	</select>
+	
+	<!-- 更新头像 -->
+	<update id="UpdateHead" parameterClass="java.util.HashMap">
+		<![CDATA[
+		update T_BASE_MEMBER_INFO set c_headimage=#headurl# where c_id=#regid# and c_islive=1
+		]]> 
+	</update>
+	
+	<!-- 生成默认昵称defaultNickname -->
+    <update id="defaultNickname" parameterClass="java.util.HashMap">     
+		UPDATE T_BASE_MEMBER_INFO SET C_NICKNAME = #NICKNAME# WHERE C_REGID = #REGID# 
+    </update>
+
+	<!-- 根据手机号查询用户信息 -->
+	<select id="findByPhone"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_BASE_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	
+	<!-- 更新当前第三方登录为最新，修改"首次登录"为0（如果需要） -->
+	<update id="updatePhonenum" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_BASE_MEMBER_INFO T
+  		   SET T.C_PHONENUM = #PHONENUM#, C_ACTIONDATE = #DATE#
+		 WHERE T.C_ID = #UID#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</update>
+	
+	<!-- 校验验证码是否正确 -->
+	<select id="isUsableCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_ACTIVITY_VALIDATE_CODE T
+		 WHERE T.C_DATE >= TO_DATE(#DATE#, 'yyyy-MM-dd HH24:MI:SS')
+		   AND T.C_CODE = #VALICODE#
+		   AND T.C_TYPE = #TYPE#
+		   AND T.C_PHONENUM = #PHONENUM#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+ </sqlMap>
+

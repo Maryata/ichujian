@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameTask" namespace="/game" extends="struts-default">
+		<!-- 任务奖励 -->
+		<action name="reward" method="reward" class="gameTaskAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 是否显示“签到” -->
+		<action name="signRecord" method="signRecord" class="gameTaskAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<action name="randomTask" method="randomTask" class="gameTaskAction"></action>
+		<!-- 签到 -->
+		<action name="signIn" method="signIn" class="gameTaskAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	</package>
+</struts>

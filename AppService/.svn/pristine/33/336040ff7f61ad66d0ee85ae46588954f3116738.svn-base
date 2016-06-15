@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="mcrapp">
+	<insert id="persistentUserBehavior" parameterClass="java.util.HashMap">
+		insert into t_mcrapp_member_action
+		  (c_id, c_imei, c_aid, c_content, c_type, c_date)
+		values
+		  (SEQ_MCRAPP_MEMBER_ACTION.nextval, #imei#, #aid#, #content#, #type#, #date#)
+	</insert>
+	<select id="index" resultClass="java.util.HashMap">
+		select c_id, c_cid, c_type, c_number, c_order
+		  from t_mcrapp_index
+		 order by c_order
+	</select>
+	
+	<select id="listCategory" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 SELECT B.c_name, B.c_logo, B.C_SUMMARY,B.c_id
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (select t4.c_name, t4.c_logo, t3.C_SUMMARY,t3.c_id
+  from (  select t.c_id, t1.c_cid, wm_concat(t2.c_name) as C_SUMMARY
+    from t_mcrapp_category t
+    left join t_mcrapp_category_mcrapp t1
+      on t.c_id = t1.c_cid
+    left join (select c_name, c_id, c_cid
+                 from (select t99.c_name,
+                              t98.c_cid,
+                              t99.c_id,
+                              row_number() OVER(PARTITION BY t98.c_cid ORDER BY t98.c_id) as r
+                         from t_mcrapp_category_mcrapp t98
+                         left join t_mcrapp_info t99
+                           on t98.c_aid = t99.c_id) t97
+                where t97.r < 5) t2
+      on t1.c_aid = t2.c_id
+   group by t.c_id, t1.c_cid) t3
+  left join t_mcrapp_category t4
+    on t3.c_id = t4.c_id) A
+         WHERE ROWNUM <= #maxRows#) B
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	
+	<select id="listAppByCollection" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+SELECT B.c_id,
+       B.c_name,
+       B.c_logourl,
+       B.c_appurl,
+       B.c_abstract,
+       B.c_version,
+       B.c_publish_date,
+       B.c_number_of_favorites
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (select t2.c_id,
+                       t2.c_name,
+                       t2.c_logourl,
+                       t2.c_appurl,
+                       t2.c_abstract,
+                       t2.c_version,
+                       t2.c_publish_date,
+                       t2.c_number_of_favorites + nvl(t3.c,0) as c_number_of_favorites
+                  from t_mcrapp_collection_mcrapp t1
+                  left join t_mcrapp_info t2
+                    on t1.c_aid = t2.c_id
+                  left join (select count(1) as c,c_aid from t_mcrapp_member_action where c_type=0 group by c_aid) t3
+                    on t1.c_aid = t3.c_aid
+                 where t1.c_cid = #cid#
+                   and t2.c_islive = '1' and t1.c_islive='1'
+                 order by t1.c_order, t1.c_cntrorder) A
+         WHERE ROWNUM <= #maxRows#) B
+ WHERE RN >= #startingIndex#
+		 ]]>
+	</select>
+	
+	<select id="listAppByCategory" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		 SELECT B.c_id,
+		        B.c_name,
+		        B.c_logourl,
+		        B.c_appurl,
+		        B.c_abstract,
+		        B.c_version,
+		        B.c_publish_date,
+		        B.c_number_of_favorites
+		   FROM (SELECT A.*, ROWNUM RN
+		           FROM (select t1.c_id,
+		                        t1.c_name,
+		                        t1.c_logourl,
+		                        t1.c_appurl,
+		                        t1.c_abstract,
+		                        t1.c_version,
+		                        t1.c_publish_date,
+		                        t1.c_number_of_favorites + nvl(t2.c,0) as c_number_of_favorites
+		                   from t_mcrapp_category_mcrapp t
+		                   left join t_mcrapp_info t1
+		                     on t.c_aid = t1.c_id
+		                   left join (select count(1) as c,c_aid from t_mcrapp_member_action where c_type=0 group by c_aid) t2
+                    		 on t.c_aid = t2.c_aid
+		                  where t.c_cid = #cid#
+		                    and t1.c_islive = '1' and t.c_islive='1'
+		                  order by t.c_order, t.c_cntrorder) A
+		          WHERE ROWNUM <= #maxRows#) B
+		  WHERE RN >= #startingIndex#
+		 ]]>
+	</select>
+	
+	<select id="findCategoryById" resultClass="java.util.HashMap">
+		select c_id, c_name, c_logo from t_mcrapp_category where c_id=#cid#
+	</select>
+	
+	<select id="search" resultClass="java.util.HashMap">
+		<![CDATA[
+		 select B.c_id,
+		        B.c_name,
+		        B.c_logourl,
+		        B.c_appurl,
+		        B.c_abstract,
+		        B.c_version,
+		        B.c_publish_date,
+		        B.c_number_of_favorites + nvl(t2.c,0) as c_number_of_favorites
+		   from t_mcrapp_info B
+		   left join (select count(1) as c,c_aid from t_mcrapp_member_action where c_type=0 group by c_aid) t2
+                         on B.c_id = t2.c_aid
+	  	where B.C_NAME like '%'||#content#||'%' and rownum <= 10
+	  	]]>
+	</select>
+ </sqlMap>
+

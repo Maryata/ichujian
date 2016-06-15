@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="class" extends="struts-default">
+		<action name="gethotbrand" method="GetHotBrand" class="ClassifiedAction">
+		</action>
+		
+		<action name="getpropertytype" method="GetPropertyType" class="ClassifiedAction">
+		</action>
+		
+		<action name="getbaseinfo" method="GetBaseInfo" class="ClassifiedAction">
+		</action>
+		
+		<action name="classdetail" method="ClassiFiedDetail" class="ClassifiedAction">
+		    <result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<action name="saveSearchRecord" method="saveSearchRecord" class="ClassifiedAction">
+		</action>
+		
+		<action name="getbusinessarea" method="GetBusinessArea" class="ClassifiedAction">
+		</action>
+		
+		<action name="getbusinesszone" method="GetBusinessZone" class="ClassifiedAction">
+		</action>
+	</package>
+</struts>

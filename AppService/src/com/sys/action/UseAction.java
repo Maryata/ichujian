@@ -1,0 +1,255 @@
+package com.sys.action;
+
+import com.sys.commons.AbstractAction;
+import com.sys.ekey.task.service.EKTaskService;
+import com.sys.service.UseService;
+import com.sys.util.StrUtils;
+import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class UseAction extends AbstractAction {
+	
+	private UseService useService;
+
+	@Autowired
+	private EKTaskService ekTaskService;
+	
+	/**输出内容*/
+	private String out;
+	
+    public String UseApp(){  //用户使用了哪些APP    
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String imei=getParameter("imei");   //是否联网
+    	String type=getParameter("type");   //单击 or 长按
+    	String key=getParameter("key");
+    	String clicktype=getParameter("clicktype");
+    	String package_name=getParameter("package_name");
+    	String app_name=getParameter("app_name");
+    	String choosetype=getParameter("choosetype");  //大类
+    	String uid=getParameter("uid");  // 用户id
+    	log.info("into UseAPP");
+    	log.info("--imei--"+imei+"--type--"+type+"--key--"+key+"--clicktype--"+clicktype+"--package_name--"+package_name+"--app_name--"+app_name+"--choosetype--"+choosetype);
+    	try{
+	    	//log.info("--imei--"+imei+"--type--"+type+"--key--"+key+"--clicktype--"+clicktype+"--app_name--"+app_name);
+    	if(StrUtils.isEmpty(imei)||StrUtils.isEmpty(type)||StrUtils.isEmpty(key)||StrUtils.isEmpty(clicktype)||StrUtils.isEmpty(package_name)||StrUtils.isEmpty(app_name)){
+			retMap.put("status", "N");
+			retMap.put("info", "1001");
+    	}else{
+			/** 2016-05-05 e键v2.1 任务：累计使用1/2/3/4号键10次;4号键设置苏宁易购并打开1次 begin */
+//			if (StrUtils.isNotEmpty(uid)) {
+//				if (!"0".equals(key)) {
+//					// 1.任务：累计使用1/2/3/4号键10次（每日任务）
+//					Integer count = useService.countOfUsingKey(uid, key);
+//					if (count >= 10) {
+//						String taskId = "";
+//						switch (key) {
+//							case "1":
+//								taskId = "6";
+//								break;
+//							case "2":
+//								taskId = "7";
+//								break;
+//							case "3":
+//								taskId = "8";
+//								break;
+//							case "4":
+//								taskId = "9";
+//								break;
+//						}
+//						ekTaskService.reward(uid, "2", taskId, null);
+//					}
+//					// 2.任务：4号键设置苏宁易购并打开1次（特殊任务）
+//					if ("4".equals(key)) {
+//						ekTaskService.reward(uid, "3", "24", package_name);
+//					}
+//				}
+//			}
+			/** 2016-05-05 e键v2.1 任务：累计使用1/2/3/4号键10次;4号键设置苏宁易购并打开1次 end */
+    		Date actiondate1=new Date();
+			if (!"0".equals(key)) {// 触键APP启动不用记录按键使用情况
+    			useService.Usekey(imei, type, key, actiondate1, clicktype,choosetype); //用户使用按键记录
+			}
+    		//String app_names=new String(app_name.getBytes("ISO-8859-1"),"UTF-8");  //编码处理
+			useService.UseApp(imei,type,key,clicktype,package_name,app_name,actiondate1,choosetype); //使用APP记录
+			retMap.put("status", "Y");
+    	}  	
+	    } catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.UseApp failed,",e);
+	   }
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+	
+    
+    
+    public String Usekey(){  //用户使用键的情况----没有用到
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String imei=getParameter("imei");
+    	String type=getParameter("type");     //单击 or 长按
+    	String key=getParameter("key");
+    	String clicktype=getParameter("clicktype");    //功能
+    	String choosetype=getParameter("choosetype");  //大类
+    	log.info("into UseKey");
+    	log.info("--imei--"+imei+"--type--"+type+"--key--"+key+"--choosetype--"+choosetype);
+    	try{
+    	if(StrUtils.isEmpty(imei)||StrUtils.isEmpty(type)||StrUtils.isEmpty(key)){
+			retMap.put("status", "N");
+			retMap.put("info", "1001");
+    	}else{
+    		Date actiondate1=new Date();
+    		useService.Usekey(imei, type, key, actiondate1, clicktype,choosetype);    			
+			retMap.put("status", "Y");
+    	}  	
+	    } catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.Usekey failed,",e);
+	    }
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+
+    
+    public String UseCommon(){     //公共按键的使用情况
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String imei=getParameter("imei");
+    	String type=getParameter("type");
+    	log.info("into UseCommon");
+    	log.info("--imei--"+imei+"--type--"+type);
+    	try {
+        	if(StrUtils.isEmpty(imei)||StrUtils.isEmpty(type)){
+    			retMap.put("status", "N");
+    			retMap.put("info", "1001");
+    	    	out = JSONObject.fromObject(retMap).toString();
+    	    	return "success";
+        	}
+    		Date actiondate1=new Date();
+    		useService.UseCommon(imei, type, actiondate1);
+			retMap.put("status", "Y");
+		} catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.UseCommon failed,",e);
+		}
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+    
+    public String getSuppListUrl() {    //获取供应商URL
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String activecode=getParameter("activecode");
+    	log.info("--activecode--"+activecode);
+    	try {
+			if(StrUtils.isEmpty(activecode)){
+    			retMap.put("status", "N");
+    			retMap.put("info", "1001");
+    	    	out = JSONObject.fromObject(retMap).toString();
+    	    	return "success";
+			}
+			String suppliercode=activecode.substring(5, 7);
+			List list=useService.getSupplierUrl(suppliercode);
+			retMap.put("status", "Y");
+			if(list.size()>0){
+				Map map=(Map) list.get(0);
+				if(StrUtils.isNotEmpty(map.get("C_URL"))){
+					String url=map.get("C_URL").toString()==null?"":map.get("C_URL").toString();
+					String type=map.get("C_TYPE").toString()==null?"":map.get("C_TYPE").toString();
+	    			retMap.put("url", url);
+	    			retMap.put("type", type);
+				}else{
+					retMap.put("url", "");
+				}
+
+			}else{
+				retMap.put("url", "");
+			}
+		} catch (Exception e) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.getSuppListUrl failed,",e);
+		}
+    	out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+	}
+    
+    public String HelpInfo(){
+    	Map<String,Object> retMap = new HashMap<String,Object>();
+    	String num=getParameter("num");
+    	String type=getParameter("type");// 供应商代码
+    	log.info("into helpinfo");
+    	log.info("--num--"+num+", type = " + type);
+    	try {
+			if(StrUtils.isEmpty(num)){
+				retMap.put("status", "N");
+    			retMap.put("info", "1001");
+    	    	out = JSONObject.fromObject(retMap).toString();
+    	    	return "success";
+			}
+			if (StrUtils.isEmpty(type)) {
+				type = "1";
+			}
+			String url = useService.getHelpInfo(num, type);
+			if (StrUtils.isEmpty(url)) {
+				num = num.length()==1 ? "0" + num : num;
+				url = "http://www.ichujian.com/webView/FAQ/" + num + ".html";
+			}
+			retMap.put("url", url);
+			retMap.put("status", "Y");
+		} catch (Exception e) {
+			// TODO: handle exception
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+e.getMessage());
+			log.error("UseAction.HelpInfo failed,",e);
+		}
+		out = JSONObject.fromObject(retMap).toString();
+    	return "success";
+    }
+
+	// 获取供应商的用户注册协议或免费通话问题帮助
+	public String ekHelpInfo() {
+		Map<String, Object> retMap = new HashMap<>();
+		String sup = getParameter("sup");// 供应商代码
+		String type = getParameter("type");// 查询内容：1.用户注册协议，2.免费通话问题帮助
+		log.info("into UseAction.ekHelpInfo ...");
+		log.info("sup = " + sup + ", type = " + type);
+
+		String info = useService.ekHelpInfo(sup, type);
+		if (StrUtils.isEmpty(info)) {
+			info  = useService.ekHelpInfo("D41001", type);
+		}
+		retMap.put("info", info);
+		retMap.put("status", "Y");
+
+		try {
+			writeToResponse(JSONObject.fromObject(retMap).toString());
+		} catch (Exception ex) {
+			retMap.put("status", "N");
+			retMap.put("info", "1003"+ex.getMessage());
+			log.error("免费通话问题帮助数据写出错误！", ex);
+		}
+		return NONE;
+	}
+
+	public String getOut() {
+		return out;
+	}
+
+	public void setOut(String out) {
+		this.out = out;
+	}
+
+	public UseService getUseService() {
+		return useService;
+	}
+
+	public void setUseService(UseService useService) {
+		this.useService = useService;
+	}
+}

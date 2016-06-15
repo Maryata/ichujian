@@ -1,0 +1,261 @@
+package com.sys.ekey.shop.service.impl;
+
+import com.sys.ekey.shop.service.ShopService;
+import com.sys.util.StrUtils;
+import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/4/15.
+ */
+@Service
+@Transactional
+public class ShopServiceImpl extends SqlMapClientDaoSupport implements ShopService {
+
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+
+    private static Logger LOGGER = Logger.getLogger(ShopServiceImpl.class);
+
+    /**
+     * 签到奖励
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> signAward() {
+        List<Map<String, Object>> list = new ArrayList();
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.signAward");
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.signAward failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * 签到 详情
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> signDettail(String uid) {
+        List<Map<String, Object>> list = new ArrayList();
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.signDettail", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.signDettail failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * 本月累计签到天数
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public int signCountDay(String uid) {
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        int count = 0;
+        try {
+            count = (int) this.getSqlMapClientTemplate().queryForObject("ek_shop.signCountDay", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.signCountDay failed, e : " + e.getMessage());
+        }
+        return count;
+    }
+
+    /**
+     * 连续签到奖励
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> signAwardSeries() {
+        List<Map<String, Object>> list = new ArrayList();
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.signAwardSeries");
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.signAwardSeries failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * 可用积分
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public int availableIntegral(String uid) {
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        int kyScore = 0;
+        try {
+            kyScore = (int) this.getSqlMapClientTemplate().queryForObject("ek_shop.availableIntegral", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.availableIntegral failed, e : " + e.getMessage());
+        }
+        return kyScore;
+    }
+
+    /**
+     * 可获得积分
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public int securableIntegral(String uid) {
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        int hdScore = 0;
+        try {
+            hdScore = (int) this.getSqlMapClientTemplate().queryForObject("ek_shop.securableIntegral", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.securableIntegral failed, e : " + e.getMessage());
+        }
+        return hdScore;
+    }
+
+    /**
+     * 任务列表
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> task(String uid) {
+        List<Map<String, Object>> list = new ArrayList();
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.task", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.task failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * 邀请人数
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public int inviteNumber(String uid) {
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        int count = 0;
+        try {
+            count = (int) this.getSqlMapClientTemplate().queryForObject("ek_shop.inviteNumber", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.inviteNumber failed, e : " + e.getMessage());
+        }
+        return count;
+    }
+
+    /**
+     * 我的邀请码
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public String inviteCode(String uid) {
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        String inviteCode = "";
+        try {
+            inviteCode = (String) this.getSqlMapClientTemplate().queryForObject("ek_shop.inviteCode", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.inviteCode failed, e : " + e.getMessage());
+        }
+        return inviteCode;
+    }
+
+    /**
+     * 邀请奖励积分
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public int inviteAward(String uid) {
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        int count = 0;
+        try {
+            count = (int) this.getSqlMapClientTemplate().queryForObject("ek_shop.inviteAward", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.inviteAward failed, e : " + e.getMessage());
+        }
+        return count;
+    }
+
+    /**
+     * 邀请详情信息
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> inviteDetail(String uid) {
+        List<Map<String, Object>> list = new ArrayList();
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("uid", uid);
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.inviteDetail", paramMap);
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.inviteDetail failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
+    // 商品兑换
+    public List<Map<String, Object>> exchangeList(String uid, String pageIndex, String pSize) {
+        List<Map<String, Object>> list = new ArrayList();
+        Map<String, Object> paramMap = new HashMap();
+        paramMap.put("UID", uid);
+        paramMap.put("PAGEINDEX", StrUtils.isEmpty(pageIndex) ? "1" : pageIndex);
+        paramMap.put("PSIZE", StrUtils.isEmpty(pSize) ? "20" : pSize);
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.exchangeList", paramMap);
+
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.exchangeList failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
+    // 商品首页广告
+    public List<Map<String, Object>> advert() {
+        List<Map<String, Object>> list = new ArrayList();
+        try {
+            list = this.getSqlMapClientTemplate().queryForList("ek_shop.advert");
+        } catch (DataAccessException e) {
+            LOGGER.error("ShopServiceImpl.advert failed, e : " + e.getMessage());
+        }
+        return list;
+    }
+}

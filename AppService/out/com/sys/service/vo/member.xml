@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="member">
+
+	<!-- 校验验证码是否正确 -->
+	<select id="isUsableCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_VALIDATE_CODE T
+		 WHERE T.C_DATE >= TO_DATE(#DATE#, 'yyyy-MM-dd HH24:MI:SS')
+		   AND T.C_CODE = #VALICODE#
+		   AND T.C_TYPE = #TYPE#
+		   AND T.C_PHONENUM = #PHONENUM#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 用户注册 -->
+    <insert id="register" parameterClass="java.util.HashMap">     
+    <selectKey resultClass="java.lang.String" type="pre" keyProperty="ID" >     
+        SELECT SEQ_GAME_MEMBER_REG.nextval AS VALUE FROM DUAL     
+    </selectKey>     
+		INSERT INTO T_CJ_MEMBER_INFO (C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_SEX,C_SUPCODE)
+		VALUES (SEQ_CJ_MEMBER_INFO.NEXTVAL,'ICJ'||#ID#,0,#PHONENUM#,#PWD#,1,#DATE#,1,0,#SUPCODE#)
+    </insert> 
+    <!-- 查询用户id -->
+	<select id="getUid" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT T.C_ID
+		  FROM T_CJ_MEMBER_INFO T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 生成默认昵称defaultNickname -->
+    <update id="defaultNickname" parameterClass="java.util.HashMap">     
+		UPDATE T_CJ_MEMBER_INFO SET C_NICKNAME = #NICKNAME# WHERE C_REGID = #REGID# 
+    </update>
+    <!-- 新增用户登录IMEI -->
+	<insert id="insertImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_CJ_MEMBER_IMEI
+		  (C_ID,
+		   C_REGID,
+		   C_IMEI,
+		   C_ISLOGIN,
+		   C_VALIDATECODE,
+		   C_ISFIRSTLOGIN,
+		   C_ACTIONDATE,
+		   C_UID)
+		VALUES
+		  (SEQ_CJ_MEMBER_IMEI.NEXTVAL,
+		   #REGID#,
+		   #IMEI#,
+		   1,
+		   #VALICODE#,
+		   1,
+		   #DATE#,
+		   #UID#)
+		]]> 
+	</insert>
+	<!-- 根据手机号和密码查询用户信息 -->
+	<select id="login"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_CJ_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_PASSWORD = #PWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 根据注册id和imei查询IMEI是否有记录 -->
+	<select id="getMemberImei"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_CJ_MEMBER_IMEI
+		 WHERE C_REGID = #REGID#
+		   AND C_IMEI = #IMEI#
+		]]> 
+	</select>
+	<!-- 更新当前第三方登录为最新-->
+	<update id="updateIsLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_CJ_MEMBER_IMEI T
+  		   SET T.C_ISLOGIN = 1
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_REGID = #REGID#
+		]]> 
+	</update>
+	<!-- 更新其他第三方登录非最新 -->
+	<update id="updateIsNotLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_CJ_MEMBER_IMEI T
+  		   SET T.C_ISLOGIN = 0
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_REGID != #REGID#
+		]]> 
+	</update>
+	<!-- 根据用户id和密码查询用户信息 -->
+	<select id="findUserByUidNPwd"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_CJ_MEMBER_INFO
+		 WHERE C_ID = #UID#
+		   AND C_PASSWORD = #PWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 修改密码 -->
+	<update id="modifyPwd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_CJ_MEMBER_INFO
+		   SET C_PASSWORD = #NPWD#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_PASSWORD = #OPWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 根据手机号查询用户信息 -->
+	<select id="findByPhone"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_CJ_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 保存验证码 -->
+	<insert id="insertValicode" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_VALIDATE_CODE
+		  (C_ID,
+		   C_IMEI,
+		   C_DATE,
+		   C_CODE,
+		   C_TYPE,
+		   C_ISLIVE,
+		   C_PHONENUM)
+		VALUES
+		  (SEQ_GAME_VALIDATE_CODE.NEXTVAL,
+		   #IMEI#,
+		   #DATE#,
+		   #CODE#,
+		   #TYPE#,
+		   1,
+		   #PHONENUM#)
+		]]> 
+	</insert>
+	<!-- 将指定手机号和类型对应的其他验证码置为无效 -->
+	<update id="invalidatedOther" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_VALIDATE_CODE
+		   SET C_ISLIVE = 0
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_TYPE = #TYPE#
+		]]> 
+	</update>
+	<!-- 设置新密码 -->
+	<update id="setNewPwd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_CJ_MEMBER_INFO
+		   SET C_PASSWORD = #PWD#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 获取当天发送的验证码 -->
+	<select id="getValiCode"
+			resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_VALIDATE_CODE
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_TYPE = #TYPE#
+		   AND TO_CHAR(C_DATE, 'yyyy-MM-dd') = #DATE#
+		]]>
+	</select>
+</sqlMap>
+

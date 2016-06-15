@@ -1,0 +1,201 @@
+package com.sys.service.impl;
+
+import com.sys.action.ErpInfo;
+import com.sys.service.ExchangeService;
+import com.sys.util.ApDateTime;
+import com.sys.util.StrUtils;
+import com.sys.util.encrypt.Base64;
+import com.sys.vo.OrderVo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
+import java.util.*;
+
+/**
+ * Created by vpc on 2016/3/2.
+ */
+@Service
+public class ExchangeServiceImpl implements ExchangeService {
+
+    private static final Log LOGGER = LogFactory.getLog(ExchangeServiceImpl.class);
+
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public int save(String phone, String express, String address, String consignee,
+                    String telNum, String imei, String pCode, String expressCode,
+                    String out_trade_no, String uid, String payType) {
+        final String sql = "insert into t_order (c_id, c_phone, c_address," +
+                " c_express, c_consignee, c_telnum, c_imei, c_date, c_pCode," +
+                " c_expressCode, c_outTradeNo, c_status, C_UID, C_PAY_TYPE)" +
+                " values (seq_order.nextVal, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)";
+        LOGGER.info("phone = " + phone + ", address = " + address + ", express = " + express
+                + ", consignee = " + consignee + ", telNum = " + telNum + ", imei = " + imei
+                + ", pCode = " + pCode + ", expressCode = " + expressCode + ", out_trade_no = " + out_trade_no
+                + ", uid = " + uid + ", payType = " + payType);
+        return jdbcTemplate.update(sql,
+                new Object[]{phone,address,express,consignee,telNum,imei,new Date(),pCode,expressCode,out_trade_no,uid,payType});
+    }
+
+    @Override
+    public Map<String, Object> record(String imei) {
+        if(StringUtils.isEmpty(imei)) {
+            imei = "-1";
+        }
+
+        Map<String,Object> result = new HashMap<String,Object>();
+//        final String sql = "select c_id, c_phone, c_address, c_express, c_consignee, c_telnum," +
+//                " c_imei, c_date from t_order where c_imei=? and c_status=1 order by c_date desc";
+        final String sql = "select c_id, c_phone, c_address, c_express, c_consignee, c_telnum," +
+                " c_imei, c_date from t_order where c_uid=? and c_status=1 order by c_date desc";
+
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,imei);
+        if(list == null) {
+            list = new ArrayList<Map<String,Object>>();
+        }
+
+        result.put("list", list);
+
+        return  result;
+    }
+
+    @Override
+    public int update(String out_trade_no) {
+        final String sql = "UPDATE t_order SET c_status=1 WHERE c_outTradeNo=?";
+
+        final String querySql = "SELECT C_ID, C_PHONE, C_ADDRESS, C_EXPRESS, C_CONSIGNEE, C_TELNUM, C_IMEI, C_DATE, C_PCODE, C_EXPRESSCODE, C_OUTTRADENO, C_STATUS FROM T_ORDER WHERE C_OUTTRADENO=?";
+
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(querySql, new Object[]{out_trade_no});
+
+        if(list != null && list.size() >= 1) {
+            Map<String,Object> map = list.get(0);
+            //erp 推送
+            String phone = (String) map.get("C_PHONE");
+            String express = (String) map.get("C_EXPRESS");
+            String address = (String) map.get("C_ADDRESS");
+            String consignee = (String) map.get("C_CONSIGNEE");
+            String telNum = (String) map.get("C_TELNUM");
+            String imei = (String) map.get("C_IMEI");
+            // 产品代码
+            String pCode = (String) map.get("C_PCODE");
+            // 物流公司代码
+            String expressCode = (String) map.get("C_EXPRESSCODE");
+
+            try {
+                OrderVo orderVo = new OrderVo();
+                orderVo.setSerialId("E" + System.currentTimeMillis());
+                orderVo.setAddress(address);
+                orderVo.setConsignee(consignee);
+                try {
+                    orderVo.setCreateDate(ApDateTime.getDateTime("yyyy-MM-dd hh:mm:ss", System.currentTimeMillis()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                orderVo.setExpressCode(expressCode);
+                orderVo.setpCode(pCode);
+                orderVo.setTelNum(telNum);
+                orderVo.setPhone(phone);
+                ErpInfo.addOrder(orderVo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return jdbcTemplate.update(sql,new Object[]{out_trade_no});
+    }
+
+    @Override
+    public Map<String,String> update(Map<String,String> parameterMap) {
+        Map<String, String> result = new HashMap<String, String>();
+        String return_code = "FAIL";
+        String return_msg = "系统错误";
+        // 订单号
+        String out_trade_no = parameterMap.get("out_trade_no");
+
+        final String selectOrderUid = "SELECT C_ID, C_UID, C_PHONE, C_ADDRESS, C_EXPRESS, C_CONSIGNEE, C_TELNUM, C_IMEI, C_DATE, C_PCODE, C_EXPRESSCODE, C_OUTTRADENO, C_STATUS, C_PAY_TYPE FROM T_ORDER T WHERE T.C_OUTTRADENO = ?";
+        //修改订单状态
+        final String sql = "UPDATE t_order SET c_status=1 WHERE c_outTradeNo=?";
+
+        final String countSql = "SELECT  COUNT(1) FROM T_EK_MEMBER_TASK WHERE C_UID=? AND C_TID=?";
+
+        final String inviteUserInfo = "SELECT  TEMI.C_ID,TEMI.C_REGID,(SELECT COUNT(1) FROM T_EK_MEMBER_INFO WHERE C_INVITECODE=TEMI.C_REGID) AS NUM" +
+                " FROM T_EK_MEMBER_INFO TEMI WHERE TEMI.C_REGID =(SELECT T.C_INVITECODE FROM T_EK_MEMBER_INFO T WHERE T.C_ID = ?)";
+
+        final String gmSucess = "SELECT  COUNT(TEMI.C_ID) FROM T_EK_MEMBER_INFO TEMI" +
+                " LEFT JOIN T_EK_MEMBER_TASK TEMT ON TEMT.C_UID = TEMI.C_ID" +
+                " WHERE TEMI.C_INVITECODE =? AND TEMT.C_TID ='5'";
+
+        final String selectCode = "SELECT T.C_INVITECODE FROM T_EK_MEMBER_INFO T WHERE T.C_ID = ?";
+
+        synchronized (jdbcTemplate) {
+            Map<String, Object> objectMap = jdbcTemplate.queryForMap(selectOrderUid, new Object[]{out_trade_no});//查询订单信息
+
+            /** 2016-04-29 增加功能：erp推送 begin */
+            try {
+                long timeMillis = System.currentTimeMillis();
+                OrderVo orderVo = new OrderVo();
+                orderVo.setSerialId("E"+out_trade_no);// 订单序列号
+                orderVo.setAddress(StrUtils.emptyOrString(objectMap.get("C_ADDRESS")));// 收货地址
+                orderVo.setConsignee(StrUtils.emptyOrString(objectMap.get("C_CONSIGNEE")));// 收货人
+                try {
+                    orderVo.setCreateDate(StrUtils.emptyOrString(objectMap.get("C_DATE")));// 订单创建时间
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                orderVo.setExpressCode(ErpInfo.EXPRESS_CODE_ZTO);// 默认发中通
+                orderVo.setpCode(StrUtils.emptyOrString(objectMap.get("C_PCODE")));// 产品代码
+                orderVo.setPhone(StrUtils.emptyOrString(objectMap.get("C_PHONE")));// 手机品牌
+                orderVo.setTelNum(StrUtils.emptyOrString(objectMap.get("C_TELNUM")));// 收货人电话
+                orderVo.setPayType(StrUtils.emptyOrString(objectMap.get("C_PAY_TYPE")));// 支付类型
+                ErpInfo.addOrder(orderVo);
+            } catch (Exception e) {
+                LOGGER.error("push to ERP failed ! [orderId : ]" + StrUtils.emptyOrString(objectMap.get("C_ID")));
+            }
+            /** 2016-04-29 增加功能：erp推送 end */
+
+            String uid = StrUtils.emptyOrString(objectMap.get("C_UID"));
+            int row = jdbcTemplate.update(sql, new Object[]{out_trade_no});//更新订单状态
+
+            if (row > 0) {
+//                int count = jdbcTemplate.queryForObject(countSql, new Object[]{objectMap.get("C_UID"), 4}, Integer.class); //查询是否首次换膜
+//                if (count == 0) {
+//                    /** 购膜人员 首次购膜添加积分*/
+//                    ekTaskService.reward(uid, "1", "4", null);
+//                    /** 查询邀请人 邀请的人中（当前邀请人是不是首次购膜）*/
+//                    /**查询邀请人的code*/
+//                    Map<String, Object>  codeMap  =jdbcTemplate.queryForMap(selectCode, new Object[]{uid});
+//                    if(StrUtils.isNotEmpty(StrUtils.emptyOrString(codeMap.get("C_INVITECODE")))){//存在邀请人的code
+//                        /** 1：查询 邀请人id */
+//                        //查询邀请人uid 邀请码  邀请的数量
+//                        Map<String, Object> inviteUserMap = jdbcTemplate.queryForMap(inviteUserInfo, new Object[]{uid});
+//                        String inviteUid = StrUtils.emptyOrString(inviteUserMap.get("C_ID"));//邀请人id
+//
+//                        int num = jdbcTemplate.queryForObject(gmSucess, new Object[]{codeMap.get("C_INVITECODE")}, Integer.class);
+//                        if (num == 0) {
+//                            ekTaskService.reward(inviteUid, "1", "5", null);
+//                        }
+//                    }
+//                    return_code = "SUCCESS";
+//                    return_msg = "OK";
+//                } else {
+//                    return_code = "FAIL";
+//                    return_msg = "NO";
+//                }
+                return_code = "SUCCESS";
+                return_msg = "OK";
+            } else {
+                return_code = "FAIL";
+                return_msg = "NO";
+            }
+        }
+        result.put("return_code", return_code);
+        result.put("return_msg", return_msg);
+
+        return result;
+    }
+}

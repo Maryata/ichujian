@@ -1,0 +1,88 @@
+package com.sys.service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+public interface AppService {
+
+    //激活
+    public void AppActive(String activecode, String jobnumber, String imei, Date actiondate, String code_imei);
+
+    public void UpdateActivecodeStatus(String activecode);
+
+    //更新
+    public List Update(String version);
+
+    public List Update(String version, String source);
+
+    //首次使用
+    public void AppStart(String imei, String source, String version, Date actiondate);
+
+    //查询是否有启动记录
+    public List FindStart(String imei);
+
+    //根据IMEI查激活码
+    public List FindCodeByImei(String imei);
+
+    //激活增加次数
+    public void UpdateActiveCount(String imei);
+
+    //设备
+    public void Device(String imei, String brand, String model, String size, String system, String nettype, String longitude, String latitude, Date actiondate);
+
+    //设备版本对照表
+    public void Device_Version(String imei, String version, Date actiondate);
+
+    //查询设备
+    public List FindDevice(String imei);
+
+    //查询激活码是否使用
+    public List FindCode(String activecode);
+
+    //激活码工号对照表
+    public void ActiveJob(String activeid, String jobid);
+
+    //查询激活码和工号是否使用
+    public List FindJobNumber(String jobnumber);
+
+    //查询激活码是否有效
+    public List FindProductSerial(String activecode);
+
+    //测试
+    public void inscode(String code, Date actiondate);
+
+    //app日志记录
+    public void AppLog(String imei, String model, String system, String loginfo, Date actiondate);
+
+    /**
+     * 根据code判断是否需要定制
+     *
+     * @param code
+     * @return
+     * @Description: TODO
+     */
+    int islive(String code);
+
+    /**
+     * 查询所有手机品牌
+     *
+     * @return
+     */
+    List<Map<String, Object>> getAllBrandsOfPhone();
+
+    /**
+     * 根据品牌id获取该品牌下的所有型号信息
+     *
+     * @param id 品牌id
+     * @return
+     */
+    List<Map<String, Object>> getSubBrandByBrandId(String id);
+
+    /**
+     * 查询所有物流信息
+     * @return
+     */
+    List<Map<String,Object>> expressInfo();
+
+}

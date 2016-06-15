@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	
+	<bean id="easyBuyService" class="com.sys.easybuy.service.impl.EasyBuyServiceImpl" scope="prototype"/>
+	
+	<bean id="easyBuyAction" class="com.sys.easybuy.action.EasyBuyAction" scope="prototype">
+		<property name="easyBuyService">
+			<ref bean="easyBuyService"/>
+		</property>
+	</bean>
+</beans>

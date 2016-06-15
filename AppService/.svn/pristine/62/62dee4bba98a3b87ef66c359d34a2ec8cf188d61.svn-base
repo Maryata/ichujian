@@ -1,0 +1,27 @@
+package com.sys.service;
+
+import java.util.Date;
+import java.util.List;
+
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
+
+public interface UseService {
+
+	//用户使用的APP
+	public void UseApp(String imei,String type,String key,String clicktype,String package_name,String app_name,Date actiondate,String choosetype);
+	
+	//用户使用按键的情况
+	public void Usekey(String imei,String type,String key,Date actiondate);
+	public void Usekey(String imei,String type,String key,Date actiondate,String clicktype,String choosetype);
+	
+	//公共按键使用
+	public void UseCommon(String imei,String type,Date actiondate);
+	
+	//获取供应商URL
+    public List getSupplierUrl(String code);
+    
+    //帮助信息
+    public String getHelpInfo(String num); 
+	
+
+}

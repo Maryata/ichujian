@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="gameGift">
+	<select id="findCategoryById" resultClass="java.util.HashMap">
+		select c_id,
+	       c_name,
+	       c_islive,
+	       c_logo,
+	       c_order,
+	       c_modifier,
+	       c_last_update,
+	       c_type
+	  from t_game_category
+	 where c_id = #cid#
+	</select>
+	<select id="giftsDetail" resultClass="java.util.HashMap">
+		SELECT B.*
+  FROM (SELECT A.*, ROWNUM RN
+          FROM (SELECT t1.C_ID ID,
+		   t1.C_NAME NAME,
+		   t1.C_DEPICT DEPICT,
+		   TO_CHAR(t1.C_SDATE, 'yyyy.MM.dd') SDATE,
+		   TO_CHAR(t1.C_EDATE, 'yyyy.MM.dd') EDATE,
+		   t1.C_METHOD METHOD,
+		   t2.C_LOGOURL LOGOURL,
+		   t2.C_NAME GNAME,
+		   t2.C_APPURL APPURL,
+		   t2.C_JARNAME JARNAME,
+		   t2.C_SIZE GSIZE from t_game_gifts_category t left join 
+		   T_GAME_GIFTS_INFO t1
+		   on t.c_gid = t1.c_id
+		   left join T_GAME_APP_INFO t2
+		   on t1.c_gid = t2.c_id
+		   where t1.c_islive = '1'
+		   and t2.c_islive = '1'
+		   and t.c_cid = #cid#
+		   order by t.c_order,t.c_cntrorder
+		   ) A
+         WHERE ROWNUM &lt;= #maxRows#) B
+ WHERE RN &gt;= #startingIndex#
+	</select>
+	<!-- 查询所有游戏礼包 -->
+	<select id="gameGiftList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT ID, GID, NAME, DEPICT, C_LOGOURL, APPURL, GSIZE, JARNAME, GNAME
+		  FROM (SELECT TEMP.*, ROWNUM RM
+		          FROM (SELECT T.C_ID      ID,
+		                       T.C_GID     GID,
+		                       T.C_NAME    NAME,
+		                       T.C_DEPICT  DEPICT,
+		                       G.C_LOGOURL C_LOGOURL,
+	                           G.C_APPURL  APPURL,
+	                           G.C_SIZE    GSIZE,
+	                           G.C_JARNAME JARNAME,
+	                           G.C_NAME    GNAME
+		                  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		                 WHERE T.C_ISLIVE = 1
+		                   AND G.C_ISLIVE = 1
+		                   AND T.C_GID = G.C_ID
+		                   AND T.C_EDATE > SYSDATE
+		                 ORDER BY T.C_ORDER) TEMP
+		         WHERE ROWNUM <= (#PAGE#) * 20)
+		 WHERE RM > (#PAGE# - 1) * 20
+		 ]]>
+	</select>
+	<!-- 查询单个游戏的礼包 -->
+	<select id="gameGift" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID      ID,
+		       T.C_NAME    NAME,
+		       T.C_DEPICT  DEPICT,
+		       G.C_NAME    GNAME,
+		       G.C_APPURL  APPURL,
+		       G.C_JARNAME JARNAME,
+		       G.C_SIZE    GSIZE,
+		       G.C_LOGOURL LOGOURL
+		  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		 WHERE T.C_ISLIVE = 1
+		   AND G.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND T.C_EDATE > SYSDATE
+		   AND T.C_GID = #GID#
+		 ORDER BY T.C_ORDER
+	    ]]>
+	</select>
+	<!-- 获取当前用户领取的礼包码 -->
+	<!-- <select id="usersGiftCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_CODE FROM T_GAME_MEMBER_GIFTS T WHERE T.C_UID = #UID# AND T.C_GID = #GID# WHERE T.C_TYPE = 1
+		]]>
+	</select> -->
+	<!-- 获取当前用户的礼包码 -->
+	<select id="usersGiftCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_CODE FROM T_GAME_MEMBER_GIFTS T WHERE T.C_UID = #UID# AND T.C_GID = #GID# ORDER BY T.C_DATE DESC
+		]]>
+	</select>
+	<!-- 随机获取一条礼包码 -->
+	<select id="getGiftCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM (SELECT T.C_ID, T.C_CODE
+		          FROM T_GAME_GIFTS_CODE_INFO T
+		         WHERE T.C_ISLIVE = 1
+		           AND T.C_GID = #GID#
+		           AND T.C_STATE = 0
+		         ORDER BY DBMS_RANDOM.VALUE)
+		 WHERE ROWNUM = 1
+	 	]]>	
+	</select>
+	<!-- 更新礼包码 -->
+	<update id="updateGiftCode" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_GIFTS_CODE_INFO T
+		   SET T.C_SDATE = SYSDATE, T.C_EDATE = SYSDATE+1, T.C_STATE = 1
+		 WHERE T.C_ID = #CID#
+	 	]]>
+	</update>
+	<!-- 添加用户对礼包的操作行为 -->
+	<insert id="updateUserActionOfGift" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_GIFTS(C_ID,C_UID,C_GID,C_TYPE,C_DATE,C_CODE)
+		VALUES(SEQ_GAME_MEMBER_GIFTS.NEXTVAL,#UID#,#GID#,#TYPE#,SYSDATE,#CODE#)
+		]]>
+	</insert>
+	<!-- 查询礼包详情 -->
+	<select id="giftDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID ID,
+		       T.C_NAME NAME,
+		       T.C_DEPICT DEPICT,
+		       TO_CHAR(T.C_SDATE, 'yyyy.MM.dd') SDATE,
+		       TO_CHAR(T.C_EDATE, 'yyyy.MM.dd') EDATE,
+		       T.C_METHOD METHOD,
+		       G.C_LOGOURL LOGOURL,
+		       G.C_NAME GNAME,
+		       G.C_APPURL APPURL,
+		       G.C_JARNAME JARNAME,
+		       G.C_SIZE GSIZE
+		  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		 WHERE T.C_ISLIVE = 1
+		   AND G.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND T.C_ID = #GID#
+		]]>
+	</select>
+	<!-- 礼包淘号 -->
+	<select id="drawGiftCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM (SELECT T.C_ID, T.C_CODE
+		          FROM T_GAME_GIFTS_CODE_INFO T
+		         WHERE T.C_ISLIVE = 1
+		           AND T.C_GID = #GID#
+		           AND T.C_STATE = 1
+		           AND T.C_EDATE < #DATE#
+		         ORDER BY DBMS_RANDOM.VALUE)
+		 WHERE ROWNUM = 1
+		]]>
+	</select>
+	<!-- 获取当前用户的礼包 2015-12-22 添加：G.C_EDATE > SYSDATE -->
+	<select id="usersGifts" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT G.C_ID, G.C_NAME, G.C_DEPICT, A.C_LOGOURL
+		  FROM T_GAME_MEMBER_GIFTS T, T_GAME_GIFTS_INFO G, T_GAME_APP_INFO A
+		 WHERE G.C_ISLIVE = 1
+		   AND A.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND G.C_GID = A.C_ID
+		   AND T.C_UID = #UID#
+		   AND T.C_TYPE = 1
+		   AND G.C_EDATE > SYSDATE
+		]]>
+	</select>
+	<!-- 用户下载过的游戏的礼包 -->
+	<select id="downloadedGameGifts" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID ID, T.C_NAME NAME, T.C_DEPICT DEPICT, G.C_LOGOURL, G.C_ID GID,
+			   G.C_NAME GNAME, G.C_APPURL APPURL, G.C_JARNAME JARNAME, G.C_SIZE GSIZE
+		  FROM T_GAME_GIFTS_INFO T, T_GAME_APP_INFO G
+		 WHERE T.C_ISLIVE = 1
+		   AND G.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND T.C_EDATE > SYSDATE
+		   AND T.C_GID IN (SELECT A.C_GID
+		                     FROM T_GAME_MEMBER_ACTION A
+		                    WHERE A.C_UID = #UID#
+		                      AND A.C_TYPE = 0)
+		]]>
+	</select>
+	<!-- 后台维护的推荐礼包 -->
+	<select id="recommendGifts" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT G.C_ID ID, G.C_NAME NAME, G.C_DEPICT DEPICT, A.C_LOGOURL, A.C_ID GID,
+			   A.C_NAME GNAME, A.C_APPURL APPURL, A.C_JARNAME JARNAME, A.C_SIZE GSIZE
+		  FROM T_GAME_GIFTS_RECOMMEND T, T_GAME_GIFTS_INFO G, T_GAME_APP_INFO A
+		 WHERE G.C_ISLIVE = 1
+		   AND A.C_ISLIVE = 1
+		   AND T.C_GID = G.C_ID
+		   AND G.C_GID = A.C_ID
+		 ORDER BY T.C_ORDER
+		]]>
+	</select>
+
+	<!-- 查询礼包码数量 -->
+	<select id="giftCodesCnt" parameterClass="String" resultClass="java.util.HashMap">
+		<![CDATA[
+			SELECT NVL(REMAIN, '0') REMAIN, NVL(GOT, '0') GOT
+			  FROM (SELECT COUNT(*) REMAIN, T1.C_GID
+			          FROM T_GAME_GIFTS_CODE_INFO T1
+			         WHERE T1.C_ISLIVE = 1
+			           AND C_STATE = 0
+			           AND T1.C_GID = #GID#
+			         GROUP BY T1.C_GID) A1
+			  FULL OUTER JOIN (SELECT COUNT(*) GOT, T2.C_GID
+			               FROM T_GAME_GIFTS_CODE_INFO T2
+			              WHERE T2.C_ISLIVE = 1
+			                AND C_STATE = 1
+			                AND T2.C_GID = #GID#
+			              GROUP BY T2.C_GID) A2
+			    ON A1.C_GID = A2.C_GID
+	 	]]>
+	</select>
+
+	<!-- 当前用户是否领取过该游戏 -->
+	<select id="hasGotGame" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_CODE
+		  FROM T_GAME_MEMBER_GIFTS T
+		 WHERE T.C_UID = #UID#
+		   AND T.C_GID = #GID#
+		   AND T.C_TYPE = 1
+	  	]]>
+	</select>
+</sqlMap>
+

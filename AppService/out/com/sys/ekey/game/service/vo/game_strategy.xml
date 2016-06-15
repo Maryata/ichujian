@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_gameStrategy">
+	<!-- 游戏攻略列表 -->
+	<select id="raiders" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT T0.C_ID,
+       T0.C_GID,
+       T0.C_NAME,
+       T0.C_DATE,
+       T0.C_ISLIVE,
+       T0.C_ORDER,
+       T0.C_SHAREURL,
+       T1.C_LOGOURL
+  FROM T_ek_GAME_STRATEGY_INFO T0
+  LEFT JOIN T_GAME_APP_INFO T1
+  ON T0.C_GID = T1.C_ID
+ WHERE T0.C_ISLIVE = 1
+ AND T0.C_GID=#gid#
+ AND T1.C_ISLIVE = 1
+ ORDER BY T0.C_ORDER DESC, T0.C_DATE DESC) T
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+	<!-- 通过攻略ID获取攻略信息 -->
+	<select id="getRaidersById" resultClass="java.util.HashMap">
+	SELECT C_ID,
+       C_GID,
+       C_NAME,
+       C_DATE,
+       C_ISLIVE,
+       C_ORDER,
+       C_SHAREURL,(select count(1) from t_ek_game_child_action where c_indexid=#id# and c_source=#source# and c_type=2) as c_count,(select count(1) from t_ek_game_child_action where c_indexid=#id# and c_source=#source# and c_uid=#uid# and c_type=2) as flag
+  FROM T_ek_GAME_STRATEGY_INFO
+ WHERE C_ID = #id#
+	</select>
+
+    <select id="search" resultClass="java.util.HashMap">
+        select t1.c_id,
+        t1.c_gid,
+        t1.c_name,
+        t1.c_shareurl,
+        t2.c_logourl,
+        t2.c_name as gname
+        from t_ek_game_strategy_info t1
+        left join t_game_app_info t2
+        on t1.c_gid = t2.c_id
+        where t1.c_islive = 1
+        and t1.c_gid = #gid#
+        and rownum &lt;= 20
+    </select>
+
+    <!--分类下的攻略-->
+    <select id="listByCategory" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT t.C_ID,
+        t.C_GID,
+        t.C_NAME,
+        t.C_DATE,
+        t.C_ISLIVE,
+        t.C_ORDER,
+        t.C_SHAREURL,
+        t1.C_LOGOURL
+        FROM T_EK_GAME_STRATEGY_CATEGORY t0
+        LEFT JOIN T_EK_GAME_STRATEGY_INFO t
+        on t0.C_SID = t.C_ID
+        LEFT JOIN T_GAME_APP_INFO t1
+        on t.C_GID = t1.C_ID
+        WHERE t0.c_cid = #cid#
+        and t.C_ISLIVE = 1
+        ORDER BY t.C_ORDER DESC, t.C_DATE DESC) T
+         WHERE ROWNUM &lt;= #maxRows#)
+ WHERE RN &gt;= #startingIndex#
+    </select>
+
+</sqlMap>
+

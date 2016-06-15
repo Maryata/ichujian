@@ -1,0 +1,252 @@
+package com.sys.ekey.game.action;
+
+import com.sys.ekey.game.service.EKGameH5Service;
+import com.sys.ekey.task.service.EKTaskService;
+import com.sys.game.service.MiPushService;
+import com.sys.game.util.IGameConst;
+import com.sys.util.ApDateTime;
+import com.sys.util.JSONUtil;
+import com.sys.util.StrUtils;
+import net.sf.json.JSONObject;
+import org.hsqldb.lib.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.*;
+
+/**
+ * 趣游戏-H5游戏
+ *
+ */
+@Component("eKGameH5Action")
+public class EKGameH5Action extends EKGameBaseAction {
+
+	private static final long serialVersionUID = 2020814169379302340L;
+
+	@Autowired
+	private EKGameH5Service eKGameH5Service;
+	
+	@Autowired
+	private MiPushService miPushService;
+
+	@Autowired
+	private EKTaskService eKTaskService;
+	
+	// h5游戏分类列表  
+  	public String h5CategoryList(){
+  		Map<String, Object> reqMap = new HashMap<String, Object>();
+  		log.info("into EKGameH5Action.h5CategoryList");
+  		try {
+  			// h5游戏分类列表
+ 			List<Map<String, Object>> list = eKGameH5Service.h5CategoryList();
+ 			reqMap.put("list", list);
+ 			reqMap.put("status", "Y");
+  		} catch (Exception e) {
+  			reqMap.put("status", "N");
+  			reqMap.put("info", "1003," + e.getMessage());
+  			log.error("EKGameH5Action.h5CategoryList failed,e : " + e);
+  		}
+  		out = JSONObject.fromObject(reqMap).toString();
+  		return "success";
+  	}
+  	
+  	// H5游戏弹幕
+  	public String h5Barrage(){
+  		Map<String, Object> reqMap = new HashMap<String, Object>();
+  		// 获取请求参数
+  		String uid = this.getParameter("uid");// 用户id
+ 		String gid = this.getParameter("gid");// 礼包id
+ 		String type = this.getParameter("type");// 操作类型  0：下载    1：卸载  2：启动   3：查看 4：退出 5：发弹幕
+ 		String source = this.getParameter("source");// 操作内容：0： app游戏  1：h5游戏
+ 		String comment = this.getParameter("comment");// 弹幕内容
+  		log.info("into EKGameH5Action.h5Barrage");
+  		log.info("uid = " + uid + ", gid = " + gid + ", type = "
+  				+ type + ", source = " + source + ", comment = " + comment);
+  		try {
+  			if (StrUtils.isEmpty(uid) || StrUtils.isEmpty(gid) ||
+ 				StrUtils.isEmpty(type) || StrUtils.isEmpty(source) ||
+ 				StrUtils.isEmpty(comment)) {
+ 				reqMap.put("status", "N");
+ 				reqMap.put("info", "1001");
+ 			} else {
+				/** 2016-05-05 e键v2.1 特殊任务：指定H5游戏中发送弹幕 奖励 begin  */
+				// 每日任务：H5游戏中发送弹幕1次
+//				eKTaskService.reward(uid, "2", "16", null);
+				// 特殊任务：指定H5游戏中发送弹幕1次
+//				eKTaskService.reward(uid, "3", "23", gid);
+				/** 2016-05-05 e键v2.1 特殊任务：指定H5游戏中发送弹幕 奖励 end  */
+ 				// 保存用户行为
+ 	 			eKGameH5Service.saveH5Barrage(uid, gid, type, source);
+ 	 			// 推送消息
+ 	 			miPushService.sendMessage(comment, gid);
+// 	 			Result r = miPushService.sendMessage(comment, gid);
+// 	 			log.info("r---------" + r.getData().toString());
+ 	 			reqMap.put("status", "Y");
+ 			}
+  		} catch (Exception e) {
+  			reqMap.put("status", "N");
+  			reqMap.put("info", "1003," + e.getMessage());
+  			log.error("EKGameH5Action.h5Barrage failed,e : " + e);
+  		}
+  		out = JSONObject.fromObject(reqMap).toString();
+  		return "success";
+  	}
+  	
+  	// 最近在玩的游戏
+  	public String recentlyPlaying(){
+  		Map<String, Object> reqMap = new HashMap<String, Object>();
+  		// 获取请求参数
+  		String uid = this.getParameter("uid");
+  		String type = this.getParameter("type");// 1:首页显示的8个，2:全部
+  		log.info("into EKGameH5Action.recentlyPlaying");
+  		log.info("uid = " + uid + "type" + type);
+  		try {
+  			if (StrUtils.isEmpty(uid) || StrUtils.isEmpty(uid)) {
+ 				reqMap.put("status", "N");
+ 				reqMap.put("info", "1001");
+ 			} else {
+ 	 			// 最近在玩的游戏
+ 				List<Map<String, Object>> list = eKGameH5Service.recentlyPlaying(uid, type);
+  				reqMap.put("list", list);
+  				reqMap.put("status", "Y");
+ 			}
+  		} catch (Exception e) {
+  			reqMap.put("status", "N");
+  			reqMap.put("info", "1003," + e.getMessage());
+  			log.error("EKGameH5Action.recentlyPlaying failed,e : " + e);
+  		}
+  		out = JSONObject.fromObject(reqMap).toString();
+  		return "success";
+  	}
+  	
+  	// 根据分类id获取具体某一分类中的游戏(H5)
+   	public String h5GamesInCategory(){
+   		Map<String, Object> reqMap = new HashMap<String, Object>();
+   		// 获取请求参数
+   		String cid = this.getParameter("cid");// 分类id
+   		String pageindex = this.getParameter("pageindex");// 页码
+   		log.info("into EKGameH5Action.h5GamesInCategory");
+   		log.info("cid = " + cid + ", pageindex = " + pageindex);
+   		try {
+   			// 分类中的游戏
+   			List<Map<String, Object>> list = eKGameH5Service.h5GamesInCategory(cid,pageindex);
+   			reqMap.put("list", list);
+   			reqMap.put("status", "Y");
+   		} catch (Exception e) {
+   			reqMap.put("status", "N");
+   			reqMap.put("info", "1003," + e.getMessage());
+   			log.error("EKGameH5Action.h5GamesInCategory failed,e : " + e);
+   		}
+   		out = JSONObject.fromObject(reqMap).toString();
+   		return "success";
+   	}
+
+	/**
+	 *
+	 * @Description: 小游戏搜索
+	 * @return
+	 */
+	public String searchH5() {
+		// String imei,String content,Date date
+		if ( log.isDebugEnabled() ) {
+			log.debug( "into searchH5..." );
+		}
+		String imei = getParameter( "imei" ), content = getParameter( "content" ), sDate = getParameter( "date" ), sUid = getParameter( "uid" ), type = getParameter( "type" );
+		List<Map<String, Object>> list = null;
+		Map<String, Object> retMap = new HashMap<String, Object>();
+		Date date = new Date();
+		int uid = -1;
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( "imei ->" + imei + " content ->" + content + " date ->"
+					+ sDate );
+		}
+
+		if(StringUtil.isEmpty(type)) {
+			type = "0";
+		}
+
+		if ( StringUtil.isEmpty( imei ) || StringUtil.isEmpty( content ) ) {
+			retMap.put( IGameConst.STATUS, IGameConst.NO );
+			retMap.put( IGameConst.INFO, IGameConst._1001 );
+		} else {
+			try {
+				if ( !StringUtil.isEmpty( sDate ) ) {
+					date = ApDateTime
+							.getDate(sDate, "yyyy-MM-dd HH:mm:ss.SSS");
+				}
+				if(!isEmpty( sUid )) {
+					uid = Integer.parseInt( sUid );
+				}
+
+				list = eKGameH5Service.searchH5(uid, imei, content, date, type);
+
+				if ( null == list ) {
+					list = new ArrayList<Map<String, Object>>();
+				}
+
+				if ( list.size() >= 1 ) {
+					list = JSONUtil.clobToString(list);
+				}
+
+				retMap.put( "apps", list );
+				retMap.put( IGameConst.STATUS, IGameConst.YES );
+				retMap.put( IGameConst.INFO, IGameConst._1002 );
+			} catch ( Exception e ) {
+				log.error( e.getMessage() );
+				retMap.put( IGameConst.STATUS, IGameConst.NO );
+				retMap.put( IGameConst.INFO, IGameConst._1003 );
+			}
+		}
+
+		try {
+			writeToResponse( JSONObject.fromObject( retMap ).toString() );
+		} catch ( IOException e ) {
+			log.error( e.getMessage() );
+		}
+
+		return NONE;
+	}
+
+	/**
+	 * 获取H5游戏信息
+	 * @return
+	 */
+	public String getH5GameById() {
+		if ( log.isDebugEnabled() ) {
+			log.debug( "into getH5GameById..." );
+		}
+
+		String id = getParameter( "id" );
+		Map<String, Object> objectMap = null;
+		Map<String, Object> retMap = new HashMap<String, Object>();
+
+		if ( StringUtil.isEmpty( id ) ) {
+			retMap.put( IGameConst.STATUS, IGameConst.NO );
+			retMap.put( IGameConst.INFO, IGameConst._1001 );
+		} else {
+			try {
+				objectMap = eKGameH5Service.getH5GameById(id);
+
+				objectMap = JSONUtil.clobToString(objectMap);
+
+				retMap.put( "h5Game", objectMap );
+				retMap.put( IGameConst.STATUS, IGameConst.YES);
+				retMap.put(IGameConst.INFO, IGameConst._1002 );
+			} catch ( Exception e ) {
+				log.error( e.getMessage() );
+				retMap.put( IGameConst.STATUS, IGameConst.NO);
+				retMap.put(IGameConst.INFO, IGameConst._1003 );
+			}
+		}
+
+		try {
+			writeToResponse( JSONObject.fromObject( retMap ).toString() );
+		} catch ( IOException e ) {
+			log.error( e.getMessage() );
+		}
+
+		return NONE;
+	}
+}

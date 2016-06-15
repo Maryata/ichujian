@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="detail">
+		<!-- 添加了islive=1 -->
+	<!-- 活动详情 -->
+	<select id="getActivityDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	<![CDATA[
+
+	  select c_id,c_imageurl,c_title,C_GRADE,C_QUOTA,c_sdate,c_edate,c_detailurl,C_PUBLISHER,c_joinurl,c_webviewurl,c_brandid,c_cname,c_logourl,c_ename,nvl(count,0) count,industryname from (
+select t.c_id,t.c_imageurl,t.c_title,t.C_GRADE,t.C_QUOTA,t.c_sdate,t.c_edate,t.c_detailurl,t.C_PUBLISHER,t.c_joinurl,t.c_webviewurl,t.c_brandid,a.c_cname,a.c_logourl,a.c_ename,i.c_name industryname 
+       from T_ACTIVITY_BASE_INFO t ,T_ACTIVITY_BRAND_INFO a,t_activity_industry_type i
+       where  t.c_islive=1 and t.c_brandid =to_char(a.c_id) and t.c_id=#activityid# and a.c_industryid=to_char(i.c_id)) a1 left join
+      (select s.c_indexid,count(s.c_indexid) count from T_ACTIVITY_USER_SELECT s group by s.c_indexid) a2 on a1.c_id=a2.c_indexid
+	]]>
+	</select>
+	
+	<!-- 我要参加,收藏等接口 -->
+	<insert id="joinActivityAndCollectionToShare"  parameterClass="java.util.HashMap">
+		<![CDATA[
+			insert into T_ACTIVITY_MEMBER_ACTIVITY (c_id,c_uid,c_activity_id,c_type,c_state,c_date)
+			values(SEQ_ACTIVITY_MEMBER_ACTIVITY.nextval,#uid#,#activityid#,#type#,1,#date#)
+		]]>
+	</insert>
+
+	<!-- 品牌详情 -->
+	<!--
+	<select id="brandDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select t.c_logourl,t.c_cname,t.c_ename ,t.c_abstract from T_ACTIVITY_BRAND_INFO t where t.c_id =#brandid#
+		]]>
+	</select> 
+	
+	-->
+	<select id="brandDetail" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select t.c_cname,t.c_ename,t.c_logourl,t.c_brandurl,t.c_brandstore,t.c_weibo,t.c_foundtime,t.c_abstract,t.c_address,t.c_slogan,t.c_businessscope from T_ACTIVITY_BRAND_INFO t where t.c_id=#brandid#
+		]]>
+	</select>
+	<!-- 关注品牌的人数 -->
+	<select id="attentionNum" resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select count(*) as attentionNum from T_ACTIVITY_MEMBER_BRAND where c_brandid =#brandid# and c_type =1 and c_state=1
+		]]>
+	</select>	
+	
+	
+	<!--  参加活动的人数-->
+	<select id="jionNum" resultClass="int"
+		parameterClass="java.util.HashMap">
+		<![CDATA[
+			select count(*) as jionNum from T_ACTIVITY_MEMBER_ACTIVITY where c_activity_id =#activityid# and c_type =1 and c_state=1
+		]]>
+	</select>
+	
+	<!-- 品牌关注 -->
+	<insert id="brandAttention" parameterClass="java.util.HashMap">
+		<![CDATA[
+			insert into T_ACTIVITY_MEMBER_BRAND (c_id,c_uid,c_brandid,c_date,c_islive,c_type,c_state) values(
+				SEQ_ACTIVITY_MEMBER_BRAND.nextval,#uid#,#brandid#,#date#,1,#type#,1
+			)
+		]]>
+	</insert>
+	<!-- 品牌取消关注 -->	
+	<update id="brandCancelAttention" parameterClass="java.util.HashMap">
+		<![CDATA[
+			update T_ACTIVITY_MEMBER_BRAND set c_state=#state# where c_type=#type# and c_uid=#uid# and c_brandid=#brandid#
+		]]>		
+	</update>
+	
+	<!-- 是否关注品牌 -->
+	<select id="isAttention" parameterClass="java.util.HashMap" resultClass="int">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_MEMBER_BRAND  where c_type=1 and c_uid=#uid# and c_state=1 and c_brandid=#brandid#  
+		]]>
+	</select>
+	
+	<!-- 是否参加 收藏该活动 -->
+	<select id="isJionOrCollect"  resultClass="java.util.HashMap" 
+			parameterClass="java.util.HashMap">
+		<![CDATA[
+			select c_type from T_ACTIVITY_MEMBER_ACTIVITY where c_uid=#uid# and c_activity_id=#activityid# and c_state=1 group by c_type 
+		]]>
+	</select>
+	
+
+	<!-- 品牌相关活动及分页 -->
+	<!--
+	<select id="brandAboutActivity" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	<![CDATA[
+			    select * from 
+			     (select tab.c_id,tab.c_title,tab.c_sdate,tab.c_content,tab.c_edate,tab.c_cname,tab.brandImage,tab.activityImage ,rownum rn from
+			          (select t.c_id,t.c_title,t.c_content,t.c_sdate,t.c_edate,b.c_cname,b.c_logourl as brandImage,t.c_imageurl as activityImage from T_ACTIVITY_BASE_INFO t,T_ACTIVITY_BRAND_INFO b
+			           where t.c_brandid=#brandid# and t.c_cityid=#cityid# and t.c_brandid =b.c_id  order by t.c_id desc ) tab
+			           where rownum<=#page#+20) 
+			           where rn>#page#
+			           
+			           
+			           
+			           
+			            select * from (select rownum rn,t.c_id,t.c_tile,t.c_sdate,t.c_edate,b.c_cname,t.c_imageurl,t.c_ from T_ACTIVITY_BASE_INFO t,T_ACTIVITY_BUSINESS_INFO b where t.c_businessid=b.c_id )
+ where rn>0 and rn<=2    
+	]]>
+	</select>
+	-->
+	<!-- 添加了islive=1 -->
+	<select id="brandAboutActivity" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	<![CDATA[
+select * from (
+select rn,c_id,c_title,c_sdate,c_edate,c_imageurl,c_grade,bid,c_cname,nvl(counts,0) as count from (
+select rownum rn,t.c_id,t.c_title,t.c_sdate,t.c_edate,t.c_imageurl,t.c_grade,b.c_id bid,b.c_cname from 
+ 							T_ACTIVITY_BASE_INFO t,t_activity_brand_info b 
+ 							where t.c_islive=1 and t.c_brandid=b.c_id  and t.c_brandid=#brandid# order by t.c_id desc) a1 left join 
+              (select s.c_indexid,count(s.c_indexid) counts from T_ACTIVITY_USER_SELECT s where s.c_type=1 and s.c_action=0 group by s.c_indexid) a2 
+              on a1.c_id=a2.c_indexid
+ 					) a3 where a3.rn>#page# and a3.rn<=#page#+20
+	]]>
+	</select>
+	<!-- 是否第一次关注品牌 -->
+	<select id="isExit" resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_MEMBER_BRAND where c_uid=#uid# and c_brandid =#brandid#
+		]]>
+	</select>
+	
+	<!-- 取消收藏 -->
+	<update id="activityCancel" parameterClass="java.util.HashMap">
+		<![CDATA[
+			update T_ACTIVITY_MEMBER_ACTIVITY set c_state=#state# where c_type=#activityType# and c_uid=#uid# and c_activity_id=#activityid#
+		]]>
+	</update>
+	<!-- 是否第一次收藏 -->
+	<select id="isExitCollection" parameterClass="java.util.HashMap" resultClass="int">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_MEMBER_ACTIVITY where c_uid=#uid# and c_activity_id =#activityid# and c_type=#type#
+		]]>
+	</select>
+	<!-- 查询是否存在有效收藏记录 -->
+	<select id="isFavoriteAct" parameterClass="java.util.HashMap" resultClass="int">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_MEMBER_ACTIVITY where c_uid=#uid# and c_activity_id =#activityid# and c_type=#type# and C_STATE=1
+		]]>
+	</select>
+	
+	<!-- 活动分类接口 -->
+	<select id="activitySort"  resultClass="java.util.HashMap">
+		<![CDATA[
+			select t.c_id,t.c_name,t.c_picurl from T_ACTIVITY_INDUSTRY_TYPE t where t.c_islive=1 order by t.c_order 
+		]]>
+	</select>
+	<!--
+	
+	 用户行为统计数量接口 
+	<select id="userActionNum" resultClass="int" parameterClass="java.util.HashMap">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_USER_SELECT t where t.c_indexid=#indexid# and t.c_action=#action# and t.c_type=#type#
+		]]>		
+	</select>
+	
+
+	-->
+	
+	<!--
+	 用户行为接口 
+	<insert id="userAction" parameterClass="java.util.HashMap">
+		<![CDATA[
+			insert into T_ACTIVITY_USER_SELECT (c_id,c_uid,c_type,c_action,c_date,c_indexid) values(
+				SEQ_ACTIVITY_USER_SELECT.NEXTVAL,#uid#,#type#,#action#,#date#,#indexid#
+			)
+		]]>		
+	</insert>
+
+	-->
+	<!-- 记录活动浏览 -->
+	<insert id="record" parameterClass="java.util.HashMap">
+		<![CDATA[
+			insert into T_ACTIVITY_USER_SELECT (c_id,c_uid,c_type,c_action,c_date,c_indexid) values(
+				SEQ_ACTIVITY_USER_SELECT.nextval,#imei#,1,0,#date#,#activityid#)
+		]]>
+	</insert>
+	
+	<!-- 记录品牌浏览 -->
+	<insert id="record2" parameterClass="java.util.HashMap">
+		<![CDATA[
+			insert into T_ACTIVITY_USER_SELECT (c_id,c_uid,c_type,c_action,c_date,c_indexid) values(
+				SEQ_ACTIVITY_USER_SELECT.nextval,#imei#,0,0,#date#,#activityid#)
+		]]>
+	</insert>	
+ </sqlMap>
+

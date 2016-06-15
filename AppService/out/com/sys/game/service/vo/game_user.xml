@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="gameUser">
+	<!-- 查询第三方绑定状态 -->
+	<select id="getBindingInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_LOGINTYPE,T.C_STATE FROM T_GAME_MEMBER_INFO T 
+		WHERE T.C_ID=#UID# AND T.C_ISLIVE=1
+		]]> 
+	</select>
+	<!-- 查询state=1的用户信息 -->
+	<select id="getRegisterInfo" parameterClass="string" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT * FROM T_GAME_MEMBER_INFO T WHERE T.C_ID=#UID# AND T.C_ISLIVE=1 AND T.C_STATE = 1
+		]]> 
+	</select>
+	<!-- 查询用户是否已经做过一次性任务（上传头像、修改昵称、修改性别、修改手机号、绑定第三方） -->
+	<select id="haveCompleted" parameterClass="string" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_TID
+		  FROM T_GAME_MEMBER_TASK T
+		 WHERE T.C_UID = #UID#
+		   AND T.C_TID IN (1, 14, 15, 16, 17, 18, 19)
+		 GROUP BY T.C_TID
+		]]> 
+	</select>
+	<!-- 查询用户是否已经做过一次性任务（上传头像、修改昵称、修改性别、修改手机号、绑定第三方） -->
+	<select id="showGetScore" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = #TID#
+		]]>
+	</select>
+	<!-- 查询用户信息 -->
+	<select id="getUserInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		select t.c_id,t.c_regid,t.c_nickname,t.c_logintype,t.c_phonenum,t.c_sex,t.c_headimage from T_GAME_MEMBER_INFO t 
+		where t.c_id=#uid# and t.c_islive=1 and t.c_state=1
+		]]>
+	</select>
+	<!-- 修改用户头像 -->
+	<update id="updateHead" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_HEADIMAGE = #HEADIMAGE#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 设置新密码 -->
+	<update id="setNewPwd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_PASSWORD = #PWD#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 根据手机号查询用户信息 -->
+	<select id="findByPhone"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 将指定手机号和类型对应的其他验证码置为无效 -->
+	<update id="invalidatedOther" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_VALIDATE_CODE
+		   SET C_ISLIVE = 0
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_TYPE = #TYPE#
+		]]> 
+	</update>
+	<!-- 校验验证码是否正确 -->
+	<select id="isUsableCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_VALIDATE_CODE T
+		 WHERE T.C_DATE >= TO_DATE(#DATE#, 'yyyy-MM-dd HH24:MI:SS')
+		   AND T.C_CODE = #VALICODE#
+		   AND T.C_TYPE = #TYPE#
+		   AND T.C_PHONENUM = #PHONENUM#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 保存验证码 -->
+	<insert id="insertValicode" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_VALIDATE_CODE
+		  (C_ID,
+		   C_IMEI,
+		   C_DATE,
+		   C_CODE,
+		   C_TYPE,
+		   C_ISLIVE,
+		   C_PHONENUM)
+		VALUES
+		  (SEQ_GAME_VALIDATE_CODE.NEXTVAL,
+		   #IMEI#,
+		   #DATE#,
+		   #CODE#,
+		   #TYPE#,
+		   1,
+		   #PHONENUM#)
+		]]> 
+	</insert>
+	<!-- 获取当天发送的验证码 -->
+	<select id="getValiCode"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_VALIDATE_CODE
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_TYPE = #TYPE#
+		   AND TO_CHAR(C_DATE, 'yyyy-MM-dd') = #DATE#
+		]]> 
+	</select>
+	<!-- 修改手机号 -->
+	<update id="updatePhonenum" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO T
+  		   SET T.C_PHONENUM = #PHONENUM#, C_ACTIONDATE = #DATE#
+		 WHERE T.C_ID = #UID#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 第三方注册账号绑定手机后，生成logintype为0的数据 -->
+	<insert id="chujianUser" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_INFO(C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_NICKNAME)
+		VALUES(#UID#,'ICJ'||SEQ_GAME_MEMBER_REG.NEXTVAL,#LOGINTYPE#,#PHONENUM#,#PWD#,1,#DATE#,0,#NICKNAME#)
+		]]> 
+	</insert>
+	<!-- 绑定手机 -->
+	<update id="bindPhone" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_PHONENUM = #PHONENUM#, C_ACTIONDATE = #ACTIONDATE#, C_PASSWORD = #PWD#
+		 WHERE C_ID = #UID#
+		   AND C_LOGINTYPE = #LOGINTYPE#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 编辑用户信息（只修改昵称和性别） -->
+	<update id="editUserInfo" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_NICKNAME = #NICKNAME#, C_SEX = #SEX#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 修改密码 -->
+	<update id="modifyPwd" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_INFO
+		   SET C_PASSWORD = #NPWD#, C_ACTIONDATE = #ACTIONDATE#
+		 WHERE C_ID = #UID#
+		   AND C_LOGINTYPE = 0
+		   AND C_PASSWORD = #OPWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</update>
+	<!-- 根据用户id和密码查询用户信息 -->
+	<select id="findUserByUidNPwd"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO
+		 WHERE C_ID = #UID#
+		   AND C_PASSWORD = #PWD#
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 更新其他第三方登录非最新 -->
+	<update id="updateIsNotLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_IMEI T
+  		   SET T.C_ISLOGIN = 0
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_REGID != #REGID#
+		]]> 
+	</update>
+	<!-- 新增当前第三方登录记录（IMEI） -->
+	<insert id="insertImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_IMEI
+		  (C_ID,
+		   C_REGID,
+		   C_IMEI,
+		   C_ISLOGIN,
+		   C_ISPWD,
+		   C_ISFIRSTLOGIN,
+		   C_ACTIONDATE,
+		   C_UID)
+		VALUES
+		  (SEQ_GAME_MEMBER_IMEI.NEXTVAL,
+		   #REGID#,
+		   #IMEI#,
+		   1,
+		   0,
+		   #ISFIRSTLOGIN#,
+		   #ACTIONDATE#,
+		   #UID#)
+		]]> 
+	</insert>
+	<!-- 查询是否是第一次登录 -->
+	<select id="isFirstLogin"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_IMEI
+		 WHERE C_REGID = #REGID#
+		   AND C_IMEI = #IMEI#
+		   AND C_UID = #UID#
+		]]> 
+	</select>
+	<!-- 更新当前第三方登录为最新    2015-12-16 不修改 C_ISFIRSTLOGIN = 0 -->
+	<update id="updateIsLogin" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_GAME_MEMBER_IMEI T
+  		   SET T.C_ISLOGIN = 1
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_REGID = #REGID#
+		]]> 
+	</update>
+	<!-- 根据注册id和imei查询IMEI是否有记录 -->
+	<select id="getMemberImei"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_IMEI
+		 WHERE C_REGID = #REGID#
+		   AND C_IMEI = #IMEI#
+		]]> 
+	</select>
+	<!-- 根据手机号和密码查询用户信息 -->
+	<select id="login"
+		resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO
+		 WHERE C_PHONENUM = #PHONENUM#
+		   AND C_PASSWORD = #PWD#
+		   AND C_LOGINTYPE = 0
+		   AND C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 保存用户登录IMEI -->
+	<insert id="regImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_GAME_MEMBER_IMEI (C_ID,C_REGID,C_IMEI,C_ISPWD,C_VALIDATECODE,C_ISFIRSTLOGIN,C_ACTIONDATE,C_UID) 
+		VALUES (SEQ_GAME_MEMBER_IMEI.NEXTVAL,#REGID#,#IMEI#,0,#VALICODE#,1,#DATE#,#UID#)
+		]]> 
+	</insert>
+	<!-- 生成默认昵称defaultNickname -->
+    <update id="defaultNickname" parameterClass="java.util.HashMap">     
+		UPDATE T_GAME_MEMBER_INFO SET C_NICKNAME = #NICKNAME# WHERE C_REGID = #REGID# 
+    </update>
+    <!-- 查询用户id -->
+	<select id="getUid" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT T.C_ID
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_LOGINTYPE = #TYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 用户注册 -->
+    <insert id="register" parameterClass="java.util.HashMap">     
+    <selectKey resultClass="java.lang.String" type="pre" keyProperty="ID" >     
+        SELECT SEQ_GAME_MEMBER_REG.nextval AS VALUE FROM DUAL     
+    </selectKey>     
+		INSERT INTO T_GAME_MEMBER_INFO (C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_SEX) 
+		VALUES (SEQ_GAME_MEMBER_INFO.NEXTVAL,'ICJ'||#ID#,0,#PHONENUM#,#PWD#,1,#DATE#,1,0)
+    </insert>
+	<!-- 触键用户：保存用户登录IMEI -->
+	<insert id="regImeiCj" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_CJ_MEMBER_IMEI (C_ID,C_REGID,C_IMEI,C_ISPWD,C_VALIDATECODE,C_ISFIRSTLOGIN,C_ACTIONDATE,C_UID) 
+		VALUES (SEQ_MEMBER_IMEI.NEXTVAL,#REGID#,#IMEI#,0,#VALICODE#,1,#DATE#,#UID#)
+		]]> 
+	</insert>
+	<!-- 触键用户：生成默认昵称defaultNickname -->
+    <update id="defaultNicknameCj" parameterClass="java.util.HashMap">     
+		UPDATE T_CJ_MEMBER_INFO SET C_NICKNAME = #NICKNAME# WHERE C_REGID = #REGID# 
+    </update>
+    <!-- 触键用户：查询用户id -->
+	<select id="getUidCj" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT T.C_ID
+		  FROM T_CJ_MEMBER_INFO T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_LOGINTYPE = #TYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 触键用户：用户注册 -->
+    <insert id="registerCj" parameterClass="java.util.HashMap">     
+    <selectKey resultClass="java.lang.String" type="pre" keyProperty="ID" >     
+        SELECT SEQ_MEMBER_REG.nextval AS VALUE FROM DUAL     
+    </selectKey>     
+		INSERT INTO T_CJ_MEMBER_INFO (C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_SEX) 
+		VALUES (SEQ_MEMBER_INFO.NEXTVAL,'ICJ'||#ID#,0,#PHONENUM#,#PWD#,1,#DATE#,1,0)
+    </insert>
+    <!-- 解绑第三方账号 -->
+	<delete id="unBindExternal" parameterClass="java.util.HashMap">
+		<![CDATA[
+		DELETE FROM T_GAME_MEMBER_INFO WHERE C_ID=#UID# AND C_LOGINTYPE=#LOGINTYPE#
+		]]> 
+	</delete>
+	<!-- 查询当前第三方账号是否是第一次登录的账号 -->
+	<select id="isFirstInfo" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		<![CDATA[
+		SELECT C_STATE FROM T_GAME_MEMBER_INFO T WHERE T.C_ID = #UID# AND T.C_LOGINTYPE = #LOGINTYPE# AND T.C_ISLIVE=1 
+		]]> 
+	</select>
+	<!-- 保存第三方数据（无手机号） -->
+	<insert id="bindExternal" parameterClass="java.util.HashMap">
+		INSERT INTO T_GAME_MEMBER_INFO
+		  (C_ID,
+		   C_REGID,
+		   C_NICKNAME,
+		   C_LOGINTYPE,
+		   C_SEX,
+		   C_AGE,
+		   C_HEADIMAGE,
+		   C_ISLIVE,
+		   C_ACTIONDATE,
+		   C_STATE)
+		VALUES
+		  (#UID#,
+		   #REGID#,
+		   #NICKNAME#,
+		   #LOGINTYPE#,
+		   #SEX#,
+		   #AGE#,
+		   #HEADIMAGE#,
+		   1,
+		   #ACTIONDATE#,
+		   0)
+	</insert>
+	<!-- 保存第三方数据（有手机号） -->
+	<insert id="bindExternalWithPhone" parameterClass="java.util.HashMap">
+		INSERT INTO T_GAME_MEMBER_INFO
+		  (C_ID,
+		   C_REGID,
+		   C_NICKNAME,
+		   C_LOGINTYPE,
+		   C_PHONENUM,
+		   C_SEX,
+		   C_AGE,
+		   C_HEADIMAGE,
+		   C_ISLIVE,
+		   C_ACTIONDATE,
+		   C_STATE)
+		VALUES
+		  (#UID#,
+		   #REGID#,
+		   #NICKNAME#,
+		   #LOGINTYPE#,
+		   #PHONENUM#,
+		   #SEX#,
+		   #AGE#,
+		   #HEADIMAGE#,
+		   1,
+		   #ACTIONDATE#,
+		   0)
+	</insert>
+	<!-- 根据用户id查询是否已注册 -->
+	<select id="isRegistered" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_ID = #UID#
+		   AND T.C_LOGINTYPE = #LOGINTYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 根据注册id和第三方登录状态查询是否已经绑定过第三方账号 -->
+	<select id="isBinding" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT *
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_LOGINTYPE = #LOGINTYPE#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 新增第三方绑定信息 -->
+	<insert id="insertExternal" parameterClass="java.util.HashMap">
+		<!-- 返回用户id -->
+		<selectKey resultClass="java.lang.String" keyProperty="ID" type="pre"> 
+			SELECT SEQ_GAME_MEMBER_INFO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO T_GAME_MEMBER_INFO
+		  (C_ID,
+		   C_REGID,
+		   C_NICKNAME,
+		   C_LOGINTYPE,
+		   C_SEX,
+		   C_AGE,
+		   C_HEADIMAGE,
+		   C_ISLIVE,
+		   C_ACTIONDATE,
+		   C_STATE)
+		VALUES
+		  (#ID#,
+		   #REGID#,
+		   #NICKNAME#,
+		   #LOGINTYPE#,
+		   #SEX#,
+		   #AGE#,
+		   #HEADIMAGE#,
+		   1,
+		   #ACTIONDATE#,
+		   1)
+	</insert>
+	<!-- 根据regid和imei查询登录与手机对应关系信息 -->
+	<select id="findInfoByRegidNImei" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+		<![CDATA[
+		SELECT count(*)
+		  FROM T_GAME_MEMBER_IMEI T
+		 WHERE T.C_REGID = #REGID#
+		   AND T.C_IMEI = #IMEI#
+		]]> 
+	</select>
+	<!-- 根据第三方登录状态和regid查询用户id -->
+	<select id="getExternal" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT T.C_ID
+		  FROM T_GAME_MEMBER_INFO T
+		 WHERE T.C_LOGINTYPE = #LOGINTYPE#
+		   AND T.C_REGID = #REGID#
+		   AND T.C_ISLIVE = 1
+		]]> 
+	</select>
+	<!-- 获取游戏提示语 -->
+	<select id="gameCue" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT C_TITLE FROM T_GAME_TITLE_INFO T WHERE T.C_ISLIVE = 1
+		]]>
+	</select>
+	<!-- 获取用户头像 -->
+	<select id="userHeadImg" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+			SELECT T.C_NICKNAME, T.C_PHONENUM, T.C_REGID, T.C_HEADIMAGE
+			  FROM T_GAME_MEMBER_INFO T
+			 WHERE T.C_ISLIVE = 1
+			   AND T.C_ID = #UID#
+			   AND T.C_STATE = 1
+		]]>
+	</select>
+
+	<!--用户总积分/趣币-->
+	<select id="totalScore" resultClass="java.lang.Integer">
+		SELECT C_SCORE FROM T_GAME_MEMBER_SCORE WHERE C_UID = #uid#
+	</select>
+	<!--用户礼包总数-->
+	<select id="getTotalGift" resultClass="java.lang.Integer">
+		SELECT COUNT(1)
+		  FROM T_GAME_MEMBER_GIFTS T, T_GAME_GIFTS_INFO I
+		 WHERE I.C_ISLIVE = 1
+		   AND T.C_UID = #UID#
+		   AND T.C_TYPE = 1
+		   AND T.C_GID = I.C_ID
+		   AND I.C_EDATE > SYSDATE
+	</select>
+	<!--用户消息总数-->
+	<select id="getTotalMess" resultClass="java.lang.Integer">
+		SELECT COUNT(1) FROM T_GAME_MEMBER_MESSAGE T WHERE T.C_UID = #UID# AND T.C_TYPE = 0
+	</select>
+	<!--用户积分记录（获取、消耗）-->
+	<select id="listScore" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (select t0.c_count,
+       t0.c_date,
+       t1.c_type,
+       t1.c_name,
+       t1.c_subname,
+       t1.c_link,
+       t1.c_logo,
+       t1.c_title
+  from t_game_member_task t0
+  left join t_game_task t1
+    on t0.c_tid = t1.c_id
+ where t0.c_uid = #uid#
+ order by t0.c_date desc
+) T
+         WHERE ROWNUM &lt;= #maxRows#)
+ WHERE RN &gt;= #startingIndex#
+	</select>
+	<!--获取消息-->
+	<select id="getMessage" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		SELECT *
+		FROM (SELECT T.*, ROWNUM RN
+		FROM (select t.c_id,
+       t.c_uid,
+       t.c_mess,
+       t.c_img,
+       t.c_type,
+       t.c_date,
+       t.c_replied,
+       t1.c_headimage
+  from t_game_member_message t
+  left join t_game_member_info t1
+    on t.c_uid = t1.c_id
+ where t.c_uid = #uid#
+   and t1.c_islive = '1'
+   and t1.c_state = '1'
+		order by c_date desc) T
+		WHERE ROWNUM &lt;= #maxRows#)
+		WHERE RN &gt;= #startingIndex#
+	</select>
+	<!--用户给客服发消息-->
+	<insert id="contactServiceRoute" parameterClass="java.util.HashMap">
+		insert into t_game_member_message
+		  (c_id, c_uid, c_mess, c_img, c_type, c_date, c_replied)
+		values
+		  (SEQ_GAME_MEMBER_MESSAGE.nextVal, #uid#, #message#, #img#, 1, sysdate, 0)
+	</insert>
+	<!-- 查询用户是否已经做过一次性任务（上传头像） -->
+	<select id="upLoadHeadImg" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = 1
+		]]>
+	</select>
+	<!-- 查询用户是否已经做过一次性任务（修改昵称） -->
+	<select id="changeNickname" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = 14
+		]]>
+	</select>
+	<!-- 查询用户是否已经做过一次性任务（绑定手机号） -->
+	<select id="boundPhone" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = 19
+		]]>
+	</select>
+	<!-- 查询用户是否已经做过一次性任务（绑定QQ） -->
+	<select id="bindQq" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = 15
+		]]>
+	</select>
+
+	<!-- 查询用户是否已经做过一次性任务（绑定微信） -->
+	<select id="bindWeChat" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = 16
+		]]>
+	</select>
+
+	<!-- 查询用户是否已经做过一次性任务（绑定微博） -->
+	<select id="bindMcroBlog" parameterClass="java.util.HashMap" resultClass="Integer">
+		<![CDATA[
+		SELECT COUNT(1) FROM T_GAME_MEMBER_TASK T WHERE T.C_UID = #UID# AND T.C_TID = 17
+		]]>
+	</select>
+</sqlMap>
+

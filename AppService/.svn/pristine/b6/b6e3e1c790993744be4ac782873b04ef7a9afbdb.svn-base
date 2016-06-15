@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_shop">
+    <!--签到奖励列表-->
+    <select id="signAward" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT T.C_DAYS ,T.C_SCORE FROM T_EK_REWARD T WHERE T.C_TYPE = '1'
+    </select>
+
+    <!--连续签到奖励列表-->
+    <select id="signAwardSeries" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT T.C_DAYS ,T.C_SCORE FROM T_EK_REWARD T WHERE T.C_TYPE = '2'
+    </select>
+
+    <!--累计签到天数-->
+    <select id="signCountDay" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+
+
+        SELECT COUNT(1) FROM T_EK_MEMBER_SIGN T
+        WHERE C_UID =#uid#
+        AND extract(month from T.C_DATE)=extract(month from SYSDATE)
+        AND extract(year from T.C_DATE)=extract(year from SYSDATE)
+
+
+        ]]>
+    </select>
+
+    <!--签到详情列表-->
+    <select id="signDettail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT T.C_DATE FROM T_EK_MEMBER_SIGN T
+        WHERE C_UID =#uid#
+        AND extract(month from T.C_DATE)=extract(month from SYSDATE)
+        AND extract(year from T.C_DATE)=extract(year from SYSDATE)
+    </select>
+
+    <!--可用积分-->
+    <select id="availableIntegral" parameterClass="java.util.HashMap" resultClass="Integer">
+        SELECT C_SCORE FROM T_EK_MEMBER_SCORE WHERE C_UID=#uid#
+    </select>
+
+    <!--可获得积分-->
+    <select id="securableIntegral" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+
+
+
+        SELECT SUM(SC.C_SCORE) FROM  (
+        SELECT T.C_ID, T.C_TYPE,T.C_NAME,T.C_SCORE,'0' AS STATUS
+        FROM T_EK_TASK T
+        WHERE T.C_TYPE='1' AND T.C_ISLIVE='1'
+        AND NOT EXISTS(SELECT TEMT.C_TID FROM T_EK_MEMBER_TASK TEMT WHERE TEMT.C_TID=T.C_ID AND TEMT.C_UID=#uid#)
+        UNION
+        SELECT T.C_ID, T.C_TYPE,T.C_SUBNAME AS C_NAME,T.C_SCORE,'0' AS STATUS
+        FROM T_EK_TASK_RANDOM TETR LEFT JOIN T_EK_TASK T ON T.C_ID=TETR.C_TID WHERE T.C_ISLIVE='1'
+        AND NOT EXISTS(
+        SELECT TEMT.C_TID FROM T_EK_MEMBER_TASK TEMT
+        LEFT JOIN T_EK_TASK_RANDOM TETR ON
+        TETR.C_TID=TEMT.C_TID  WHERE TEMT.C_TID=T.C_ID AND TEMT.C_UID=#uid#)
+        UNION
+        SELECT T.C_ID, T.C_TYPE,T.C_SUBNAME AS C_NAME,T.C_SCORE,'0' AS STATUS
+        FROM T_EK_TASK_SPECIAL TETS LEFT JOIN T_EK_TASK T ON T.C_ID=TETS.C_TID
+        WHERE T.C_ISLIVE='1' AND  TETS.C_SDATE <= SYSDATE AND SYSDATE <= TETS.C_EDATE
+        AND NOT EXISTS(
+        SELECT TEMT.C_TID FROM T_EK_MEMBER_TASK TEMT
+        LEFT JOIN T_EK_TASK_SPECIAL TETS ON
+        TETS.C_TID=TEMT.C_TID  WHERE TEMT.C_TID=T.C_ID AND TEMT.C_UID=#uid#)
+        ) SC
+
+
+
+        ]]>
+    </select>
+
+    <!--我的任务列表-->
+    <select id="task" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+
+        SELECT T.C_ID, T.C_TYPE,T.C_NAME,T.C_SCORE,'0' AS STATUS
+        FROM T_EK_TASK T
+        WHERE T.C_TYPE='1' AND T.C_ISLIVE='1'
+        AND NOT EXISTS(SELECT TEMT.C_TID FROM T_EK_MEMBER_TASK TEMT WHERE TEMT.C_TID=T.C_ID AND TEMT.C_UID=#uid#)
+        UNION
+        SELECT T.C_ID, T.C_TYPE,T.C_NAME,T.C_SCORE,'1' AS STATUS
+        FROM T_EK_MEMBER_TASK TEMT LEFT JOIN T_EK_TASK T ON T.C_ID = TEMT.C_TID  AND T.C_ISLIVE='1'
+        WHERE TEMT.C_UID=#uid# AND  T.C_TYPE='1'
+        UNION
+        SELECT T.C_ID, T.C_TYPE,T.C_SUBNAME AS C_NAME,T.C_SCORE,'0' AS STATUS
+        FROM T_EK_TASK_RANDOM TETR LEFT JOIN T_EK_TASK T ON T.C_ID=TETR.C_TID WHERE T.C_ISLIVE='1'
+        AND NOT EXISTS(
+        SELECT TEMT.C_TID FROM T_EK_MEMBER_TASK TEMT
+        LEFT JOIN T_EK_TASK_RANDOM TETR ON
+        TETR.C_TID=TEMT.C_TID  WHERE TEMT.C_TID=T.C_ID AND TEMT.C_UID=#uid#)
+        UNION
+        SELECT  T.C_ID, T.C_TYPE,T.C_SUBNAME AS C_NAME,T.C_SCORE,'1' AS STATUS  FROM T_EK_TASK_RANDOM TETR
+        LEFT JOIN T_EK_MEMBER_TASK TEMT ON TETR.C_TID = TEMT.C_TID
+        LEFT JOIN T_EK_TASK T ON T.C_ID=TEMT.C_TID AND T.C_ISLIVE='1'
+        WHERE TEMT.C_UID=#uid#
+        UNION
+        SELECT T.C_ID, T.C_TYPE,T.C_SUBNAME AS C_NAME,T.C_SCORE,'0' AS STATUS
+        FROM T_EK_TASK_SPECIAL TETS LEFT JOIN T_EK_TASK T ON T.C_ID=TETS.C_TID
+        WHERE T.C_ISLIVE='1' AND  TETS.C_SDATE <= SYSDATE AND SYSDATE <= TETS.C_EDATE
+        AND NOT EXISTS(
+        SELECT TEMT.C_TID FROM T_EK_MEMBER_TASK TEMT
+        LEFT JOIN T_EK_TASK_SPECIAL TETS ON
+        TETS.C_TID=TEMT.C_TID  WHERE TEMT.C_TID=T.C_ID AND TEMT.C_UID=#uid#)
+        UNION
+        SELECT  T.C_ID, T.C_TYPE,T.C_SUBNAME AS C_NAME,T.C_SCORE,'1' AS STATUS  FROM T_EK_TASK_SPECIAL TETS
+        LEFT JOIN T_EK_MEMBER_TASK TEMT ON TETS.C_TID = TEMT.C_TID
+        LEFT JOIN T_EK_TASK T ON T.C_ID=TEMT.C_TID AND T.C_ISLIVE='1'
+        WHERE TEMT.C_UID=#uid#
+
+
+
+        ]]>
+    </select>
+
+    <!--邀请人数-->
+    <select id="inviteNumber" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+
+
+        SELECT COUNT(1) FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_INVITECODE=(SELECT TEMI.C_REGID FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_ID = #uid# AND TEMI.C_ISLIVE='1')
+
+
+        ]]>
+    </select>
+
+
+    <!--我的邀请码-->
+    <select id="inviteCode" parameterClass="java.util.HashMap" resultClass="String">
+        SELECT TEMI.C_REGID FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_ID = #uid# AND TEMI.C_ISLIVE='1'
+    </select>
+
+    <!--邀请奖励积分-->
+    <select id="inviteAward" parameterClass="java.util.HashMap" resultClass="Integer">
+        <![CDATA[
+
+        SELECT SUM(SCORE) FROM (
+        SELECT
+        (SELECT TO_CHAR(T.C_SCORE) FROM T_EK_TASK T WHERE T.C_ID='1') AS SCORE
+        FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_INVITECODE=(SELECT TEMI.C_REGID FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_ID = #uid# AND TEMI.C_ISLIVE='1')
+        UNION
+        SELECT (SELECT TO_CHAR(T.C_SCORE) FROM T_EK_TASK T WHERE T.C_ID='4') AS SCORE
+        FROM T_EK_MEMBER_INFO TEMI
+        LEFT JOIN T_EK_MEMBER_TASK TEMT ON TEMT.C_UID = TEMI.C_ID
+        WHERE TEMI.C_INVITECODE=(SELECT TEMI.C_REGID FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_ID = #uid# AND TEMI.C_ISLIVE='1') AND TEMT.C_TID='4')
+
+        ]]>
+    </select>
+
+    <!--邀请详情信息-->
+    <select id="inviteDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+        SELECT CONCAT(CONCAT('已成功邀请', REGEXP_REPLACE(C_PHONENUM,'(\d{3})(\d{4})(\d{4})','\1****\3')),'注册') AS DETEAIL ,TEMI.C_ID,
+        (SELECT TO_CHAR(T.C_SCORE) FROM T_EK_TASK T WHERE T.C_ID='1') AS SCORE
+        FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_INVITECODE=(SELECT TEMI.C_REGID FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_ID = #uid# AND TEMI.C_ISLIVE='1')
+        UNION
+        SELECT CONCAT(CONCAT('已成功邀请', REGEXP_REPLACE(C_PHONENUM,'(\d{3})(\d{4})(\d{4})','\1****\3')),'首次0元购膜') AS DETEAIL ,
+        TEMI.C_ID ,(SELECT TO_CHAR(T.C_SCORE) FROM T_EK_TASK T WHERE T.C_ID='4') AS SCORE
+        FROM T_EK_MEMBER_INFO TEMI
+        LEFT JOIN T_EK_MEMBER_TASK TEMT ON TEMT.C_UID = TEMI.C_ID
+        WHERE TEMI.C_INVITECODE=(SELECT TEMI.C_REGID FROM T_EK_MEMBER_INFO TEMI
+        WHERE TEMI.C_ID = #uid# AND TEMI.C_ISLIVE='1') AND TEMT.C_TID='4'
+
+        ]]>
+    </select>
+
+</sqlMap>
+

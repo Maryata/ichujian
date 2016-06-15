@@ -1,0 +1,172 @@
+package com.sys.feiyucloud.common;
+
+/**
+ * 飞语云常量-错误代码
+ * <p/>
+ * Created by Maryn on 2016/4/11.
+ */
+public class FeiYuCloudErrorConst {
+
+    /**
+     * 应用服务器错误代码表
+     */
+    class Server {
+        /**
+         * 授权失败，参数fyAccountId为空
+         */
+        public static final String AUTH_FAIL_NULL_ACCID = "101001";
+        /**
+         * 授权失败，参数appId为空
+         */
+        public static final String AUTH_FAIL_NULL_APPID = "101002";
+        /**
+         * 授权失败，参数au为空
+         */
+        public static final String AUTH_FAIL_NULL_AU = "101003";
+        /**
+         * 授权失败，时间戳出错
+         */
+        public static final String AUTH_FAIL_TIMESTAMP = "101004";
+        /**
+         * 授权失败，加密出错
+         */
+        public static final String AUTH_FAIL_ENCRYPT = "101005";
+        /**
+         * 授权失败，此应用不存在
+         */
+        public static final String AUTH_FAIL_UNEXISTSAPP = "101006";
+        /**
+         * 授权失败，参数appAccountId为空
+         */
+        public static final String AUTH_FAIL_NULL_APP_ACCID = "102001";
+        /**
+         * 授权失败，ip禁止
+         */
+        public static final String AUTH_FAIL_IPBAN = "102002";
+        /**
+         * 授权失败，此app不属于此sp账户
+         */
+        public static final String AUTH_FAIL_ASCRIPTION = "102003";
+        /**
+         * 此账户在此应用下已经创建过
+         */
+        public static final String ACCOUNT_EXISTING = "103001";
+        /**
+         * 此手机号码已经被其他账户绑定
+         */
+        public static final String ACCOUNT_EXISTING_PHONENUM = "103002";
+        /**
+         * 此应用下对应的账户不存在
+         */
+        public static final String ACCOUNT_UNEXISTING = "103003";
+        /**
+         * 此应用下对应的飞语账户不存在
+         */
+        public static final String FEIYU_ACCOUNT_UNEXISTING = "103004";
+        /**
+         * 此账户已经禁用
+         */
+        public static final String ACCOUNT_BAN = "103005";
+        /**
+         * 此账户已经被启用
+         */
+        public static final String ACCOUNT_ENABLE = "103006";
+        /**
+         * 超过请求话机在线最大数量
+         */
+        public static final String CALL_OVER_MAXONLINE = "103007";
+        /**
+         * 被叫不正确
+         */
+        public static final String CALL_CALLEE = "104001";
+        /**
+         * 此飞语号没有绑定手机号
+         */
+        public static final String FEIYUCLOUD_UNBOUNDED_PHONE = "104002";
+        /**
+         * 主叫必须是以86开头中国手机号码或者座机
+         */
+        public static final String CALL_CALLER_86BEGINNING = "104003";
+        /**
+         * 被叫不能是特定服务号
+         */
+        public static final String CALL_CALLEE_SPECIALNUM = "104004";
+        /**
+         * 主叫和被叫不能相同
+         */
+        public static final String CALL_CALLER_CALLEE_SAME = "104005";
+        /**
+         * 同一个主叫和被叫10秒内不能连续发起两次呼叫
+         */
+        public static final String CALL_ONCEMORE_CALL_IN10SEC = "104006";
+        /**
+         * 通话最大分钟数必须大于0
+         */
+        public static final String CALL_MAXTIME = "104007";
+        /**
+         * 没有找对对应的通话请求记录
+         */
+        public static final String CALL_REC = "104008";
+        /**
+         * 被叫不存在
+         */
+        public static final String CALL_CALLEE_UNEXISTING = "104009";
+        /**
+         * 没有配置呼叫授权地址
+         */
+        public static final String CALL_UNCONFIG_AUTHURI = "104010";
+        /**
+         * 呼叫内部错误
+         */
+        public static final String CALL_INTERNAL = "104011";
+        /**
+         * 网络请求失败
+         */
+        public static final String HTTP_REQUEST = "105001";
+        /**
+         * 网络请求app服务器失败
+         */
+        public static final String HTTP_REQUEST_APPSERVER = "105002";
+        /**
+         * 解析推送话单返回结果失败
+         */
+        public static final String HTTP_PARSE_RESAULT = "105003";
+        /**
+         * 请求交换接口出错
+         */
+        public static final String HTTP_REQUEST_EXCHANGE = "106001";
+    }
+
+    /**
+     * Android错误代码表
+     */
+    class App {
+//        300000	内部错误
+//        301000	context为空
+//        301001	飞语云应用ID为空
+//        301002	飞语云应用Token为空
+//        301003	飞语云账户ID为空
+//        301004	飞语云账户密码为空
+//        301005	渠道号为空
+//        301100	飞语云连接已断开
+//        301101	飞语云连接失败，网络异常
+//        302000	网络请求失败
+//        302001	网络异常
+//        302101	呼叫失败
+//        302102	被叫号码为空
+//        302103	显号类型错误
+//        302104	呼叫失败，未连接到飞语云
+//        302105	找不到当前电话
+//        302106	呼叫失败，正在通话中
+//        302201	被叫不在线
+//        302202	被叫拒接
+//        302203	被叫正忙
+//        302204	呼叫超时
+//        302205	呼叫间隔过短
+//        302206	呼叫受限
+//        302207	呼叫服务暂不可用
+//        302208	呼叫终止
+//        302209	呼叫失败，被叫未找到
+//        302210	开发者账户余额不足
+    }
+}

@@ -1,0 +1,237 @@
+package com.sys.commons;
+
+import com.opensymphony.xwork2.ActionSupport;
+import com.sys.util.encrypt.Base64;
+import org.apache.log4j.Logger;
+import org.apache.struts2.ServletActionContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * 定义每个action的抽象类，里面定义了模组的功能类型和常用方法
+ * <p/>
+ * add Request and response methods here.
+ *
+ * @author adam.sun
+ */
+@Controller("abstractAction")
+public class AbstractAction extends ActionSupport {
+
+    /**
+     * Logger available to subclasses
+     */
+    protected Logger log = (Logger.getLogger(getClass()));
+
+    //返回结果状态：op_code
+    //protected int op_Y = 1;
+    //protected int op_N = 0;
+
+    protected String SUCCESS = "input";
+
+	/*protected JsonConfig config = new JsonConfig();
+
+	public void setJsonInit(){
+		config.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd HH:mm:ss"));
+	}*/
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6655372714902221271L;
+    /**
+     * session存放当前登录系统的用户bean
+     */
+    public static final String AP_SYS_SESSION_LOGON_USER = "AP_SYS_SESSION_LOGON_USER";
+
+    /**
+     * 用户登录后的权限对象
+     */
+    public static final String AP_SYS_SESSION_MENUMODEL = "AP_SYS_SESSION_MENUMODEL";
+
+    /**
+     * session can be get by  request.getSession()
+     *
+     * @return
+     */
+    protected static HttpServletRequest getRequest() {
+        return ServletActionContext.getRequest();
+    }
+
+    protected static ServletContext getServletContext() {
+        return ServletActionContext.getServletContext();
+
+    }
+
+    protected static HttpServletResponse getResponse() {
+        return ServletActionContext.getResponse();
+    }
+
+    protected String getParameter(String name) {
+        String v = getRequest().getParameter(name);
+        if (v != null) {
+            v = v.trim();
+            try {
+                v = Base64.decode(v);
+            } catch (Exception e) {
+                log.error("Base64.decode failed,", e);
+            }
+        }
+        return v;
+    }
+
+    protected static InputStream getParameter3(String name) {
+        String v = getRequest().getParameter(name);
+        //String v = name;
+
+        InputStream sbs = null;
+        if (v != null) {
+            v = v.trim();
+            try {
+                byte[] b = Base64.decryptBASE64(v);
+                //byte[] b = Base64.decode(v, "");
+                for (int i = 0; i < b.length; ++i) {
+                    //调整异常数据
+                    if (b[i] < 0) {
+                        b[i] += 256;
+                    }
+                }
+                //FileOutputStream fos=new FileOutputStream(file);
+                sbs = byte2Input(b);
+                //fos.write(b);
+                //fos.close();
+            } catch (Exception e) {
+
+            }
+        }
+        return sbs;
+    }
+
+    public static final InputStream byte2Input(byte[] buf) {
+        return new ByteArrayInputStream(buf);
+    }
+
+    protected String getParameter2(String name) {
+        String v = getRequest().getParameter(name);
+        if (v != null) {
+            v = v.trim();
+        } else {
+            v = "";
+        }
+        return v;
+    }
+
+
+    protected static void printToResponse(String xmlString) throws IOException {
+        HttpServletResponse response;
+        //将生成的XML字符串发往客户端     
+        response = getResponse();
+        response.setContentType("text/xml; charset=UTF-8");
+        response.setHeader("Cache-Control", "no-cache");
+        response.getWriter().print(xmlString);
+        response.getWriter().flush();
+    }
+
+    /**
+     * @param str
+     * @throws IOException
+     */
+    public static void writeToResponse(String str) throws IOException {
+        writeToResponse(getResponse(), str);
+    }
+
+    public static void writeToResponse2(String str) {
+        try {
+            writeToResponse(getResponse(), str);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param str
+     * @throws IOException
+     */
+    public static void writeToResponse(HttpServletResponse response, String str) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        response.setHeader("Cache-Control", "no-cache");
+        response.getWriter().write(str);
+        response.getWriter().flush();
+    }
+
+
+    /**
+     * 设置登录系统的用户
+     *
+     * @param loginUser
+     */
+    public static void invalidateLoginUser() {
+        getRequest().getSession().invalidate();
+    }
+
+    /**
+     * @param beanName    在Request中取得Spring配置中的Bean
+     * @param beanIFClass 此bean的接口或实例类
+     * @return Object
+     */
+    @SuppressWarnings("unchecked")
+    public static Object getSpringBean(String beanName, @SuppressWarnings("rawtypes") Class beanIFClass) {
+        ServletContext servletContext = getRequest().getSession().getServletContext();
+        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return wac.getBean(beanName, beanIFClass);
+
+    }
+
+    public static String getRealPath(String path) {
+        return ServletActionContext.getServletContext().getRealPath(path);
+
+    }
+
+    public static String getRootPath() {
+        if (getRequest() == null) {
+            throw new RuntimeException("request is null.");
+        }
+        StringBuffer url = new StringBuffer();
+        url.append(getRequest().getScheme() + "://");
+        url.append(getRequest().getServerName());
+        if (getRequest().getServerPort() != 80)
+            url.append(":" + getRequest().getServerPort());
+        url.append(getRequest().getContextPath());
+        return url.toString();
+    }
+
+    public static String getRootPath(HttpServletRequest request) {
+        if (request == null) {
+            throw new RuntimeException("request is null.");
+        }
+        StringBuffer url = new StringBuffer();
+        url.append(request.getScheme() + "://");
+        url.append(request.getServerName());
+        if (request.getServerPort() != 80)
+            url.append(":" + request.getServerPort());
+        url.append(request.getContextPath());
+        return url.toString();
+    }
+
+    /**
+     * 输入相对路径如： pages/index.jsp
+     * 返回绝对URL如： http://localhost:8080/applatform/pages/index.jsp
+     *
+     * @param relativePath
+     * @return
+     */
+    public static String getAbsolutePath(HttpServletRequest request, String relativePath) {
+        if (relativePath.startsWith("/"))
+            return getRootPath(request) + relativePath;
+        else
+            return getRootPath(request) + "/" + relativePath;
+    }
+
+}

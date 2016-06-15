@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekeyIndex" namespace="/ekeyIndex" extends="struts-default">
+		<!--键位app-->
+		<action name="appByKey" method="appByKey" class="indexAction"></action>
+		<!--键位信息-->
+		<action name="keyInfo" method="keyInfo" class="indexAction"></action>
+		<!--更多app接口-->
+		<action name="more" method="more" class="indexAction"></action>
+		<!--用户定制历史-->
+		<action name="customHis" method="customHis" class="indexAction"></action>
+
+		<!-- 用户首页APP布局接口 -->
+		<action name="indexAppLayout" method="indexAppLayout" class="indexAction"></action>
+
+		<!-- 首页广告 -->
+		<action name="advertInfo" method="advertInfo" class="indexAction"></action>
+
+		<!-- 用户点击APP历史纪录 -->
+		<action name="appUsingHis" method="appUsingHis" class="indexAction"></action>
+
+		<!-- 记录用户点击APP的行为 -->
+		<action name="appUsingRecord" method="appUsingRecord" class="indexAction"></action>
+
+		<!-- 查询所有按键的点击次数 -->
+		<action name="countOfEachKeys" method="countOfEachKeys" class="indexAction"></action>
+
+		<!-- 查询现有的所有首页应用总数，如果总数于参数不相等则返回所有应用，否则返回0 -->
+		<action name="getAllAppOrNot" method="getAllAppOrNot" class="indexAction"></action>
+	</package>
+</struts>

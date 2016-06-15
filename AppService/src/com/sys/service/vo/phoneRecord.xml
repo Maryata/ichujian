@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="phoneRecord">
+	<!-- 修改已存在的imei的状态为0 -->
+	<update id="updatePhone" parameterClass="java.util.HashMap">
+		<![CDATA[
+		UPDATE T_SYS_PHONE_RECORD T
+		   SET T.C_STATE = 0, C_DATE = SYSDATE
+		 WHERE T.C_IMEI = #IMEI#
+		   AND T.C_STATE = 1
+		]]> 
+	</update>
+	
+	<!-- 保存数据 -->
+	<insert id="recordPhone" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_SYS_PHONE_RECORD
+		  (C_ID, C_IMEI, C_UEMAIL, C_DATE, C_STATE)
+		VALUES
+		  (SEQ_SYS_PHONE_RECORD.NEXTVAL, #IMEI#, #UEMAIL#, SYSDATE, 1)
+		]]> 
+	</insert>
+	
+	<!-- 保存imei -->
+	<insert id="recordImei" parameterClass="java.util.HashMap">
+		<![CDATA[
+		INSERT INTO T_SYS_IMEI_TIME
+		  (C_ID, C_IMEI, C_DATE)
+		VALUES
+		  (SEQ_SYS_IMEI_TIME.NEXTVAL, #IMEI#, SYSDATE)
+		]]> 
+	</insert>
+    
+</sqlMap>
+

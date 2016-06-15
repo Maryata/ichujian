@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="search">
+	<select id="getSearch" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	<![CDATA[
+	    select c_name,c_pinyin,c_ab from T_ACTIVITY_SEARCH_KEY 						
+	]]>
+	</select>
+
+	<select id="getSearchBrand" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	<![CDATA[
+		select c_id,c_cname,c_ename,c_logourl from T_ACTIVITY_BRAND_INFO  where c_cname like '%$textMsg$%' or c_ename like '%$textMsg$%'
+			 
+	]]>
+	</select>
+
+ 	<select id="getSearchActivity" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">  
+	<![CDATA[
+		select t.c_id,t.c_title,t.c_sdate,t.c_edate,t.c_content,b.c_cname,b.c_logourl as brandLogo,t.c_imageurl as activityImage from T_ACTIVITY_BASE_INFO t,T_ACTIVITY_BRAND_INFO b where t.c_title like '%$textMsg$%'
+				     and （t.c_cityid = #cityid# or t.c_cityid is null or t.c_cityid=0) and t.c_brandid =b.c_id and c_edate >#date# and t.c_type=1
+	]]>
+	</select>
+
+	<insert id="setSearchRecord"  parameterClass="java.util.HashMap">
+		<![CDATA[
+			insert into T_ACTIVITY_SEARCH_RECARD(c_id,c_uid,c_date,c_key) values(
+			SEQ_ACTIVITY_SEARCH_RECARD.nextval,#imei#,#date#,#textMsg#
+
+			)
+		]]>
+	</insert>
+	
+	
+	<select id="attentionNum" parameterClass="java.util.HashMap" resultClass="int">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_MEMBER_BRAND where c_brandid=#brandid# and c_type =#brandType# and c_state=1
+		]]>
+	</select>
+	
+	
+	<select id="isAttention" parameterClass="java.util.HashMap" resultClass="int">
+		<![CDATA[
+			select count(*) from T_ACTIVITY_MEMBER_BRAND where c_type =#brandType# and c_brandid=#brandid# and c_uid =#uid# and c_islive=1 and c_state=1
+		]]>		
+	</select>
+
+</sqlMap>
+

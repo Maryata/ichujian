@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_gameActivity">
+	<!--游戏活动列表-->
+	<select id="listActivity" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<![CDATA[
+			SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT T0.C_ID,
+                       T0.C_GID,
+                       T0.C_NAME,
+                       T0.C_SDATE,
+                       T0.C_EDATE,
+                       T0.C_ISLIVE,
+                       T0.C_ORDER,
+                       T0.C_SHAREURL,
+                       T0.C_LOGOURL,
+                       T1.C_NAME AS C_GNAME
+                  FROM T_EK_GAME_ACTIVITY_INFO T0
+                  LEFT JOIN T_GAME_APP_INFO T1
+                  on t0.c_gid = t1.c_id
+                 WHERE T0.C_GID = #gid# AND T0.C_ISLIVE=1 AND ROUND(TO_NUMBER(sysdate - T0.c_edate)) <= 0
+                 ORDER BY T0.C_ORDER DESC, T0.C_EDATE DESC) T
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+	</select>
+    <!--进行中的活动列表-->
+    <select id="eventsList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        <![CDATA[
+			SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT T0.C_ID,
+                       T0.C_GID,
+                       T0.C_NAME,
+                       T0.C_SDATE,
+                       T0.C_EDATE,
+                       T0.C_ISLIVE,
+                       T0.C_ORDER,
+                       T0.C_SHAREURL,
+                       T0.C_LOGOURL,
+                       T1.c_Name as C_GNAME
+                  FROM T_EK_GAME_ACTIVITY_INFO T0
+                  LEFT JOIN T_GAME_APP_INFO T1
+                  on t0.c_gid = t1.c_id
+                 WHERE T0.C_ISLIVE=1 AND ROUND(TO_NUMBER(sysdate - T0.c_edate)) <= 0
+                 ORDER BY T0.C_ORDER DESC, T0.C_EDATE DESC) T
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+    </select>
+    <!--往期活动列表-->
+    <select id="eventsOldList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        <![CDATA[
+			SELECT *
+  FROM (SELECT T.*, ROWNUM RN
+          FROM (SELECT T0.C_ID,
+                       T0.C_GID,
+                       T0.C_NAME,
+                       T0.C_SDATE,
+                       T0.C_EDATE,
+                       T0.C_ISLIVE,
+                       T0.C_ORDER,
+                       T0.C_SHAREURL,
+                       T0.C_LOGOURL,
+                       T1.c_Name as C_GNAME
+                  FROM T_EK_GAME_ACTIVITY_INFO T0
+                  LEFT JOIN T_GAME_APP_INFO T1
+                  on t0.c_gid = t1.c_id
+                 WHERE T0.C_ISLIVE=1 AND ROUND(TO_NUMBER(sysdate - T0.c_edate)) > 0
+                 ORDER BY T0.C_ORDER DESC, T0.C_EDATE DESC) T
+         WHERE ROWNUM <= #maxRows#)
+ WHERE RN >= #startingIndex#
+		]]>
+    </select>
+    <!--持久化用户对活动的回复-->
+    <insert id="campusActivities" parameterClass="java.util.HashMap">
+        insert into t_ek_game_member_activity
+          (c_id, c_uid, c_aid, c_comment, c_img, c_cdate, c_udate)
+        values
+          (SEQ_EK_GAME_MEMBER_ACTIVITY.nextVal, #uid#, #aid#, #comment#, #img#, sysdate, sysdate)
+    </insert>
+    <!--更新用户对活动的回复-->
+    <update id="updateMemberActivityById" parameterClass="java.util.HashMap">
+        update t_EK_game_member_activity
+           set c_uid = #uid#,
+               c_aid = #aid#,
+               c_comment = #comment#,
+               c_img = #img#,
+               c_udate = sysdate
+         where c_id = #id#
+    </update>
+    <!--获取用户对活动的回复-->
+    <select id="getReply" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        select c_id,
+       c_uid,
+       c_aid,
+       c_comment,
+       c_img,
+       c_cdate,
+       c_udate,
+       (select c_nickName
+          from t_EK_member_info
+         where c_id = #uid#
+           and c_islive = 1
+           and c_state = 1) as c_nickName
+  from t_EK_game_member_activity
+ where c_uid = #uid#
+   and c_aid = #aid#
+    </select>
+	<!-- 通过活动ID获取活动信息  --> 
+	<select id="getActivityById" resultClass="java.util.HashMap">
+		SELECT T0.C_ID,
+       T0.C_GID,
+       T0.C_NAME,
+       T0.C_SDATE,
+       T0.C_EDATE,
+       T0.C_LOGOURL,
+       T0.C_ISLIVE,
+       T0.C_ORDER,
+       T0.C_SHAREURL,
+       T1.C_NAME AS C_GNAME,(select count(1) from t_EK_game_child_action where c_indexid=#id# and c_source=#source# and c_type=2) as c_count,(select count(1) from t_EK_game_child_action where c_indexid=#id# and c_source=#source# and c_uid=#uid# and c_type=2) as flag
+    FROM T_EK_GAME_ACTIVITY_INFO T0
+  LEFT JOIN T_GAME_APP_INFO T1
+  ON T0.C_GID = T1.C_ID
+ WHERE T0.C_ID = #id#
+	</select>
+	<!-- 我的活动 -->
+    <select id="attendedAct" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+    	<![CDATA[
+    	SELECT C_ID, C_LOGOURL, C_NAME, C_DEPICT, C_CDATE, C_EDATE, C_GNAME
+          FROM (SELECT ROWNUM RM, TEMP1.*
+                  FROM (SELECT I.C_ID,
+                               I.C_LOGOURL,
+                               I.C_NAME,
+                               I.C_DEPICT,
+                               T.C_CDATE,
+                               I.C_EDATE,
+                               G.C_NAME C_GNAME
+                          FROM T_EK_GAME_MEMBER_ACTIVITY T,
+                               T_EK_GAME_ACTIVITY_INFO   I,
+                               T_GAME_APP_INFO           G
+                         WHERE I.C_ISLIVE = 1
+                           AND G.C_ISLIVE = 1
+                           AND G.C_ID = I.C_GID
+                           AND T.C_AID = I.C_ID
+                           AND T.C_UID = #UID#
+                         ORDER BY T.C_CDATE DESC) TEMP1
+                 WHERE ROWNUM <= (#PAGE#) * #PSIZE#)
+         WHERE RM > (#PAGE# - 1) * #PSIZE#
+
+		]]>
+    </select>
+</sqlMap>
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekActivity" namespace="/ekGame" extends="struts-default">
+
+		<!-- 通过游戏ID获取游戏活动列表 -->
+		<action name="getAListOfGamesByGameId" method="getAListOfGamesByGameId" class="eKGameActivityAction"></action>
+		<!-- 通过活动ID获取活动信息 -->
+		<action name="getActivityById" method="getActivityById" class="eKGameActivityAction"></action>
+		<!--有效期内的活动和往期的活动列表-->
+		<action name="eventsList" method="eventsList" class="eKGameActivityAction"></action>
+		<!--回复活动-->
+		<action name="campusActivities" method="campusActivities" class="eKGameActivityAction"></action>
+		<!--活动详情-->
+		<action name="eventDetails" method="eventDetails" class="eKGameActivityAction"></action>
+		<!--参加活动-->
+		<action name="campusActivities" method="campusActivities" class="eKGameActivityAction">
+			<!--<interceptor-ref name="json">-->
+			<!--<param name="contentType">application/json</param>-->
+			<!--</interceptor-ref>-->
+		</action>
+		<!-- 我的活动 -->
+		<action name="attendedAct" method="attendedAct" class="eKGameActivityAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+	</package>
+</struts>

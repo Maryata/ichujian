@@ -1,0 +1,39 @@
+package com.sys.ekey.freecall.vo;
+
+import java.util.Map;
+
+/**
+ * Created by Maryn on 2016/4/12.
+ */
+public class FeiyuResult {
+
+    private String resultCode;// 状态码
+
+    private String resultMsg;// 错误信息描述
+
+    private Map<String, Object> result;// 返回信息
+
+    public String getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(String resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public String getResultMsg() {
+        return resultMsg;
+    }
+
+    public void setResultMsg(String resultMsg) {
+        this.resultMsg = resultMsg;
+    }
+
+    public Map<String, Object> getResult() {
+        return result;
+    }
+
+    public void setResult(Map<String, Object> result) {
+        this.result = result;
+    }
+}

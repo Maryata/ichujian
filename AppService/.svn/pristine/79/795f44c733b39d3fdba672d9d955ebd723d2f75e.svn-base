@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	
+	<!-- set -->
+	<bean id="setService" class="com.sys.service.SetServiceImpl" scope="prototype"/>
+	<bean id="SetAction" class="com.sys.action.SetAction" scope="prototype">
+		<property name="setService">
+			<ref bean="setService"/>
+		</property>
+	</bean>
+	
+	<!-- app -->
+	<bean id="appService" class="com.sys.service.AppServiceImpl" scope="prototype"/>
+	<bean id="AppAction" class="com.sys.action.AppAction" scope="prototype">
+		<property name="appService">
+			<ref bean="appService"/>
+		</property>
+	</bean>
+	
+	<!-- use -->
+	<bean id="useService" class="com.sys.service.UseServiceImpl" scope="prototype"/>
+	<bean id="UseAction" class="com.sys.action.UseAction" scope="prototype">
+		<property name="useService">
+			<ref bean="useService"/>
+		</property>
+	</bean>
+	
+	<!-- news -->
+	<bean id="newsService" class="com.sys.service.NewsServiceImpl" scope="prototype"/>
+	<bean id="NewsAction" class="com.sys.action.NewsAction" scope="prototype">
+		<property name="newsService">
+			<ref bean="newsService"/>
+		</property>
+	</bean>
+		 
+</beans>

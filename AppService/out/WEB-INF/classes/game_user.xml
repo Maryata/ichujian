@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameUser" namespace="/game" extends="struts-default">
+		
+		<!-- 用户个人信息 -->
+		<action name="userinfo" method="userInfo" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 是否显示“完善个人资料” -->
+		<action name="showComplete" method="showComplete" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!-- 是否显示“完善资料”中的选项是否加分 -->
+		<action name="showGetScore" method="showGetScore" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!-- 根据合集id获取单个游戏合集 -->
+		<action name="external" method="external" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 第三方绑定 -->
+		<action name="bindexternal" method="bindExternal" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 解绑第三方账号  -->
+		<action name="unBindExternal" method="unBindExternal" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 触键注册 -->
+		<action name="register" method="register" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 用户登录 -->
+		<action name="login" method="login" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 修改密码 -->
+		<action name="modifypwd" method="modifyPwd" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 编辑用户信息（只修改昵称和性别） -->
+		<action name="edituserinfo" method="editUserInfo" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 绑定手机 -->
+		<action name="bindphone" method="bindPhone" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 获取验证码 -->
+		<action name="getvalicode" method="getValiCode" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 忘记密码-判断验证码的有效性 -->
+		<action name="isvalidcode" method="isValidCode" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 忘记密码-设置新密码 -->
+		<action name="setpwdoffgt" method="setPwdOfFgt" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 修改用户头像 -->
+		<action name="userhead" method="userHead" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 校验手机号是否可用 -->
+		<action name="validatePhone" method="validatePhone" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		
+		<!-- 获取游戏提示语 -->
+		<action name="gameCue" method="gameCue" class="gameUserAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+
+		<!--我的趣币-->
+		<action name="score" method="score" class="gameUserAction"></action>
+		<!--用户和客服交互的信息-->
+		<action name="getMessage" method="getMessage" class="gameUserAction"></action>
+		<!--用户发送消息给客服-->
+		<action name="contactServiceRoute" method="contactServiceRoute" class="gameUserAction"></action>
+	</package>
+</struts>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings 
+	cacheModelsEnabled="true" 
+	lazyLoadingEnabled="true"
+	useStatementNamespaces="true" 
+	maxRequests="300"      
+	maxSessions="300" 
+	maxTransactions="100"  
+	/>
+	<!--  最大链接数 最小链接数 一定要配置 不然会很惨。。。  -->
+	    <sqlMap resource="com/sys/service/vo/user.xml" />
+	    <sqlMap resource="com/sys/service/vo/softwaresql1.xml" />
+	    <sqlMap resource="com/sys/service/vo/industry.xml" />
+	    <sqlMap resource="com/sys/service/vo/recommend.xml" />
+	    <sqlMap resource="com/sys/service/vo/classified.xml" />
+	    <sqlMap resource="com/sys/service/vo/activity.xml" />
+	    <sqlMap resource="com/sys/service/vo/search.xml" /> 
+	    <sqlMap resource="com/sys/service/vo/useactivity.xml" /> 
+ 		<sqlMap resource="com/sys/service/vo/web.xml" /> 
+ 		<sqlMap resource="com/sys/service/vo/usernotify.xml" /> 
+ 		
+ 		<sqlMap resource="com/sys/service/vo/phoneRecord.xml" />
+ 		 
+ 		<sqlMap resource="com/sys/service/vo/member.xml" /> 
+ 		
+<!--  		<sqlMap resource="com/sys/game/service/vo/game.xml"/> -->
+ 		<sqlMap resource="com/sys/game/service/vo/game_activity.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_app.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_gift.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_h5.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_info.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_strategy.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_user.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_task.xml"/>
+ 		<sqlMap resource="com/sys/game/service/vo/game_mall.xml"/>
+
+ 		<sqlMap resource="com/sys/mcrapp/service/vo/mcrapp.xml"/>
+ 		
+ 		<!-- 一键购膜 -->
+ 		<sqlMap resource="com/sys/easybuy/service/vo/easyBuy.xml"/>
+
+ 		<!-- e键 -->
+ 		<sqlMap resource="com/sys/ekey/index/service/vo/ek_index.xml"/>
+ 		<sqlMap resource="com/sys/ekey/activity/service/vo/ek_activity.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_activity.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_app.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_gift.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_h5.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_info.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_mall.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_strategy.xml"/>
+ 		<sqlMap resource="com/sys/ekey/game/service/vo/game_task.xml"/>
+ 		<sqlMap resource="com/sys/ekey/user/service/vo/member.xml"/>
+ 		<sqlMap resource="com/sys/ekey/freecall/service/vo/ek_freeCall.xml"/>
+ 		<sqlMap resource="com/sys/ekey/task/service/vo/ek_task.xml"/>
+	    <sqlMap resource="com/sys/ekey/shop/service/vo/ek_shop.xml"/>
+</sqlMapConfig>

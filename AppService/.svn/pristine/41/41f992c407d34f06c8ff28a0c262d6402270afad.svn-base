@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekeyShop" namespace="/ekeyShop" extends="struts-default">
+		<!--&lt;!&ndash;键位app&ndash;&gt;
+		<action name="appByKey" method="appByKey" class="indexAction"></action>
+		&lt;!&ndash;键位信息&ndash;&gt;
+		<action name="keyInfo" method="keyInfo" class="indexAction"></action>
+		&lt;!&ndash;更多app接口&ndash;&gt;
+		<action name="more" method="more" class="indexAction"></action>
+		&lt;!&ndash;用户定制历史&ndash;&gt;
+		<action name="customHis" method="customHis" class="indexAction"></action>
+
+		&lt;!&ndash; 用户首页APP布局接口 &ndash;&gt;
+		<action name="indexAppLayout" method="indexAppLayout" class="indexAction"></action>
+
+		&lt;!&ndash; 首页广告 &ndash;&gt;
+		<action name="advertInfo" method="advertInfo" class="indexAction"></action>
+
+		&lt;!&ndash; 用户点击APP历史纪录 &ndash;&gt;
+		<action name="appUsingHis" method="appUsingHis" class="indexAction"></action>
+
+		&lt;!&ndash; 记录用户点击APP的行为 &ndash;&gt;
+		<action name="appUsingRecord" method="appUsingRecord" class="indexAction"></action>
+
+		&lt;!&ndash; 查询所有按键的点击次数 &ndash;&gt;
+		<action name="countOfEachKeys" method="countOfEachKeys" class="indexAction"></action>
+
+		&lt;!&ndash; 查询现有的所有首页应用总数，如果总数于参数不相等则返回所有应用，否则返回0 &ndash;&gt;
+		<action name="getAllAppOrNot" method="getAllAppOrNot" class="indexAction"></action>-->
+	</package>
+</struts>

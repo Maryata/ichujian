@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameMall" namespace="/game" extends="struts-default">
+		<!-- 商城产品 -->
+		<action name="mallProduct" method="mallProduct" class="gameMallAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 申请商品兑换 -->
+		<action name="exchange" method="exchange" class="gameMallAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+		<!-- 商品兑换记录 -->
+		<action name="exchangeRecord" method="exchangeRecord" class="gameMallAction">
+			<result name="input">/JsonData.jsp</result>
+			<result name="success">/JsonData.jsp</result>
+		</action>
+	</package>
+</struts>

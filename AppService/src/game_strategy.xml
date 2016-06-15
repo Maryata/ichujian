@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gameStrategy" namespace="/game" extends="struts-default">
+		<!-- 游戏攻略列表 -->
+		<action name="raiders" method="raiders" class="gameStrategyAction"></action>
+		<!-- 通过攻略ID获取攻略信息 -->
+		<action name="getRaidersById" method="getRaidersById" class="gameStrategyAction"></action>
+	</package>
+</struts>

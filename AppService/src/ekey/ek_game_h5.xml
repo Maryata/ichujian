@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+    <package name="ekGameH5" namespace="/ekGame" extends="struts-default">
+
+        <!-- "H5游戏弹幕" -->
+        <action name="h5Barrage" method="h5Barrage" class="eKGameH5Action">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 最近在玩 -->
+        <action name="recentlyPlaying" method="recentlyPlaying" class="eKGameH5Action">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- H5游戏分类列表 -->
+        <action name="h5CategoryList" method="h5CategoryList" class="eKGameH5Action">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!-- 根据分类id获取具体某一分类中的游戏(H5) -->
+        <action name="h5GamesInCategory" method="h5GamesInCategory" class="eKGameH5Action">
+            <result name="input">/JsonData.jsp</result>
+            <result name="success">/JsonData.jsp</result>
+        </action>
+        <!--搜索H5游戏-->
+        <action name="searchH5" method="searchH5" class="eKGameH5Action"></action>
+        <!--获取h5游戏-->
+        <action name="getH5GameById" method="getH5GameById" class="eKGameH5Action"></action>
+    </package>
+</struts>

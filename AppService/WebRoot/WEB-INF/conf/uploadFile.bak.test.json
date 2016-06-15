@@ -1,0 +1,14 @@
+{
+sftp:{
+	host : '192.168.8.221',
+	port : "22",
+	username : 'root',
+	password : 'mokey123'
+},
+userhead:{
+	IS_SYNC_FTP:'Y',
+	
+	HTTP_ROOT : 'http://192.168.8.221/',
+	DIR_ROOT : '/ichujian/static/'
+}
+}
