@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="freeCall">
+
+    <!-- 走马灯广告 -->
+    <select id="marqueeBanner" resultClass="java.util.HashMap">
+        SELECT T.C_ID, T.C_TITLE, T.C_URL
+          FROM T_FC_MARQUEE_BANNER T
+         WHERE T.C_ISLIVE = 1
+         ORDER BY T.C_ORDER
+    </select>
+
+    <!-- 轮播广告 -->
+    <select id="advert" resultClass="java.util.HashMap">
+        SELECT T.C_ID, T.C_TITLE, T.C_URL, T.C_IMG
+          FROM T_FC_ADVERT T
+         WHERE T.C_ISLIVE = 1
+         ORDER BY T.C_ORDER
+    </select>
+    <!--套餐列表-->
+    <select id="meal" resultClass="java.util.HashMap">
+        SELECT T.C_ID, T.C_NAME, T.C_PRICE,T.C_TIME
+        FROM T_FC_COMBO T
+        WHERE T.C_ISLIVE = 1
+        ORDER BY T.C_ID
+    </select>
+    <!--到期时间-->
+    <select id="term" parameterClass="java.util.HashMap" resultClass="String">
+      SELECT TO_CHAR(C_DATE,'yyyy-MM-dd') FROM (
+        SELECT T.C_ID,T.C_UID,T.C_DATE,T.C_SYSDATE,T.C_FCID,T.C_OUT_TRADE_NO,T.C_TIME FROM T_FC_RECORD T
+        WHERE  T.C_UID=#uid# ORDER BY T.C_SYSDATE DESC
+        ) WHERE ROWNUM=1
+    </select>
+</sqlMap>
+

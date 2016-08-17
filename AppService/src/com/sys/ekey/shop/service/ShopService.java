@@ -1,1 +1,278 @@
-package com.sys.ekey.shop.service;import java.util.List;import java.util.Map;/** * Created by vpc on 2016/4/15. */public interface ShopService {    /**     * 签到奖励     *     * @return     */    List<Map<String, Object>> signAward();    /**     * 签到详情     *     * @return     */    List<Map<String, Object>> signDettail(String uid);    /**     * 本月累计签到天数     *     * @param uid     * @return     */    int signCountDay(String uid);    /**     * 连续签到奖励     *     * @return     */    List<Map<String, Object>> signAwardSeries();    /**     * 可用积分     *     * @param uid     * @reintturn     */    int availableIntegral(String uid);    /**     * 可获得积分     *     * @param uid     * @return     */    int securableIntegral(String uid);    /**     * 任务列表     *     * @param uid     * @return     */    List<Map<String, Object>> task(String uid);    /**     * 邀请人数     *     * @param uid     * @return     */    int inviteNumber(String uid);    /**     * 我的邀请码     *     * @param uid     * @return     */    String inviteCode(String uid);    /**     * 邀请奖励积分     *     * @param uid     * @return     */    int inviteAward(String uid);    /**     * 邀请详情信息     *     * @param uid     * @return     */    List<Map<String, Object>> inviteDetail(String uid);    /**     * 商品兑换     *     * @param uid       用户id     * @param pageIndex 页码     * @param pSize     每页数量     * @return     */    List<Map<String,Object>> exchangeList(String uid, String pageIndex, String pSize);    /**     * 商品首页广告     *     * @return     */    List<Map<String,Object>> advert();}
+package com.sys.ekey.shop.service;
+
+import com.sys.ekey.shop.common.OrderException;
+import com.sys.ekey.shop.common.ProductOutOfStockException;
+import com.sys.ekey.shop.common.UserScoreException;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by vpc on 2016/4/15.
+ */
+public interface ShopService {
+    /**
+     * 签到奖励
+     *
+     * @return
+     */
+    List<Map<String, Object>> signAward(String uid);
+
+    /**
+     * 签到详情
+     *
+     * @return
+     */
+    List<Map<String, Object>> signDettail(String uid);
+
+    /**
+     * 本月累计签到天数
+     *
+     * @param uid
+     * @return
+     */
+    int signCountDay(String uid);
+
+    /**
+     * 连续签到奖励
+     *
+     * @return
+     *//*
+    List<Map<String, Object>> signAwardSeries();
+*/
+    /**
+     * 可用积分
+     *
+     * @param uid
+     * @reintturn
+     */
+    int availableIntegral(String uid);
+
+    /**
+     * 可获得积分
+     *
+     * @param uid
+     * @return
+     */
+    int securableIntegral(String uid);
+
+    /**
+     * 任务列表
+     *
+     * @param uid
+     * @return
+     */
+    List<Map<String, Object>> task(String uid);
+
+    /**
+     * 邀请人数
+     *
+     * @param uid
+     * @return
+     */
+    int inviteNumber(String uid);
+
+    /**
+     * 我的邀请码
+     *
+     * @param uid
+     * @return
+     */
+    String inviteCode(String uid);
+
+    /**
+     * 邀请奖励积分
+     *
+     * @param uid
+     * @return
+     */
+    int inviteAward(String uid);
+
+    /**
+     * 邀请详情信息
+     *
+     * @param uid
+     * @return
+     */
+    List<Map<String, Object>> inviteDetail(String uid);
+
+    /**
+     * 商品列表
+     *
+     * @return
+     */
+    List<Map<String, Object>> commodity(String cid,int pageNumber, int pageSize);
+
+    /**
+     * 头像查询
+     *
+     * @param uid
+     * @return
+     */
+    String logo(String uid);
+
+    /**
+     * 商品详情
+     *
+     * @param pid
+     * @return
+     */
+    List<Map<String, Object>> commodityDetail(String pid);
+
+    /**
+     * 积分获取记录
+     *
+     * @param uid
+     * @return
+     */
+    List<Map<String, Object>> gainRecords(String uid, int pageNumber, int pageSize);
+
+    /**
+     * 积分使用记录
+     *
+     * @param uid
+     * @return
+     */
+    List<Map<String, Object>> useRecords(String uid, int pageNumber, int pageSize);
+
+    /**
+     * 商品兑换
+     *
+     * @param uid       用户id
+     * @param pageIndex 页码
+     * @param pSize     每页数量
+     * @return
+     */
+    List<Map<String, Object>> exchangeList(String uid, String pageIndex, String pSize);
+
+    /**
+     * 商品首页广告
+     *
+     * @return
+     */
+    List<Map<String, Object>> advert();
+
+    /**
+     * 跳转到 事物订单页
+     *
+     * @param pid
+     * @return
+     */
+    List<Map<String, Object>> matterToOrder(String uid,String pid);
+
+    /**
+     * 根据商户订单号查询订单
+     *
+     * @param out_trade_no 商户订单号
+     * @return
+     */
+    List<Map<String, Object>> getOrderByTradeNo(String out_trade_no);
+
+    /**
+     * 查询商品详情
+     *
+     * @param id
+     * @return
+     */
+    List<Map<String, Object>> getComboById(String uid ,String id);
+
+    /**
+     * 生成新订单
+     *  @param out_trade_no
+     * @param c_score_cost
+     * @param c_ctime
+     * @param c_pay_status
+     * @param c_pay_type
+     * @param phone
+     * @param account
+     * @param address
+     * @param c_pid
+     * @param c_type
+     * @param pCode
+     * @param pName
+     */
+    void insertOrder(String out_trade_no, String Price, String c_score_cost, String c_ctime, String c_pay_status, String c_pay_type, String phone, String account, String address, String c_pid, String c_type, String uid, String num, String pCode, String pName);
+
+    /**
+     * 修改支付状态
+     *
+     * @param params
+     * @param s
+     */
+    Map<String, String> updatePayStatus(Map<String, String> params, String s, String payStatus);
+
+    /**
+     * 记录微信通知
+     *
+     * @param parameterMap
+     */
+    void logWeChartPay(Map<String, String> parameterMap);
+
+    /**
+     * 查询 用户的默认信息
+     *
+     * @param uid
+     * @return
+     */
+    List<Map<String, Object>> address(String uid);
+
+    /**
+     * 修改商品数量
+     *
+     * @param pid
+     * @return
+     */
+    int updateProductNum(String pid);
+
+    /**
+     * 查询可用的
+     *
+     * @param pid
+     * @return
+     */
+    int getCount(String pid);
+
+
+    /**
+     * 查询用户总积分
+     *
+     * @param uid
+     * @return
+     */
+    String selectUserScore(String uid);
+
+
+    /**
+     * 生成虚拟商品订单
+     *
+     * @param uid     用户id
+     * @param product 产品信息
+     * @param amount  兑换数量
+     */
+    boolean virtualOrder(String uid, List<Map<String, Object>> product, String amount) throws ProductOutOfStockException, OrderException, UserScoreException;
+
+    /**
+     * 修改用户积分
+     *
+     * @param uid
+     * @param score
+     */
+    int updateUserScore(String uid, String score);
+
+    /**
+     * 订单表查询收货地址
+     *
+     * @param uid
+     * @return
+     */
+    List<Map<String, Object>> isExit(String uid);
+
+    /**
+     * 兑换记录
+     *
+     * @param out_trade_no
+     * @return
+     */
+    List<Map<String, Object>> changeResult(String out_trade_no);
+
+}

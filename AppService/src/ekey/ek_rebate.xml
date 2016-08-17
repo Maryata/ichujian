@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekeyRebate" namespace="/ekeyRebate" extends="struts-default">
+
+		<!-- 我的财富 -->
+		<action name="myWealth" method="myWealth" class="rebateAction" />
+		<!-- 财富明细 -->
+		<action name="wealthDetail" method="wealthDetail" class="rebateAction" />
+		<!-- 财富明细（按月统计） -->
+		<action name="wealthDetailByMonth" method="wealthDetailByMonth" class="rebateAction" />
+		<!-- 我的人脉 -->
+		<action name="myReference" method="myReference" class="rebateAction" />
+		<!-- 龙虎榜 -->
+		<action name="rankList" method="rankList" class="rebateAction" />
+		<!-- 申请提现 -->
+		<action name="withdraw" method="withdraw" class="rebateAction" />
+		<!-- 提现明细 -->
+		<action name="withdrawDetail" method="withdrawDetail" class="rebateAction" />
+		<!-- 校验身份证 -->
+		<action name="authId" method="authId" class="rebateAction" />
+		<!-- 保存商户信息 -->
+		<action name="saveBusinessInfo" method="saveBusinessInfo" class="rebateAction" />
+		<!-- 查询商户信息 -->
+		<action name="businessInfo" method="businessInfo" class="rebateAction" />
+		<!-- 申请售后屏保 -->
+		<action name="activeInsurance" method="activeInsurance" class="rebateAction" />
+		<!-- 查询是否已激活售后屏保 -->
+		<action name="isActed" method="isActed" class="rebateAction" />
+		<!-- 申请维修 -->
+		<action name="applyForRepair" method="applyForRepair" class="rebateAction" />
+		<!-- 申请明细 -->
+		<action name="applyDetail" method="applyDetail" class="rebateAction" />
+		<!-- 获取getOpenId -->
+		<action name="getOpenId" method="getOpenId" class="rebateAction" />
+		<!-- 获取getSignature -->
+		<action name="getSignature" method="getSignature" class="rebateAction" />
+
+	</package>
+</struts>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <title>申请购膜</title>
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="js/md5.js"></script>
+<script type="text/javascript" src="js/jquery.base64.js"></script>
+<script type="text/javascript" src="js/jquery.json.min.js"></script>
+<body>
+<div class="border-box">
+    <div class="content">
+        <p class="m_t5 l_h35 div_h35">
+            <input type="hidden" id="C_ID">
+            <input type="hidden" id="payType" value="2">
+            <input type="hidden" id="type" value="1">
+            <i class="icon iconfont icon-shouji c_cheng f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">手机品牌</span>
+        </p>
+        <p class="m_t5">
+            <select class="bc_eee m_l10b" id="brand">
+                <option value="0"> 请选择</option>
+            </select>
+        </p>
+        <p class="m_t10">
+            <i class="icon iconfont icon-shouji c_yellow2 f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">手机机型</span>
+        </p>
+        <p class="m_t5">
+            <select class="bc_eee m_l10b" id="model">
+                <option value="0"> 请选择</option>
+            </select>
+        </p>
+        <p class="m_t10 l_h35 div_h35">
+            <i class="icon iconfont icon-dingwei c_blue f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">收货地址</span>
+        </p>
+        <p>
+            <input class="line m_l10b" type="text" id="address" placeholder="请输入您的收货地址">
+        </p>
+        <p class="m_t10 l_h35 div_h35">
+            <i class="icon iconfont icon-yonghu c_yellow f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">收货人</span>
+        </p>
+        <p>
+            <input class="line m_l10b" type="text" id="consignee" placeholder="请输入收货人姓名">
+        </p>
+        <p class="m_t10 l_h35 div_h35">
+            <i class="icon iconfont icon-dianhua c_green2 f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">联系电话</span>
+        </p>
+        <p class="m_b10">
+            <input class="line m_l10b" type="text" id="telNum" placeholder="请输入收货电话">
+        </p>
+    </div>
+</div>
+<div class="border-box">
+    <div class="content">
+        <p class="m_t5 l_h35 div_h35">
+            <i class="icon iconfont icon-dingdan c_cheng f_24 f_l"> </i>
+            <span class=" f_16 f_b ">订单详情</span>
+        </p>
+        <p class="m_t5">
+        <table class="c_555 m_l10b w_90b f_16 l_h25  m_b10" width="0" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr>
+                <td>换购数量</td>
+                <td>x1</td>
+            </tr>
+            <tr>
+                <td>智能膜 <span id="_brand" class="c_red">请选择</span> <span id="_modle" class="c_red">请选择</span></td>
+                <td class="c_red" id="price">￥129.00</td>
+            </tr>
+            </tbody>
+        </table>
+        </p>
+    </div>
+</div>
+<div class="border-box">
+    <div class="content">
+        <p class="m_t5 l_h35 div_h35 p_10_0">
+            <img class="car_ico" src="images/car.jpg">
+            <span class=" f_18 f_b ">选择支付方式</span>
+        </p>
+
+    </div>
+</div>
+<div class="enter-box">
+    <div class="content">
+        <p class="zhifu">
+            <button id="zhifu1" class="hover" type="submit">
+                <i class="icon iconfont icon-zhifubao c_blue f_24 f_l m_t-5"> </i>
+                <span class=" f_16 f_b m_l5 c_444">支付宝</span>
+            </button>
+
+        </p>
+    </div>
+</div>
+<div class="enter-box">
+    <div class="content">
+        <p class="zhifu">
+            <button id="zhifu2" type="submit">
+                <i class="icon iconfont icon-weixinzhifu c_green f_24 f_l m_t-5"> </i>
+                <span class=" f_16 f_b m_l5 c_444">微信</span>
+            </button>
+        </p>
+    </div>
+</div>
+<div class="enter-box m_t5">
+    <div class="content  m_b10">
+        <p>
+            <input type="submit" class="enter-btn" id="pay" value="立即支付">
+        </p>
+    </div>
+</div>
+<!--<input type="hidden" name="uid" id="_uid"/>
+<input type="hidden" name="payType" id="_payType"/>
+<input type="hidden" name="type" id="_type"/>
+<input type="hidden" name="phone" id="_phone"/>
+<input type="hidden" name="pCode" id="_pCode"/>
+<input type="hidden" name="telNum" id="_telNum"/>
+<input type="hidden" name="consignee" id="_consignee"/>
+<input type="hidden" name="address" id="_address"/>-->
+<form id="form2" action="https://mapi.alipay.com/gateway.do" method="post">
+    <input type="hidden" name="service" id="service"/>
+    <input type="hidden" name="partner" id="partner"/>
+    <input type="hidden" name="seller_id" id="seller_id"/>
+    <input type="hidden" name="_input_charset" id="_input_charset"/>
+    <input type="hidden" name="payment_type" id="payment_type"/>
+    <input type="hidden" name="notify_url" id="notify_url"/>
+    <input type="hidden" name="return_url" id="return_url"/>
+    <input type="hidden" name="out_trade_no" id="out_trade_no"/>
+    <input type="hidden" name="subject" id="subject"/>
+    <input type="hidden" name="total_fee" id="total_fee"/>
+    <input type="hidden" name="show_url" id="show_url"/>
+    <input type="hidden" name="app_pay" id="app_pay"/>
+    <input type="hidden" name="body" id="body"/>
+    <input type="hidden" name="sign" id="sign"/>
+    <input type="hidden" name="sign_type" id="sign_type"/>
+
+</form>
+<!--<iframe id="frame" name="frame" width="1" height="1" style="display:none"></iframe>-->
+<script src="layer.m/layer.m.js"></script>
+
+<!--提示！-->
+<script>
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return decodeURI(r[2]);
+        return null; //返回参数值
+    }
+    // appId=" + appId + "&timeStamp=" + timeStamp + "&nonceStr=" + nonceStr + "&package=" +package + "&paySign=" +paySign
+    var code = getUrlParam("code");
+    console.log(code);
+
+    $('#test1').on('click', function () {
+        layer.msg('手机号错误', function () {
+        });
+    });
+    $('#test2').on('click', function () {
+        layer.msg('<i class="icon iconfont icon-duihao c_green f_16"> </i>注册成功');
+    });
+    //支付宝
+    $('#zhifu1').on('click', function () {
+        $("#zhifu1").addClass("hover");
+        $("#zhifu2").removeClass("hover");
+        $("#payType").val(2);
+
+    });
+    //微信
+    $('#zhifu2').on('click', function () {
+        $("#zhifu2").addClass("hover");
+        $("#zhifu1").removeClass("hover");
+        $("#payType").val(1);
+    });
+
+    $(function () {
+        $("#C_ID").val(getUrlParam('id'))
+
+    });
+
+</script>
+<script>
+    //获取手机型号
+    $(function () {
+        $.ajax({
+            //url: 'http://localhost:8888/app/getAllBrandsOfPhone_H5.action',
+            //url:'http://www.ichujian.com/IOSService1/app/getAllBrandsOfPhone_H5.action',
+            url: 'http://www.ichujian.com/AppService1/app/getAllBrandsOfPhone_H5.action',
+            type: 'GET',
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (result) {
+                var data = JSON.stringify(result);
+                var json = $.parseJSON(data);
+                var status = json.status;
+                var info = json.info;
+                var _tr = "";
+                if (status == "N") {
+                    if (info == "1003") {
+                        layer.msg("系统错误");
+                        return false;
+                    }
+                } else {
+                    $(json.brands).each(function () {
+                        _tr = "<option value=" + this.C_ID + ">" + this.C_NAME + "</option>"
+                        $("#brand").append(_tr);
+                    });
+                }
+            },
+            error: function (result) {
+                layer.alert("系统错误");
+            }
+        });
+
+        //手机品牌改变事件
+        $("#brand").change(function () {
+            var brand = $("#brand").val();
+            if (brand == 0) {
+                layer.msg("请选择手机品牌");
+                return false;
+            }
+            $("#_brand").html($(this).find("option:selected").text());
+            $.ajax({
+                //url: 'http://localhost:8888/app/getSubBrandByBrandId_H5.action',
+                //url:'http://www.ichujian.com/IOSService1/app/getSubBrandByBrandId_H5.action',
+                url: 'http://www.ichujian.com/AppService1/app/getSubBrandByBrandId_H5.action',
+                type: 'GET',
+                data: {id: $.base64.encode(brand)},
+                dataType: 'JSONP',
+                jsonp: 'callback',
+                crossDomain: true,
+                jsonpCallback: "MTIz",
+                success: function (result) {
+                    var data = JSON.stringify(result);
+                    var json = $.parseJSON(data);
+                    var status = json.status;
+                    var info = json.info;
+                    var _tr = "";
+                    if (status == "N") {
+                        if (info == "1003") {
+                            layer.msg("系统错误");
+                            return false;
+                        }
+                    } else {
+                        $(json.subBrands).each(function () {
+                            _tr = "<option value=" + this.C_CODE + ">" + this.C_NAME + "</option>"
+                            $("#model").append(_tr);
+                        });
+                    }
+                },
+                error: function (result) {
+                    layer.alert("系统错误");
+                }
+            });
+        });
+        $("#model").change(function () {
+            $("#_modle").html($(this).find("option:selected").text());
+
+        });
+        function MTIz(data) {
+        }
+        // 用于获取openId
+        var code = getUrlParam("code");
+        console.log(code);
+        getOpenId(code);
+    });
+
+    // 初始化微信支付的参数
+    var appId, timeStamp, nonceStr, package, signType, paySign;
+
+
+
+    $("#pay").click(function () {
+        var payType = $("#payType").val();
+        if (payType == "2") {
+            aliPay();
+        } else {
+//            getOpenId();
+        }
+    });
+
+    ///提交订单
+    function aliPay() {
+        var payType = $("#payType").val();
+        var uid = $("#C_ID").val();
+        var type = $("#type").val();
+        var _phone = $("#brand").val();
+        var phone = $("#brand").find("option:selected").text() + " " + $("#model").find("option:selected").text();
+        var pCode = $("#model").val();
+        var telNum = $("#telNum").val();
+        var consignee = $("#consignee").val();
+        var address = $("#address").val();
+        if (uid == "") {
+            layer.msg("请重新扫描二维码");
+            return false;
+        }
+        if (_phone == 0) {
+            layer.msg("你选择您需要的品牌");
+            return false;
+        }
+        if (pCode == 0) {
+            layer.msg("你选择您需要的机型");
+            return false;
+        }
+        if (telNum == "") {
+            layer.msg("请填写收货电话");
+            return false;
+        }
+        if (consignee == "") {
+            layer.msg("请填写收货人姓名");
+            return false;
+        }
+        if (address == "") {
+            layer.msg("请填写收货地址");
+            return false;
+        }
+        var _url = "";
+        if ("2" == payType) {
+            //           _url = 'http://localhost:8888/exchange/submitOrder_H5.action';
+            _url = 'http://www.ichujian.com/AppService1/exchange/submitOrder_H5.action';
+        } else {
+            //           _url = 'http://localhost:8888/servlet/h5WXSign';
+            _url = 'http://www.ichujian.com/AppService1/servlet/h5WXSign';
+        }
+
+        $.ajax({
+            url: _url,
+            //url:'http://www.ichujian.com/IOSService1/exchange/submitOrder_H5.action',
+            type: 'GET',
+            data: {
+                uid: uid,
+                payType: payType,
+                type: type,// 套餐类型
+                phone: phone,
+                pCode: pCode,
+                telNum: telNum,
+                consignee: consignee,
+                address: address
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (result) {
+                var data = JSON.stringify(result);
+                var json = $.parseJSON(data);
+                var status = json.status;
+                var info = json.info;
+                var sParaTemp = json.sParaTemp;
+                var _tr = "";
+                if (status == "N") {
+                    if (info == "1003") {
+                        layer.msg("系统错误");
+                        return false;
+                    } else {
+                        layer.msg("订单创建失败");
+                        return false;
+                    }
+                } else {
+                    $(sParaTemp).each(function () {
+                        $("#service").val(this.service);
+                        $("#partner").val(this.partner);
+                        $("#seller_id").val(this.seller_id);
+                        $("#_input_charset").val(this._input_charset);
+                        $("#payment_type").val(this.payment_type);
+                        $("#notify_url").val(this.notify_url);
+                        $("#return_url").val(this.return_url);
+                        $("#out_trade_no").val(this.out_trade_no);
+                        $("#subject").val(this.subject);
+                        $("#total_fee").val(this.total_fee);
+                        $("#show_url").val(this.show_url);
+                        $("#app_pay").val(this.app_pay);
+                        $("#body").val(this.body);
+                        $("#sign").val(this.sign);
+                        $("#sign_type").val(this.sign_type);
+                    });
+                    location.href = "https://mapi.alipay.com/gateway.do?" + $("#form2").serialize();
+                }
+            },
+            error: function (result) {
+                console.log(result);
+                layer.alert("系统错误" + result);
+            }
+        });
+        function MTIz(data) {
+        }
+
+    }
+
+    // 获取openId
+    function getOpenId(code) {
+        var _url = "http://www.ichujian.com/AppService1/ekeyRebate/getOpenId.action";
+        $.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+                code: code
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (data) {
+                /*{
+                 "access_token": "YVptktHnKkRHs---pBtB-pr2DoLfaSP6qD3Q6Cvo6m_tCtMAYNEh47EooSEWskCnKDXzoL8eDJp2UOuj2HzwkmloEyAAKzS5uKavAYpB-D8",
+                 "expires_in": 7200,
+                 "refresh_token": "FVKl3XedK-A27YiteU5WEfDFPhbWIupCLyHWaF27dHYI8ccCcgrZPF3pLNwyaPlE585t5an8bjTqFD4ha6SDnGayW-93CH_qv_x8QNBkpi4",
+                 "openid": "oz-PxvoxMPerRcZLuUQUtLBuU5-0",
+                 "scope": "snsapi_userinfo"
+                 }*/
+                var openId = data.openid;
+                var access_token = data.access_token;
+                wxPay(openId, access_token);
+            },
+            error: function (data) {
+                layer.alert("系统错误" + data);
+            }
+        });
+        function MTIz(data) {
+            alert(data);
+        }
+    }
+
+    ///提交订单
+    function wxPay(openId, access_token) {
+        if (openId == "" || openId == null || openId == "undefined") {
+            layer.msg("系统错误");
+            return false;
+        }
+        if (access_token == "" || access_token == null || access_token == "undefined") {
+            layer.msg("系统错误");
+            return false;
+        }
+        var payType = $("#payType").val();
+        var uid = $("#C_ID").val();
+        var type = $("#type").val();
+        var _phone = $("#brand").val();
+        var phone = $("#brand").find("option:selected").text() + " " + $("#model").find("option:selected").text();
+        var pCode = $("#model").val();
+        var telNum = $("#telNum").val();
+        var consignee = $("#consignee").val();
+        var address = $("#address").val();
+        if (uid == "") {
+            layer.msg("请重新扫描二维码");
+            return false;
+        }
+        if (_phone == 0) {
+            layer.msg("你选择您需要的品牌");
+            return false;
+        }
+        if (pCode == 0) {
+            layer.msg("你选择您需要的机型");
+            return false;
+        }
+        if (telNum == "") {
+            layer.msg("请填写收货电话");
+            return false;
+        }
+        if (consignee == "") {
+            layer.msg("请填写收货人姓名");
+            return false;
+        }
+        if (address == "") {
+            layer.msg("请填写收货地址");
+            return false;
+        }
+        var _url = 'http://www.ichujian.com/AppService1/servlet/h5WXSign';
+
+
+        $.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+                uid: uid,
+                payType: payType,
+                type: type,// 套餐类型
+                phone: phone,
+                pCode: pCode,
+                telNum: telNum,
+                consignee: consignee,
+                address: address,
+                openId: openId
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (result) {
+                var appId = result.appId;
+                var timeStamp = result.timeStamp;
+                var nonceStr = result.nonceStr;
+                var pg = result.package;
+                var paySign = result.rSign;
+                var signType = result.signType;
+
+//                var _param = "?appId=" + appId + "&timeStamp=" + timeStamp + "&nonceStr=" + nonceStr + "&pg=" + pg + "&paySign=" + paySign + "&signType=" + signType + "&access_token=" + access_token;
+//
+//                location.href = "http://www.51ekey.com/webView/rebate/wxPay.html" + _param;
+            },
+            error: function (data) {
+                layer.alert("系统错误" + data);
+            }
+        });
+        function MTIz(data) {
+            alert(data);
+        }
+    }
+    $(function () {
+        // 预支付的参数
+        var appId = getUrlParam("appId");
+        var timeStamp = getUrlParam("timeStamp");
+        var nonceStr = getUrlParam("nonceStr");
+        var pg = getUrlParam("pg");
+        var signType = getUrlParam("signType");
+        var paySign = getUrlParam("paySign");
+
+        // 上一个页面传来的token
+        var access_token = getUrlParam("access_token");
+
+        getSignature(access_token, nonceStr, timeStamp);
+
+
+    });
+
+    function wcPay() {
+        wx.chooseWXPay({
+            timestamp: timeStamp,
+            nonceStr: nonceStr,
+            package: pg,
+            signType: signType,
+            paySign: paySign,
+            success: function (res) {
+                // 支付成功后的回调函数，详细请参见：http://pay.weixin.qq.com/wiki/doc/api/index.php?chapter=7_7
+                if (res.err_msg == "get_brand_wcpay_request:ok") { // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+                    //TODO：此处为安全期间，应调用商户api查询订单状态。
+                    setTimeout(function () {
+                        window.location.href = 'www.ichujian.com';//支付成功页面
+                    }, 2000);
+                }
+                else if (res.err_msg == "get_brand_wcpay_request:cancel")  //支付过程中用户取消
+                {
+                    //TODO：支付过程中用户取消的商户处理逻辑。
+
+                }
+                else if (res.err_msg == "get_brand_wcpay_request:fail")  //支付失败
+                {
+                    //TODO：支付失败的商户处理逻辑。
+                    window.location.href = "";//这里默认跳转到主页
+                } else {
+                    setTimeout(function () {
+                        window.location.href = "";//支付成功页面
+                    }, 2000);
+                }
+            }
+        });
+    }
+
+    function getSignature(access_token) {
+        var _url = 'http://www.ichujian.com/AppService1/ekeyRebate/getSignature.action';
+
+        $.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+                access_token: access_token,
+                type: 'jsapi',
+                _url: window.location.href,
+                nonceStr: nonceStr,
+                timeStamp: timeStamp
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (data) {
+                var signature = data.sign;
+                console.log("signature--> " + signature);
+
+            },
+            error: function (data) {
+                layer.alert("系统错误" + data);
+            }
+        });
+        function MTIz(data) {
+            alert(data);
+        }
+
+    }
+
+    function onBridgeReady() {
+        WeixinJSBridge.invoke(
+                'getBrandWCPayRequest', {
+                    "appId": appId,     //公众号名称，由商户传入
+                    "timeStamp": timeStamp,         //时间戳，自1970年以来的秒数
+                    "nonceStr": nonceStr, //随机串
+                    "package": pg,
+                    "signType": signType,         //微信签名方式:
+                    "paySign": paySign    //微信签名
+                },
+
+                function (res) {
+                    alert(res);
+                    if (res.err_msg == "get_brand_wcpay_request:ok") {
+
+                        alert("支付成功");
+                    }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+                }
+        );
+    }
+
+
+    function pay() {
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+            } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+            }
+        } else {
+            onBridgeReady();
+        }
+
+    }
+</script>
+</body>
+</html>

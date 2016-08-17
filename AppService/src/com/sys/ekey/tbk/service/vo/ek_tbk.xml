@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_tbk">
+    <!--广告位-->
+    <select id="advert" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+      <![CDATA[
+
+
+
+		SELECT T.C_ID,T.C_IMG,T.C_NAME,T.C_ORDER,T.C_PID,T.C_TYPE FROM T_TBK_ITEM_ADVERT T WHERE T.C_TYPE=#type# ORDER BY T.C_ORDER DESC
+
+
+
+        ]]>
+   </select>
+    <!--分类查询-->
+    <select id="cateList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+      <![CDATA[
+
+
+		 SELECT C_AID,C_NAME FROM T_TBK_ITEM_INDEX_CAT T
+         LEFT JOIN T_TBK_ITEM_CAT_BASE TB ON T.C_AID=TB.C_ID
+         WHERE TB.C_ISLIVE=1 ORDER BY T.C_ORDER DESC
+
+
+        ]]>
+   </select>
+
+    <!--首页主题查询-->
+    <select id="themeList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+		SELECT T.C_CID,TTIT.C_CLICK,TTIT.C_NAME,TTIT.C_IMG,TTIT.C_CLICK
+        FROM T_TBK_ITEM_INDEX T
+        LEFT JOIN T_TBK_ITEM_THEME TTIT ON TTIT.C_ID=T.C_CID
+        WHERE T.C_TYPE=0 AND TO_CHAR (T.C_DATE, 'yyyy-MM-dd')=#date# AND TTIT.C_ISLIVE=1
+        ORDER BY T.C_ORDER DESC
+
+
+        ]]>
+    </select>
+
+    <!--首页商品查询-->
+    <select id="productList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+		SELECT T.C_CID,TTIT.C_TITLE,TTIT.C_RESERVEPRICE,TTIT.C_ZKFINALPRICE,TTIT.C_VOLUME,
+		T.C_SCORE,TTIT.C_PICTURL,TTIT.C_ITEMURL,TTIT.C_SMALLIMAGES,TTIT.C_NUMIID,TTIT.C_NICK,
+		TTIT.C_PROVCITY,TTIT.C_SELLERID,TTIT.C_USERTYPE
+        FROM T_TBK_ITEM_INDEX T
+        LEFT JOIN T_TBK_ITEM_INFO TTIT ON TTIT.C_ID=T.C_CID
+        WHERE T.C_TYPE=1 AND TO_CHAR (T.C_DATE, 'yyyy-MM-dd')=#date# AND TTIT.C_ISLIVE=1
+        ORDER BY T.C_ORDER DESC
+
+
+        ]]>
+    </select>
+
+    <!--主题详情查询-->
+    <select id="themeDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+		SELECT T.C_NAME,T.C_IMG,T.C_DETAIL FROM T_TBK_ITEM_THEME T WHERE T.C_ID=#aid# AND C_ISLIVE=1
+
+
+        ]]>
+    </select>
+    <!--主题商品详情查询-->
+    <select id="themeProductDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+		SELECT
+        T.C_DETAIL,T.C_NAME ,T.C_PID,
+        TTII.C_RESERVEPRICE,TTII.C_ZKFINALPRICE,TTII.C_VOLUME,TTII.C_SCORE,TTII.C_PICTURL,TTII.C_ITEMURL,TTII.C_SMALLIMAGES,TTII.C_NUMIID
+        ,TTII.C_NICK,TTII.C_PROVCITY,TTII.C_SELLERID,TTII.C_USERTYPE
+        FROM T_TBK_ITEM_INDEX_THEME T
+        LEFT JOIN T_TBK_ITEM_THEME TTIT ON T.C_AID=TTIT.C_ID
+        LEFT JOIN T_TBK_ITEM_INFO TTII ON TTII.C_ID=T.C_PID
+        WHERE T.C_AID=#aid# AND TTIT.C_ISLIVE=1 AND TTII.C_ISLIVE=1
+        ORDER BY T.C_ORDER DESC
+
+
+        ]]>
+    </select>
+
+    <!--商品列表查询-->
+    <select id="products" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+		SELECT
+        TTII.C_RESERVEPRICE,TTII.C_ZKFINALPRICE,TTII.C_VOLUME,TTII.C_SCORE,TTII.C_PICTURL
+        ,TTII.C_ITEMURL,TTII.C_SMALLIMAGES,TTII.C_NUMIID
+        ,TTII.C_NICK,TTII.C_PROVCITY,TTII.C_SELLERID,TTII.C_USERTYPE
+        FROM T_TBK_ITEM_CAT_DETAIL T
+        LEFT JOIN T_TBK_ITEM_INFO TTII ON TTII.C_NUMIID=T.C_IID
+        WHERE  T.C_CID=1 AND TTII.C_ISLIVE=1
+        ORDER BY T.C_ORDER DESC
+
+
+        ]]>
+    </select>
+
+    <!--添加收藏-->
+    <insert id="collect" parameterClass="java.util.HashMap">
+        INSERT INTO T_TBK_ITEM_COLLECT
+        (C_ID,C_UID,C_AID)
+        VALUES
+        (SEQ_TBK_ITEM_COLLECT.NEXTVAL,#uid#,#aid#)
+    </insert>
+
+    <!--查询是否收藏牧歌主题-->
+    <select id="collectList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+		SELECT * FROM T_TBK_ITEM_COLLECT T WHERE T.C_AID=#aid# AND T.C_UID=#uid#
+
+
+        ]]>
+    </select>
+
+    <!--查询收藏列表-->
+    <select id="collects" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <![CDATA[
+		SELECT T.C_AID,TC.C_IMG,TC.C_CLICK,TC.C_NAME,CASE WHEN T.C_ENDDATE <SYSDATE THEN 0 ELSE 1 END AS STATUS
+        FROM
+        T_TBK_ITEM_COLLECT T
+        LEFT JOIN T_TBK_ITEM_THEME TC ON TC.C_ID=T.C_AID
+        WHERE T.C_UID=#uid# AND TC.C_ISLIVE=1
+        ]]>
+    </select>
+
+
+    <!-- &lt;!&ndash; 校验验证码是否正确 &ndash;&gt;
+     <select id="isUsableCode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+         <![CDATA[
+
+
+
+
+
+         SELECT *
+           FROM T_EK_VALIDATE_CODE T
+          WHERE T.C_DATE >= TO_DATE(#DATE#, 'yyyy-MM-dd HH24:MI:SS')
+            AND T.C_CODE = #VALICODE#
+            AND T.C_TYPE = #TYPE#
+            AND T.C_PHONENUM = #PHONENUM#
+            AND T.C_ISLIVE = 1
+
+
+
+
+
+         ]]>
+     </select>
+     &lt;!&ndash; 用户注册 &ndash;&gt;
+     <insert id="register" parameterClass="java.util.HashMap">
+         <selectKey resultClass="java.lang.String" type="pre" keyProperty="ID">
+             SELECT SEQ_EK_MEMBER_REG.nextval AS VALUE FROM DUAL
+         </selectKey>
+         INSERT INTO T_EK_MEMBER_INFO
+         (C_ID,C_REGID,C_LOGINTYPE,C_PHONENUM,C_PASSWORD,C_ISLIVE,C_ACTIONDATE,C_STATE,C_SEX,C_SUPCODE,C_INVITECODE,C_FC,C_REFER_ID,C_ISAGENT,C_AGENT_ID)
+         VALUES
+         (SEQ_EK_MEMBER_INFO.NEXTVAL,'ICJ'||#ID#,0,#PHONENUM#,#PWD#,1,#DATE#,1,0,#SUPCODE#,#INVITECODE#,#FC#,#C_REFER_ID#,#C_ISAGENT#,#C_AGENT_ID#)
+     </insert>-->
+
+    <!-- 生成默认昵称defaultNickname -->
+    <!-- <update id="defaultNickname" parameterClass="java.util.HashMap">
+         UPDATE T_EK_MEMBER_INFO SET C_NICKNAME = #NICKNAME# WHERE C_REGID = #REGID#
+     </update>-->
+
+</sqlMap>
+

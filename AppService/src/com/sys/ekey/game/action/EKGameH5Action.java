@@ -72,9 +72,9 @@ public class EKGameH5Action extends EKGameBaseAction {
  			} else {
 				/** 2016-05-05 e键v2.1 特殊任务：指定H5游戏中发送弹幕 奖励 begin  */
 				// 每日任务：H5游戏中发送弹幕1次
-//				eKTaskService.reward(uid, "2", "16", null);
+				eKTaskService.reward(uid, "2", "16", null);
 				// 特殊任务：指定H5游戏中发送弹幕1次
-//				eKTaskService.reward(uid, "3", "23", gid);
+				eKTaskService.reward(uid, "3", "23", gid);
 				/** 2016-05-05 e键v2.1 特殊任务：指定H5游戏中发送弹幕 奖励 end  */
  				// 保存用户行为
  	 			eKGameH5Service.saveH5Barrage(uid, gid, type, source);

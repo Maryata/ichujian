@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="ekeyTbk" namespace="/ekeyTbk" extends="struts-default">
+
+		<!-- 广告位 -->
+		<action name="advert" method="advert" class="tbkAction" />
+		<!--分类查询-->
+		<action name="cateList" method="cateList" class="tbkAction" />
+		<!--首页主题商品查询-->
+		<action name="theme" method="theme" class="tbkAction" />
+		<!--主题详情查询-->
+		<action name="themeDetail" method="themeDetail" class="tbkAction" />
+		<!--商品列表查询-->
+		<action name="products" method="products" class="tbkAction" />
+		<!--添加收藏-->
+		<action name="collect" method="collect" class="tbkAction" />
+		<!--添加收藏-->
+		<action name="collectList" method="collectList" class="tbkAction" />
+
+
+	</package>
+</struts>

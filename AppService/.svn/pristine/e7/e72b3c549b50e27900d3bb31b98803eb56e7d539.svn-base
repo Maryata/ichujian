@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>支付成功</title>
+<link rel="stylesheet" href="css/iconfont.css">
+<link href="css/reset.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+<img class="w_all" src="images/banner.jpg">
+  <div class="content">  
+    <p class=" m_t40 l_h35 div_h35 t_c">
+      <i class="icon iconfont icon-duihao c_green f_48"> </i>
+    </p>  
+    <p class="m_t5 l_h35 div_h35 t_c c_green f_20">
+     支付成功
+    </p>   
+  </div>
+  <div class="enter-box m_t50  absolute b_0 w_all">
+<div class="content  m_b10">
+  <p>
+    <input type="submit" class="enter-btn" id="enter" value="下一步，购膜 " >
+  </p>
+</div>
+</div>
+<script src="js/jquery-2.1.4.js"></script>
+<script src="layer.m/layer.m.js"></script>
+
+<!--提示！-->
+<script>
+$('#test1').on('click', function(){
+	layer.msg('手机号错误', function(){
+});
+});
+$('#test2').on('click', function(){
+	layer.msg('<i class="icon iconfont icon-duihao c_green f_16"> </i>注册成功');
+});
+$('#zhifu1').on('click', function(){
+	$("#zhifu1").addClass("hover");
+	$("#zhifu2").removeClass("hover");
+});
+$('#zhifu2').on('click', function(){
+	$("#zhifu2").addClass("hover");
+	$("#zhifu1").removeClass("hover");
+});
+$('#libao1').on('click', function(){
+	$("#libao1").addClass("choice");
+	$("#libao2").removeClass("choice");
+});
+$('#libao2').on('click', function(){
+	$("#libao2").addClass("choice");
+	$("#libao1").removeClass("choice");
+});
+</script>
+
+
+
+
+</body>
+</html>

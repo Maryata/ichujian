@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC   
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"  
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 免费通话（独立APP） -->
+	<package name="freeCall" namespace="/freeCall" extends="struts-default">
+		<!-- 走马灯广告 -->
+		<action name="marqueeBanner" method="marqueeBanner" class="freeCallAction" />
+		<!-- 轮播广告 -->
+		<action name="advert" method="advert" class="freeCallAction" />
+		<!--套餐列表 -->
+		<action name="meal" method="meal" class="freeCallAction" />
+		<!--到期时间 -->
+		<action name="term" method="term" class="freeCallAction" />
+		<action name="test" method="test" class="freeCallAction" />
+	</package>
+</struts>

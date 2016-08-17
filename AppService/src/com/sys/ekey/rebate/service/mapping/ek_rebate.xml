@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ek_rebate">
+
+    <!-- 我的财富 -->
+    <select id="myWealth" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+
+
+
+        SELECT REMAIN, (REMAIN - WITHDRAW) USEFUL, INCOME, OUTCOME, C_WITHDRAW
+          FROM (SELECT INCOME, OUTCOME, (INCOME - OUTCOME) REMAIN
+                  FROM (SELECT NVL(SUM(C_AMOUNT), 0) INCOME, C_UID
+                          FROM T_EK_MEMBER_WEALTH T
+                         WHERE T.C_UID = #uid#
+                           AND T.C_CHANGE = 1),
+                       (SELECT NVL(SUM(C_AMOUNT), 0) OUTCOME, C_UID
+                          FROM T_EK_MEMBER_WEALTH T
+                         WHERE T.C_UID = #uid#
+                           AND T.C_CHANGE = 0)),
+               (SELECT NVL(SUM(C_AMOUNT), 0) WITHDRAW
+                  FROM T_EK_MEMBER_WITHDRAW T
+                 WHERE T.C_UID = #uid#
+                   AND T.C_STATUS = 0),
+               (SELECT CASE WHEN C_WITHDRAW IS NULL THEN 0 ELSE 1 END AS C_WITHDRAW FROM T_EK_MEMBER_INFO T WHERE T.C_ID = #uid#)
+
+
+
+
+
+        ]]>
+    </select>
+
+    <!-- 财富明细 -->
+    <select id="wealthDetail" resultClass="java.util.HashMap">
+        <![CDATA[
+
+
+
+
+
+
+
+
+
+		SELECT T.C_TIME,
+               CASE T.C_LEVEL
+                 WHEN '1' THEN
+                  '金牌'
+                 WHEN '2' THEN
+                  '银牌'
+                 ELSE
+                  '铜牌'
+               END C_LEVEL,
+               CASE T.C_SOURCE
+                 WHEN '01' THEN
+                  '免费购膜'
+                 WHEN '02' THEN
+                  '充值免费通话'
+               END C_SOURCE,
+               T.C_AMOUNT
+          FROM T_EK_MEMBER_WEALTH T
+         WHERE T.C_UID = #uid#
+           AND T.C_CHANGE = '1'
+           AND EXTRACT(MONTH FROM T.C_TIME) = EXTRACT(MONTH FROM SYSDATE)
+         ORDER BY T.C_TIME DESC
+
+
+
+
+
+
+
+
+
+
+        ]]>
+    </select>
+
+    <!-- 财富明细（按月统计） -->
+    <select id="wealthDetailByMonth" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+
+
+        SELECT TO_CHAR(T.C_TIME, 'YYYY-MM') C_TIME, SUM(T.C_AMOUNT) C_AMOUNT
+        FROM T_EK_MEMBER_WEALTH T
+        WHERE T.C_UID = #UID#
+        AND T.C_CHANGE = 1
+        <isEqual property="TYPE" compareValue="1">
+            AND EXTRACT(MONTH FROM T.C_TIME) = EXTRACT(MONTH FROM SYSDATE)
+        </isEqual>
+        GROUP BY TO_CHAR(T.C_TIME, 'YYYY-MM')
+        ORDER BY C_TIME DESC
+
+    </select>
+
+    <!-- 我的人脉 -->
+    <select id="myReference" resultClass="java.util.HashMap">
+
+
+        SELECT GOLD, SILVER, BRONZE
+          FROM (SELECT COUNT(C_ID) GOLD
+                  FROM T_EK_MEMBER_INFO T
+                 WHERE T.C_REFER_ID = #uid#),
+               (SELECT COUNT(C_ID) SILVER
+                  FROM T_EK_MEMBER_INFO T2
+                 WHERE T2.C_REFER_ID IN
+                      (SELECT T.C_ID
+                         FROM T_EK_MEMBER_INFO T
+                        WHERE T.C_REFER_ID = #uid#)),
+               (SELECT COUNT(C_ID) BRONZE
+                  FROM T_EK_MEMBER_INFO T2
+                 WHERE T2.C_REFER_ID IN
+                      (SELECT T2.C_ID
+                         FROM T_EK_MEMBER_INFO T2
+                        WHERE T2.C_REFER_ID IN
+                              (SELECT T.C_ID
+                                 FROM T_EK_MEMBER_INFO T
+                                WHERE T.C_REFER_ID = #uid#)))
+
+    </select>
+
+    <!-- 龙虎榜 -->
+    <select id="rankList" resultClass="java.util.HashMap">
+
+
+        SELECT M.C_NICKNAME, TEMP.TOTAL
+        FROM (SELECT T.C_UID, SUM(T.C_AMOUNT) TOTAL
+        FROM T_EK_MEMBER_WEALTH T
+        WHERE T.C_CHANGE = 1
+        <isEqual property="TYPE" compareValue="1">
+            AND EXTRACT(MONTH FROM T.C_TIME) = EXTRACT(MONTH FROM SYSDATE)
+        </isEqual>
+        GROUP BY T.C_UID) TEMP,
+        T_EK_MEMBER_INFO M
+        WHERE TEMP.C_UID = M.C_ID
+        ORDER BY TOTAL DESC
+
+    </select>
+
+    <!-- 提现明细 -->
+    <select id="withdrawDetail" resultClass="java.util.HashMap">
+
+
+        SELECT T.C_ID,
+               T.C_TIME_APPLY,
+               T.C_NUMBER,
+               T.C_AMOUNT,
+               T.C_STATUS
+          FROM T_EK_MEMBER_WITHDRAW T
+         WHERE T.C_UID = #UID#
+         ORDER BY T.C_TIME_APPLY DESC
+
+    </select>
+
+    <!-- 申请提现 -->
+    <insert id="withdraw" parameterClass="java.util.HashMap">
+        INSERT INTO T_EK_MEMBER_WITHDRAW (C_ID, C_NUMBER, C_UID, C_AMOUNT, C_PAY_TYPE, C_PAY_ACCOUNT, C_STATUS, C_TIME_APPLY)
+        VALUES (SEQ_EK_MEMBER_WITHDRAW.NEXTVAL, #C_NUMBER#, #UID#, #AMOUNT#, #PAY_TYPE#, #PAY_ACCOUNT#, #C_STATUS#, SYSDATE)
+    </insert>
+
+    <!-- 校验提现密码 -->
+    <select id="correctWithdrawPwd" resultClass="String">
+
+        SELECT C_WITHDRAW FROM T_EK_MEMBER_INFO T WHERE T.C_ID = #UID#
+
+    </select>
+
+    <!-- 校验身份证 -->
+    <select id="authId" resultClass="Integer">
+
+        SELECT COUNT(1) FROM T_EK_MEMBER_INFO T WHERE T.C_ID = #UID# AND T.C_ID_NUM = #ID_NUM#
+
+    </select>
+
+    <!-- 保存商户信息 -->
+    <update id="saveBusinessInfo" parameterClass="java.util.HashMap">
+
+        UPDATE T_EK_MEMBER_INFO
+           SET C_COMPANY = #C_COMPANY#,
+               C_LICENSE = #C_LICENSE#,
+               C_LAW_NAME = #C_LAW_NAME#,
+               C_LAW_ID = #C_LAW_ID#,
+               C_SHOP_ADDR = #C_SHOP_ADDR#,
+               C_SHOP_TEL = #C_SHOP_TEL#,
+               C_LICENSE_IMG = #C_LICENSE_IMG#,
+               C_SHOP_IMG = #C_SHOP_IMG#
+         WHERE
+               C_ID = #C_ID#
+
+    </update>
+
+    <!-- 获取商户信息 -->
+    <select id="businessInfo" resultClass="java.util.HashMap">
+
+        SELECT
+            C_COMPANY,
+            C_LICENSE,
+            C_LAW_NAME,
+            C_LAW_ID,
+            C_SHOP_ADDR,
+            C_SHOP_TEL,
+            C_LICENSE_IMG,
+            C_SHOP_IMG
+        FROM
+            T_EK_MEMBER_INFO
+        WHERE
+            C_ID = #uid#
+
+    </select>
+
+    <!-- 申请提现 -->
+    <insert id="activeInsurance" parameterClass="java.util.HashMap">
+        INSERT INTO T_EK_MEMBER_INS_ACTIVE
+            (C_ID,
+            C_UID,
+            C_PHONE_NUM,
+            C_IMEI,
+            C_CODE,
+            C_PHONE_MODEL,
+            C_TIME_APPLY,
+            C_IMG,
+            C_STATUS)
+        VALUES
+            (SEQ_EK_MEMBER_INS_ACTIVE.NEXTVAL,
+            #C_UID#,
+            #C_PHONE_NUM#,
+            #C_IMEI#,
+            #C_CODE#,
+            #C_PHONE_MODEL#,
+            SYSDATE,
+            #C_IMG#,
+            '0')
+    </insert>
+
+    <!-- 查询激活码是否有效 -->
+    <select id="findProductSerial" resultClass="java.util.HashMap">
+        <![CDATA[
+        select * from t_base_active_code where c_code=#activecode# and c_isvalid = 1
+		]]>
+    </select>
+
+    <!-- 更新用户的激活码 -->
+    <update id="updateUsersActiveCode" parameterClass="java.util.HashMap">
+        UPDATE T_ACTION_ACTIVE T SET T.C_ACTIVECODE = #C_CODE#, T.C_ACTIONDATE = SYSDATE WHERE T.C_IMEI = #C_IMEI#
+    </update>
+
+    <!-- 修改激活码状态 -->
+    <update id="updateActiveCodeStatus" parameterClass="java.util.HashMap">
+        <![CDATA[
+		update T_BASE_ACTIVE_CODE set C_ISVALID=0 where C_CODE=#activecode#
+		]]>
+    </update>
+
+    <!-- 查询是否已激活售后屏保 -->
+    <select id="isActed" resultClass="java.util.HashMap">
+
+        SELECT *
+          FROM (SELECT T.C_ID, T.C_STATUS, ADD_MONTHS(T.C_TIME_AUTH, 12) C_VALIDITY
+                  FROM T_EK_MEMBER_INS_ACTIVE T
+                 WHERE T.C_UID = #UID#
+                   AND T.C_CODE = #CODE#
+                 ORDER BY C_TIME_APPLY DESC)
+         WHERE ROWNUM = 1
+
+
+    </select>
+
+    <!-- 申请维修 -->
+    <insert id="applyForRepair" parameterClass="java.util.HashMap">
+        INSERT INTO T_EK_MEMBER_INS_REPAIR
+            (C_ID,
+            C_ACT_ID,
+            C_TIME_APPLY,
+            C_IMG,
+            C_STATUS)
+        VALUES
+            (SEQ_EK_MEMBER_INS_REPAIR.NEXTVAL,
+            #C_ACT_ID#,
+            SYSDATE,
+            #C_IMG#,
+            '0')
+    </insert>
+
+    <!-- 查询"申请激活"的明细 -->
+    <select id="activeDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT T.C_ID, T.C_TIME_APPLY, T.C_STATUS
+          FROM T_EK_MEMBER_INS_ACTIVE T
+         WHERE T.C_UID = #C_UID#
+           AND T.C_CODE = #C_CODE#
+        <isEqual property="C_STATUS" compareValue="0">
+            AND T.C_STATUS = '0'
+        </isEqual>
+        <isEqual property="C_STATUS" compareValue="1">
+            AND T.C_STATUS != '0'
+        </isEqual>
+          ORDER BY T.C_TIME_APPLY DESC
+    </select>
+
+    <!-- 查询"申请维修"的明细 -->
+    <select id="repairDetail" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+
+        SELECT T.C_TIME_APPLY, T.C_STATUS
+          FROM T_EK_MEMBER_INS_REPAIR T
+         WHERE T.C_ACT_ID = #C_ACT_ID#
+         ORDER BY T.C_TIME_APPLY DESC
+
+    </select>
+</sqlMap>
+
