@@ -6,24 +6,23 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="screen-orientation" content="portrait">
 <meta name="x5-orientation" content="portrait">
-<title>支付成功</title>
+<title>支付异常</title>
 <link rel="stylesheet" href="css/iconfont.css">
 <link href="css/reset.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
 
 </head>
 <script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
-
 <body>
 <input type="hidden" id="C_ID">
 <input type="hidden" id="paytype">
 <img class="w_all" src="images/banner.jpg">
   <div class="content">  
     <p class=" m_t40 l_h35 div_h35 t_c">
-      <i class="icon iconfont icon-duihao c_green f_48"> </i>
+      <i class="icon iconfont icon-tanhao-copy c_red1 f_48"> </i>
     </p>  
-    <p class="m_t5 l_h35 div_h35 t_c c_green f_20">
-     支付成功
+    <p class="m_t5 l_h35 div_h35 t_c c_red1 f_20">
+     支付异常，请联系客服
     </p>   
   </div>
   <div class="enter-box m_t50  absolute b_0 w_all">
@@ -38,7 +37,7 @@
 <!--提示！-->
 <script>
 $(function () {
-        $("#C_ID").val(getUrlParam('id'));
+        $("#C_ID").val(getUrlParam('id'))
 		$("#paytype").val(getUrlParam('paytype'));
         function getUrlParam(name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -59,9 +58,6 @@ $(function () {
 	    } else {
 		    location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx51d347df2a345dd3&redirect_uri=http%3a%2f%2fwww.51ekey.com%2fwebView%2frebate%2fapply.html%3fid%3d'+id+'&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect';
 		}
-		
-	   
-	    
 	});
 </script>
 
