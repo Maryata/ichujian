@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <title>微信支付</title>
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="js/md5.js"></script>
+<script type="text/javascript" src="js/jquery.base64.js"></script>
+<script type="text/javascript" src="js/jquery.json.min.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="layer.m/layer.m.js"></script>
+<body>
+<div class="index_box">
+	<div class="apply_name">微信js支付测试</div>
+	<div class="branch_con">
+		<ul>
+			<li><span class="name">测试支付信息</span></li>
+			<li><span class="appId"></span></li>
+			<li><span class="timeStamp"></span></li>
+			<li><span class="nonceStr"></span></li>
+			<li><span class="pg"></span></li>
+			<li><span class="signType"></span></li>
+			<li><span class="paySign"></span></li>
+		</ul>
+		<p class="cz_btn"><a id='wcPay' href="javascript:wcPay();" class="f_16 f_b m_l5 c_444">立即支付</a></p>
+	</div>
+</div>
+<script type="text/javascript">
+	function getUrlParam(name) {
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+		if (r != null) return decodeURI(r[2]);
+		return null; //返回参数值
+	}
+	
+	
+	var appId, timeStamp, nonceStr, pg, signType, paySign;
+
+	$(function(){
+
+		// 预支付的参数
+		appId = getUrlParam("appId");
+		timeStamp = getUrlParam("timeStamp");
+		nonceStr = getUrlParam("nonceStr");
+		pg = getUrlParam("pg");
+		signType = getUrlParam("signType");
+		paySign = getUrlParam("paySign");
+
+		getSignature();
+		
+		/*
+		wx.chooseWXPay({
+			timestamp: timeStamp,
+			nonceStr: nonceStr,
+			package: pg,
+			signType: signType,
+			paySign: paySign,
+			success:function(res){
+				// 支付成功后的回调函数，详细请参见：http://pay.weixin.qq.com/wiki/doc/api/index.php?chapter=7_7
+				if(res.err_msg == "get_brand_wcpay_request:ok" ) { // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+					//TODO：此处为安全期间，应调用商户api查询订单状态。
+					setTimeout(function(){
+						window.location.href='www.ichujian.com';//支付成功页面
+					},2000);
+				}
+				else if(res.err_msg == "get_brand_wcpay_request:cancel" )  //支付过程中用户取消
+				{
+					//TODO：支付过程中用户取消的商户处理逻辑。
+
+				}
+				else if(res.err_msg == "get_brand_wcpay_request:fail" )  //支付失败
+				{
+					//TODO：支付失败的商户处理逻辑。
+					window.location.href="";//这里默认跳转到主页
+				}else{
+					setTimeout(function(){
+						window.location.href="";//支付成功页面
+					},2000);
+				}
+			}
+		});
+        */
+	});
+
+	function wcPay() {
+		console.log("timeStamp--" + timeStamp);
+		console.log("nonceStr--" + nonceStr);
+		console.log("pg--" + pg);
+		console.log("signType--" + signType);
+		console.log("paySign--" + paySign);
+		wx.chooseWXPay({
+			timestamp: timeStamp,
+			nonceStr: nonceStr,
+			package: pg,
+			signType: signType,
+			paySign: paySign,
+			success:function(res){
+				// 支付成功后的回调函数，详细请参见：http://pay.weixin.qq.com/wiki/doc/api/index.php?chapter=7_7
+				if(res.err_msg == "get_brand_wcpay_request:ok" ) { // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+					//TODO：此处为安全期间，应调用商户api查询订单状态。
+					setTimeout(function(){
+						window.location.href='www.ichujian.com';//支付成功页面
+					},2000);
+				}
+				else if(res.err_msg == "get_brand_wcpay_request:cancel" )  //支付过程中用户取消
+				{
+					//TODO：支付过程中用户取消的商户处理逻辑。
+
+				}
+				else if(res.err_msg == "get_brand_wcpay_request:fail" )  //支付失败
+				{
+					//TODO：支付失败的商户处理逻辑。
+					window.location.href="";//这里默认跳转到主页
+				}else{
+					setTimeout(function(){
+						window.location.href="";//支付成功页面
+					},2000);
+				}
+			}
+		});
+	}
+	
+	function getSignature() {
+		var _url = 'http://www.ichujian.com/AppService1/ekeyRebate/getSignature.action';
+		
+		$.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+				_url: window.location.href
+				/*
+                access_token: access_token,
+				type: 'jsapi',
+				_url: window.location.href,
+				nonceStr: nonceStr,
+				timeStamp: timeStamp
+				*/
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (data) {
+				var _appId = data.appId;
+				var _timestamp = data.timestamp;
+				var _nonceStr = data.nonceStr;
+				var _signature = data.signature;
+				wx.config({
+					appId: _appId, // 必填，公众号的唯一标识
+					timestamp: _timestamp, // 必填，生成签名的时间戳
+					nonceStr: _nonceStr, // 必填，生成签名的随机串
+					signature: _signature,// 必填，签名，见附录1
+					jsApiList: [ // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+						'chooseWXPay'
+						/*
+						'checkJsApi',
+						'onMenuShareTimeline',
+						'onMenuShareAppMessage',
+						'onMenuShareQQ',
+						'onMenuShareWeibo',
+						'hideMenuItems',
+						'showMenuItems',
+						'hideAllNonBaseMenuItem',
+						'showAllNonBaseMenuItem',
+						'translateVoice',
+						'startRecord',
+						'stopRecord',
+						'onRecordEnd',
+						'playVoice',
+						'pauseVoice',
+						'stopVoice',
+						'uploadVoice',
+						'downloadVoice',
+						'chooseImage',
+						'previewImage',
+						'uploadImage',
+						'downloadImage',
+						'getNetworkType',
+						'openLocation',
+						'getLocation',
+						'hideOptionMenu',
+						'showOptionMenu',
+						'closeWindow',
+						'scanQRCode',
+						'chooseWXPay',
+						'openProductSpecificView',
+						'addCard',
+						'chooseCard',
+						'openCard'
+						*/
+					] 
+				});
+            },
+            error: function (data) {
+                layer.alert("系统错误" + data);
+            }
+        });
+        function MTIz(data) {
+            alert(data);
+        }
+		
+	}
+	
+	  function onBridgeReady(){
+		   
+		   WeixinJSBridge.invoke(
+		       'getBrandWCPayRequest', {
+				   "appId" : appId,     //公众号名称，由商户传入     
+		           "timeStamp": timeStamp,         //时间戳，自1970年以来的秒数     
+		           "nonceStr" : nonceStr, //随机串     
+		           "package" : pg,     
+		           "signType" : signType,         //微信签名方式:     
+		           "paySign" : paySign    //微信签名 
+		       },
+		       
+		       function(res){
+				   alert(res.err_msg);
+		           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+		        	   
+		        	   alert("支付成功");
+		           }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+		       }
+		   ); 
+		}
+	  
+	  
+	    function pay(){
+	    	
+			if (typeof WeixinJSBridge == "undefined"){
+			   if( document.addEventListener ){
+			       document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+			   }else if (document.attachEvent){
+			       document.attachEvent('WeixinJSBridgeReady', onBridgeReady); 
+			       document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+			   }
+			}else{
+			   onBridgeReady();
+			} 
+	    	
+	    }
+	</script>
+
+
+</body>
+</html>

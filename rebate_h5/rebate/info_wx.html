@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <title>订单详情</title>
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+<script type="text/javascript" src="js/common_h5pay.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script src="layer.m/layer.m.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<body>
+<div class="border-box">
+    <input type="hidden" id="code">
+    <input type="hidden" id="param_uid"/>
+    <input type="hidden" id="param_pCode"/>
+    <div class="content">
+        <p class="m_t5 l_h35 div_h35">
+            <i class="icon iconfont icon-shouji c_cheng f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">手机品牌</span>
+			<span class=" f_14 c_888 m_l5" id ="param_txt_b"></span>
+        </p>
+        <p class="m_t30">
+            <i class="icon iconfont icon-shouji c_yellow2 f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5" >手机机型</span>
+			<span class=" f_14 c_888 m_l5" id ="param_txt_m"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-dingwei c_blue f_24 f_l"> </i>
+			<span class=" f_16 f_b m_l5" >收货地址</span>
+            <span class=" f_14 c_888 m_l5" id ="param_address"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-yonghu c_yellow f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">收货人</span>
+            <span class=" f_14 c_888 m_l5" id ="param_consignee"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-dianhua c_green2 f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">联系电话</span>
+            <span class=" f_14 c_888 m_l5" id ="param_telNum"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-dingdan c_cheng f_24 f_l"> </i>
+            <span class=" f_16 f_b ">订单详情</span>
+        </p>
+        <p class="m_t5">
+        <table class="c_555 m_l10b w_90b f_14 l_h25  m_b10" width="0" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr>
+                <td>换购数量</td>
+                <td>x1</td>
+            </tr>
+            <tr>
+                <td>智能膜 <span id="param_phone"></span></td>
+                <td class="c_red">￥129.00</td>
+            </tr>
+            </tbody>
+        </table>
+        </p>
+    </div>
+</div>
+<input type="hidden" id="flag_wx" value="0"/>
+<div class="enter-box absolute w_all b_0">
+	<div class="content  m_b10">
+		<p>
+			<input type="submit" class="enter-btn" id="pay" value="确认支付" >
+		</p>
+	</div>
+</div>
+<!--获取浏览器信息！-->
+<script>
+    var browser = {
+        versions: function () {
+            var u = navigator.userAgent, app = navigator.appVersion;
+            return {
+                trident: u.indexOf('Trident') > -1, //IE内核
+                presto: u.indexOf('Presto') > -1, //opera内核
+                webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1,//火狐内核
+                mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                iPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
+                iPad: u.indexOf('iPad') > -1, //是否iPad
+                webApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+                weixin: u.indexOf('MicroMessenger') > -1, //是否微信 （2015-01-22新增）
+                qq: u.match(/\sQQ/i) == " qq" //是否QQ
+            };
+        }(),
+        language: (navigator.browserLanguage || navigator.language).toLowerCase()
+    }
+    if (browser.versions.mobile) {//判断是否是移动设备打开。browser代码在下面
+
+        var ua = navigator.userAgent.toLowerCase();//获取判断用的对象
+        //alert(ua)		
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+            //在微信中打开
+            $("#flag_wx").val("1");
+        } else {
+        }
+    }
+    $('.zhifubao_tip').on('click', function () {
+        layer.msg('用其他浏览器打开链接即可使用支付宝支付', function () {
+        });
+    });
+    $('.weixin_tip').on('click', function () {
+        layer.msg('用其微信打开链接即可使用微信支付', function () {
+        });
+    });
+    $("#param_uid").val(getUrlParam("uid"));
+    $("#param_phone").text(getUrlParam("phone"));// 品牌+型号(文本)
+    $("#param_pCode").val(getUrlParam("pCode"));// 型号id
+    $("#param_telNum").text(getUrlParam("telNum"));
+    $("#param_consignee").text(getUrlParam("consignee"));
+    $("#param_address").text(getUrlParam("address"));
+    $("#param_txt_b").text(getUrlParam("txt_b"));
+    $("#param_txt_m").text(getUrlParam("txt_m"));
+
+    // 用于获取openId
+    $("#code").val(getUrlParam("code"));
+
+    $(function () {
+        // 获取微信初始化的的签名
+        $.ajax({
+            url: 'http://www.ichujian.com/AppService1/ekeyRebate/getSignature.action',
+            type: 'GET',
+            data: {
+                _url: window.location.href
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz2",
+            success: function (data) {
+                var _appId = data.appId;
+                var _timestamp = data.timestamp;
+                var _nonceStr = data.nonceStr;
+                var _signature = data.signature;
+                wx.config({
+                    appId: _appId, // 必填，公众号的唯一标识
+                    timestamp: _timestamp, // 必填，生成签名的时间戳
+                    nonceStr: _nonceStr, // 必填，生成签名的随机串
+                    signature: _signature,// 必填，签名，见附录1
+                    jsApiList: [ // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+                        'chooseWXPay'
+                    ]
+                });
+            },
+            error: function (data) {
+                layer.alert("系统错误");
+            }
+        });
+        function MTIz2(data) {
+            console.log(data);
+        }
+    });
+
+    $("#pay").click(function () {
+        if ($("#flag_wx").val() == "1") {
+            getOpenId();
+        } else {
+            layer.msg('如需要使用微信支付，请通过微信重新打开链接或扫码', function () {});
+        }
+    });
+
+    // 通过微信重定向到这个页面时带来的code获取openId
+    function getOpenId() {
+        var _url = "http://www.ichujian.com/AppService1/ekeyRebate/getOpenId.action";
+        $.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+                code: $("#code").val()
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (data) {
+                /*{
+                 "access_token": "YVptktHnKkRHs---pBtB-pr2DoLfaSP6qD3Q6Cvo6m_tCtMAYNEh47EooSEWskCnKDXzoL8eDJp2UOuj2HzwkmloEyAAKzS5uKavAYpB-D8",
+                 "expires_in": 7200,
+                 "refresh_token": "FVKl3XedK-A27YiteU5WEfDFPhbWIupCLyHWaF27dHYI8ccCcgrZPF3pLNwyaPlE585t5an8bjTqFD4ha6SDnGayW-93CH_qv_x8QNBkpi4",
+                 "openid": "oz-PxvoxMPerRcZLuUQUtLBuU5-0",
+                 "scope": "snsapi_userinfo"
+                 }*/
+                var openId = data.openid;
+                var access_token = data.access_token;
+                // 后台调用“统一下单接口”发起支付请求，获取到prepay_id
+                wxPay(openId, access_token);
+            },
+            error: function (data) {
+                layer.alert("系统错误");
+            }
+        });
+        function MTIz(data) {
+            console.log(data);
+        }
+    }
+
+    ///提交订单
+    function wxPay(openId, access_token) {
+        if (openId == "" || openId == null || openId == "undefined") {
+            layer.msg("请重新扫描二维码");
+            return false;
+        }
+        if (access_token == "" || access_token == null || access_token == "undefined") {
+            layer.msg("请重新扫描二维码");
+            return false;
+        }
+
+        var payType = "1";
+        var uid = $("#param_uid").val();
+        var phone = $("#param_phone").text();
+        var pCode = $("#param_pCode").val();
+        var telNum = $("#param_telNum").val();
+        var consignee = $("#param_consignee").val();
+        var address = $("#param_address").val();
+
+        var _url = 'http://www.ichujian.com/AppService1/servlet/h5WXSign';
+
+
+        $.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+                uid: uid,
+                payType: payType,
+                phone: phone,
+                pCode: pCode,
+                telNum: telNum,
+                consignee: consignee,
+                address: address,
+                openId: openId
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (result) {
+                var appId = result.appId;
+                var timeStamp = result.timeStamp;
+                var nonceStr = result.nonceStr;
+                var pg = result.package;
+                var paySign = result.rSign;
+                var signType = result.signType;
+
+                /*
+                 var _param = "?appId=" + appId + "&timeStamp=" + timeStamp + "&nonceStr=" + nonceStr + "&pg=" + pg + "&paySign=" + paySign + "&signType=" + signType;
+
+                 location.href = "http://www.51ekey.com/webView/rebate/wxPay.html" + _param;
+                 */
+                // 最终支付
+                chooseWXPay(timeStamp, nonceStr, pg, signType, paySign);
+            },
+            error: function (data) {
+                layer.alert("系统错误");
+            }
+        });
+        function MTIz(data) {
+            console.log(data);
+        }
+
+    }
+
+    function chooseWXPay(timeStamp, nonceStr, pg, signType, paySign) {
+        wx.chooseWXPay({
+            timestamp: timeStamp,
+            nonceStr: nonceStr,
+            package: pg,
+            signType: signType,
+            paySign: paySign,
+            success: function (res) {
+                // 支付成功后的回调函数，详细请参见：http://pay.weixin.qq.com/wiki/doc/api/index.php?chapter=7_7
+                if (res.err_msg == "get_brand_wcpay_request:ok") { // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+                    //TODO：此处为安全期间，应调用商户api查询订单状态。
+                    //setTimeout(function () {
+                        //支付成功页面
+                        //window.location.href='http://www.51ekey.com/webView/rebate/ok.html?id=' + $("#C_ID").val();
+                        //layer.alert("支付成功12");
+                        window.location.assign('http://www.51ekey.com/webView/rebate/ok.html?id=' + $("#param_uid").val());
+                    //}, 1000);
+                }
+                else if (res.err_msg == "get_brand_wcpay_request:cancel")  //支付过程中用户取消
+                {
+                    //TODO：支付过程中用户取消的商户处理逻辑。
+                    //layer.alert("支付取消");
+                }
+                else if (res.err_msg == "get_brand_wcpay_request:fail")  //支付失败
+                {
+                    //TODO：支付失败的商户处理逻辑。
+                    // window.location.href='http://www.51ekey.com/webView/rebate/ok.html?id=' + $("#C_ID").val();
+                    //layer.alert("支付失败");
+                } else {
+                    //setTimeout(function () {
+                        // window.location.href="";//支付成功页面
+                        window.location.assign('http://www.51ekey.com/webView/rebate/ok.html?id=' + $("#param_uid").val());
+                    //}, 1000);
+                }
+            }
+        });
+    }
+</script>
+
+
+</body>
+</html>

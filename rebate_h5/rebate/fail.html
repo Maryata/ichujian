@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <title>支付异常</title>
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="js/common_h5pay.js"></script>
+<body>
+<input type="hidden" id="C_ID">
+<img class="w_all" src="images/banner.jpg">
+<div class="content">
+    <p class=" m_t40 l_h35 div_h35 t_c">
+        <i class="icon iconfont icon-tanhao-copy c_red1 f_48"> </i>
+    </p>
+    <p class="m_t5 l_h35 div_h35 t_c c_red1 f_20">
+        支付异常，请联系客服
+    </p>
+</div>
+<div class="enter-box m_t50  absolute b_0 w_all">
+    <div class="content  m_b10">
+        <p>
+            <input type="submit" class="enter-btn" id="enter" value="继续购膜 ">
+        </p>
+    </div>
+</div>
+<script src="layer.m/layer.m.js"></script>
+
+<!--提示！-->
+<script>
+    $(function () {
+        $("#C_ID").val(getUrlParam('id'))
+    });
+    $("#enter").click(function () {
+        var id = $("#C_ID").val();
+        var paytype = $("#paytype").val();
+        if (id == "") {
+            layer.msg("二维码扫描失效，请重新扫描");
+            return false;
+        }
+        location.href = "http://www.ichujian.com/webView/rebate/apply.html?id=" + id;
+
+    });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>订单详情</title>
+<link rel="stylesheet" href="css/iconfont.css">
+<link href="css/reset.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="border-box">
+  <div class="content">  
+    <p class="m_t5 l_h35 div_h35">
+      <i class="icon iconfont icon-shouji c_cheng f_24 f_l"> </i>
+      <span class=" f_16 f_b m_l5">手机品牌:</span>
+      <span class=" f_14 c_888 m_l5">HTC</span>
+    </p>
+    <!--<p class="m_t5">
+      <input class="line m_l10b" type="text" value="HTC" readonly  >
+    </p>-->
+    <p class="m_t30">
+      <i class="icon iconfont icon-shouji c_yellow2 f_24 f_l"> </i>
+      <span class=" f_16 f_b m_l5">手机机型:</span>
+      <span class=" f_14 c_888 m_l5">M9</span>
+    </p>
+    <!--<p class="m_t5">
+      <input class="line m_l10b" type="text" value="M9" readonly  >
+    </p>-->
+    <p class="m_t30 l_h35 div_h35">
+      <i class="icon iconfont icon-dingwei c_blue f_24 f_l"> </i>
+      <span class=" f_16 f_b m_l5">收货地址:</span>
+      <span class=" f_14 c_888 m_l5">上海 徐汇 虹漕路88号</span>
+    </p>
+    <!--<p>
+      <input class="line m_l10b" type="text" value="上海 徐汇 虹漕路88号" readonly  >
+    </p>-->
+    <p class="m_t30 l_h35 div_h35">
+      <i class="icon iconfont icon-yonghu c_yellow f_24 f_l"> </i>
+      <span class=" f_16 f_b m_l5">收货人:</span>
+      <span class=" f_14 c_888 m_l5">小二黑</span>
+    </p>
+    <!--<p>
+      <input class="line m_l10b" type="text" value="小二黑" readonly  >
+    </p>-->
+    <p class="m_t30 l_h35 div_h35">
+      <i class="icon iconfont icon-dianhua c_green2 f_24 f_l"> </i>
+      <span class=" f_16 f_b m_l5">联系电话:</span>
+      <span class=" f_14 c_888 m_l5">13x3x3x33x</span>
+    </p>
+    <!--<p class="m_b10">
+      <input class="line m_l10b" type="text" value="13x3x3x33x" readonly  >
+    </p>-->
+    <p class="m_t30 l_h35 div_h35">
+      <i class="icon iconfont icon-dingdan c_cheng f_24 f_l"> </i>
+      <span class=" f_16 f_b ">订单详情</span>
+    </p>
+    <p class="m_t5">
+      <table class="c_555 m_l10b w_90b f_14 l_h25  m_b10" width="0" border="0" cellspacing="0" cellpadding="0">
+        <tbody>
+          <tr>
+            <td>换购数量</td>
+            <td>x1</td>
+          </tr>
+          <tr>
+            <td>智能膜 HTC M9</td>
+            <td class="c_red">￥129.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </p>
+  </div>
+</div>
+
+
+
+
+<div class="enter-box absolute w_all b_0">
+<div class="content  m_b10">
+  <p>
+    <input type="submit" class="enter-btn" id="enter" value="确认支付" >
+  </p>
+</div>
+</div>
+<script src="js/jquery-2.1.4.js"></script>
+<script src="layer.m/layer.m.js"></script>
+<!--获取浏览器信息！-->
+<script>
+var browser={
+   versions:function(){
+       var u = navigator.userAgent, app = navigator.appVersion;
+       return {
+           trident: u.indexOf('Trident') > -1, //IE内核
+           presto: u.indexOf('Presto') > -1, //opera内核
+           webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+           gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1,//火狐内核
+           mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+           ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+           android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+           iPhone: u.indexOf('iPhone') > -1 , //是否为iPhone或者QQHD浏览器
+           iPad: u.indexOf('iPad') > -1, //是否iPad
+           webApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+           weixin: u.indexOf('MicroMessenger') > -1, //是否微信 （2015-01-22新增）
+           qq: u.match(/\sQQ/i) == " qq" //是否QQ
+       };
+   }(),
+   language:(navigator.browserLanguage || navigator.language).toLowerCase()
+}
+if (browser.versions.mobile) {//判断是否是移动设备打开。browser代码在下面
+ 
+        var ua = navigator.userAgent.toLowerCase();//获取判断用的对象
+        //alert(ua)		
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+			document.getElementById('zhifu2').className = 'hover';
+            document.getElementById('zhifuico2').className = 'c_green icon iconfont icon-weixinzhifu  f_24 f_l m_t-5';
+			document.getElementById('zhifu1').className = 'zhifubao_tip';
+                //在微信中打开
+ 
+        } else {
+			document.getElementById('zhifu1').className = 'hover';
+             document.getElementById('zhifuico1').className = 'c_blue icon iconfont icon-weixinzhifu  f_24 f_l m_t-5';
+             document.getElementById('zhifu2').className = 'weixin_tip';
+		
+		}
+		 /*if (browser.versions.ios) {
+             document.getElementById('zhifu1').className = 'hover';
+             document.getElementById('zhifuico1').className = 'c_blue icon iconfont icon-weixinzhifu  f_24 f_l m_t-5';
+             document.getElementById('zhifu2').className = 'weixin_tip';
+                //是否在IOS浏览器打开
+ 
+        } 
+ 
+        if(browser.versions.android){
+		    document.getElementById('zhifu1').className = 'hover';
+            document.getElementById('zhifuico1').className = 'c_blue icon iconfont icon-weixinzhifu  f_24 f_l m_t-5';
+            document.getElementById('zhifu2').className = 'weixin_tip';
+ 
+                //是否在安卓浏览器打开
+ 
+        }*/
+        
+} 
+</script>
+<!--提示！-->
+<script>
+$('#test1').on('click', function(){
+	layer.msg('手机号错误', function(){
+});
+});
+$('.zhifubao_tip').on('click', function(){
+	layer.msg('用其他浏览器打开链接即可使用支付宝支付', function(){
+});
+});
+$('.weixin_tip').on('click', function(){
+	layer.msg('用其微信打开链接即可使用微信支付', function(){
+});
+});
+$('#test2').on('click', function(){
+	layer.msg('<i class="icon iconfont icon-duihao c_green f_16"> </i>注册成功');
+	
+});
+
+</script>
+
+
+
+
+</body>
+</html>

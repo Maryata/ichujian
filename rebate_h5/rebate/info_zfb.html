@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <title>订单详情</title>
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+<script type="text/javascript" src="js/common_h5pay.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script src="layer.m/layer.m.js"></script>
+<script type="text/javascript" src="js/jquery.base64.js"></script>
+<body>
+<div class="border-box">
+    <input type="hidden" id="param_uid" />
+    <input type="hidden" id="param_pCode" />
+    <div class="content">
+        <p class="m_t5 l_h35 div_h35">
+            <i class="icon iconfont icon-shouji c_cheng f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">手机品牌</span>
+			<span class=" f_14 c_888 m_l5" id ="param_txt_b"></span>
+        </p>
+        <p class="m_t30">
+            <i class="icon iconfont icon-shouji c_yellow2 f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5" >手机机型</span>
+			<span class=" f_14 c_888 m_l5" id ="param_txt_m"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-dingwei c_blue f_24 f_l"> </i>
+			<span class=" f_16 f_b m_l5" >收货地址</span>
+            <span class=" f_14 c_888 m_l5" id ="param_address"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-yonghu c_yellow f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">收货人</span>
+            <span class=" f_14 c_888 m_l5" id ="param_consignee"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-dianhua c_green2 f_24 f_l"> </i>
+            <span class=" f_16 f_b m_l5">联系电话</span>
+            <span class=" f_14 c_888 m_l5" id ="param_telNum"></span>
+        </p>
+        <p class="m_t30 l_h35 div_h35">
+            <i class="icon iconfont icon-dingdan c_cheng f_24 f_l"> </i>
+            <span class=" f_16 f_b ">订单详情</span>
+        </p>
+        <p class="m_t5">
+        <table class="c_555 m_l10b w_90b f_14 l_h25  m_b10" width="0" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr>
+                <td>换购数量</td>
+                <td>x1</td>
+            </tr>
+            <tr>
+                <td>智能膜 <span id="param_phone"></span></td>
+                <td class="c_red">￥129.00</td>
+            </tr>
+            </tbody>
+        </table>
+        </p>
+    </div>
+</div>
+<input type="hidden" id="flag_zfb" value="0"/>
+<div class="enter-box absolute w_all b_0">
+	<div class="content  m_b10">
+		<p>
+			<input type="submit" class="enter-btn" id="pay" value="确认支付" >
+		</p>
+	</div>
+</div>
+<form id="form2" action="https://mapi.alipay.com/gateway.do" method="post">
+    <input type="hidden" name="service" id="service"/>
+    <input type="hidden" name="partner" id="partner"/>
+    <input type="hidden" name="seller_id" id="seller_id"/>
+    <input type="hidden" name="_input_charset" id="_input_charset"/>
+    <input type="hidden" name="payment_type" id="payment_type"/>
+    <input type="hidden" name="notify_url" id="notify_url"/>
+    <input type="hidden" name="return_url" id="return_url"/>
+    <input type="hidden" name="out_trade_no" id="out_trade_no"/>
+    <input type="hidden" name="subject" id="subject"/>
+    <input type="hidden" name="total_fee" id="total_fee"/>
+    <input type="hidden" name="show_url" id="show_url"/>
+    <input type="hidden" name="app_pay" id="app_pay"/>
+    <input type="hidden" name="body" id="body"/>
+    <input type="hidden" name="sign" id="sign"/>
+    <input type="hidden" name="sign_type" id="sign_type"/>
+</form>
+<!--获取浏览器信息！-->
+<script>
+    var browser = {
+        versions: function () {
+            var u = navigator.userAgent, app = navigator.appVersion;
+            return {
+                trident: u.indexOf('Trident') > -1, //IE内核
+                presto: u.indexOf('Presto') > -1, //opera内核
+                webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1,//火狐内核
+                mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                iPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
+                iPad: u.indexOf('iPad') > -1, //是否iPad
+                webApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+                weixin: u.indexOf('MicroMessenger') > -1, //是否微信 （2015-01-22新增）
+                qq: u.match(/\sQQ/i) == " qq" //是否QQ
+            };
+        }(),
+        language: (navigator.browserLanguage || navigator.language).toLowerCase()
+    }
+    if (browser.versions.mobile) {//判断是否是移动设备打开。browser代码在下面
+
+        var ua = navigator.userAgent.toLowerCase();//获取判断用的对象
+        //alert(ua)		
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+			
+            //在微信中打开
+        } else {
+            $("#flag_zfb").val("1");
+        }
+    }
+    $('.zhifubao_tip').on('click', function () {
+        layer.msg('用其他浏览器打开链接即可使用支付宝支付', function () {
+        });
+    });
+    $('.weixin_tip').on('click', function () {
+        layer.msg('用其微信打开链接即可使用微信支付', function () {
+        });
+    });
+    $("#param_uid").val(getUrlParam("uid"));
+    $("#param_phone").text(getUrlParam("phone"));// 品牌+型号(文本)
+    $("#param_pCode").val(getUrlParam("pCode"));
+    $("#param_telNum").text(getUrlParam("telNum"));
+    $("#param_consignee").text(getUrlParam("consignee"));
+    $("#param_address").text(getUrlParam("address"));
+    $("#param_txt_b").text(getUrlParam("txt_b"));
+    $("#param_txt_m").text(getUrlParam("txt_m"));
+
+    $("#pay").click(function () {
+		
+        if ($("#flag_zfb").val() == "1") {
+            aliPay();
+        } else {
+            layer.msg('如需要使用支付宝支付，请通过非微信方式重新打开链接或扫码', function () {});
+        }
+    });
+
+    //提交订单
+    function aliPay() {
+        var payType = "2";
+        var uid = $("#param_uid").val(); 
+		//$.base64.decode();
+        var phone = $("#param_phone").text();
+        var pCode = $("#param_pCode").val();
+        var telNum = $("#param_telNum").text();
+        var consignee = $("#param_consignee").text();
+        var address = $("#param_address").text();		
+        var _url = 'http://www.ichujian.com/AppService1/exchange/submitOrder_H5.action';
+
+        $.ajax({
+            url: _url,
+            type: 'GET',
+            data: {
+                uid: uid,
+                payType: payType,
+                phone: phone,
+                pCode: pCode,
+                telNum: telNum,
+                consignee: consignee,
+                address: address
+            },
+            dataType: 'JSONP',
+            jsonp: 'callback',
+            crossDomain: true,
+            jsonpCallback: "MTIz",
+            success: function (result) {
+                var data = JSON.stringify(result);
+                var json = $.parseJSON(data);
+                var status = json.status;
+                var info = json.info;
+                var sParaTemp = json.sParaTemp;
+                if (status == "N") {
+                    if (info == "1003") {
+                        layer.msg("系统错误");
+                        return false;
+                    } else {
+                        layer.msg("订单创建失败");
+                        return false;
+                    }
+                } else {
+                    $(sParaTemp).each(function () {
+                        $("#service").val(this.service);
+                        $("#partner").val(this.partner);
+                        $("#seller_id").val(this.seller_id);
+                        $("#_input_charset").val(this._input_charset);
+                        $("#payment_type").val(this.payment_type);
+                        $("#notify_url").val(this.notify_url);
+                        $("#return_url").val(this.return_url);
+                        $("#out_trade_no").val(this.out_trade_no);
+                        $("#subject").val(this.subject);
+                        $("#total_fee").val(this.total_fee);
+                        $("#show_url").val(this.show_url);
+                        $("#app_pay").val(this.app_pay);
+                        $("#body").val(this.body);
+                        $("#sign").val(this.sign);
+                        $("#sign_type").val(this.sign_type);
+                    });
+                    location.href = "https://mapi.alipay.com/gateway.do?" + $("#form2").serialize();
+
+                }
+
+
+            },
+            error: function (result) {
+                console.log(result);
+                layer.alert("系统错误");
+            }
+        });
+		
+        function MTIz(data) {
+            console.log(data);
+        }
+
+    }
+</script>
+
+
+</body>
+</html>

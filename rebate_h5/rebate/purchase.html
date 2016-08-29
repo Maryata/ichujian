@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>立即购买</title>
+<link rel="stylesheet" href="css/iconfont.css">
+<link href="css/reset.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body class="purchase_bg">
+<input type="hidden" name="C_REFER_ID" id="C_REFER_ID">
+<a class="purchase" href="#"><img class=" w_all" src="images/purchase_btn.png"></a>
+
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script src="layer.m/layer.m.js"></script>
+<script type="text/javascript" src="js/jquery.base64.js"></script>
+
+<!--提示！-->
+<script>
+$('#test1').on('click', function(){
+	layer.msg('手机号错误', function(){
+});
+});
+
+ $(function(){
+	//var id = $.base64.decode(getUrlParam('id'))
+	 $("#C_REFER_ID").val(getUrlParam('id'));
+	});
+	function getUrlParam(name)
+	{
+	var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+	var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+	if (r!=null) return decodeURI(r[2]); return null; //返回参数值
+	}
+	
+	$(document).on('click','.cj', function(){
+     //ClickHandler.clicked($(this).attr("url"));
+	 
+     });
+$(".purchase").click(function(){
+      var C_REFER_ID=$("#C_REFER_ID").val();
+	  if(C_REFER_ID==""){
+	    layer.msg("扫描失效，请重新扫描！");
+	    return false;
+	  }
+	  //location.href="http://www.ichujian.com/ios/webView/rebate/APPLY.html?id="+C_REFER_ID;
+	  //C_REFER_ID = $.base64.encode(C_REFER_ID)
+	  location.href="http://www.ichujian.com/webView/rebate/apply.html?id="+C_REFER_ID;
+	 });
+</script>
+<script>
+$('#test2').on('click', function(){
+	layer.msg('<i class="icon iconfont icon-duihao c_green f_16"> </i>注册成功');
+});
+</script>
+
+
+
+
+</body>
+</html>

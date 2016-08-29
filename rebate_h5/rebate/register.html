@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content ="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>注册</title>
+<link rel="stylesheet" href="css/iconfont.css">
+<link href="css/reset.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+
+</head>
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="js/md5.js"></script>
+<script type="text/javascript" src="js/jquery.base64.js"></script> 
+<script type="text/javascript" src="js/jquery.json.min.js"></script> 
+<script type="text/javascript" src="js/jquery.cookie.js"></script> 
+<body>
+<img class="w_all" src="images/banner.jpg">
+<div class="content">
+  <p class="t_c c_cheng f_16">
+    Hi,您是通过<span id="C_NAME">xxx</span>推荐而来！
+	<input type="hidden" name="C_REFER_ID" id="C_REFER_ID">
+  </p>
+  <p class="m_t20 l_h35 div_h35">
+    <i class="icon iconfont icon-shouji c_cheng f_24 f_l"> </i>
+    <span class=" f_16 f_b m_l5">手机号</span>
+  </p>
+  <p class="m_t5">
+    <input class="bc_eee m_l10b" type="number"  autocomplete="off" id="phonenum" placeholder="请填写真实号码，将做为易有登录账号">
+  </p>
+  <p class="m_t5 l_h35 div_h35">
+    <i class="icon iconfont icon-peiziiconfont10 c_blue f_24 f_l"> </i>
+    <span class=" f_16 f_b m_l5">真实姓名</span>
+  </p>
+  <p class="m_t5">
+    <input class="bc_eee m_l10b" placeholder="真实姓名有利于您的人脉圈建立" type="text"  autocomplete="off" id="nick">
+  </p>
+  <p class="m_t5 l_h35 div_h35">
+    <i class="icon iconfont icon-peiziiconfont10 c_blue f_24 f_l"> </i>
+    <span class=" f_16 f_b m_l5">密码</span>
+  </p>
+  <p class="m_t5">
+    <input class="bc_eee m_l10b" type="password"  autocomplete="off" id="pwd" placeholder="请输入6位数字">
+  </p>
+  <p class="m_t5 l_h35 div_h35">
+    <i class="icon iconfont icon-peiziiconfont10 c_blue f_24 f_l"> </i>
+    <span class=" f_16 f_b m_l5">确认密码</span>
+  </p>
+  <p class="m_t5">
+    <input class="bc_eee m_l10b" type="password" id="new_pwd"  autocomplete="off" placeholder="请再次输入6位数字">
+  </p>
+  <p class="m_t5 l_h35 div_h35">
+    <i class="icon iconfont icon-6 c_yellow f_18 f_l"> </i>
+    <span class=" f_16 f_b m_l10">验证码</span>
+  </p>
+  <p class="m_t5 yzm_box">
+    <input class="bc_eee m_l10b" type="number"  autocomplete="off" id="valicode"  placeholder="请输入验证码">
+    <input class="yzm-btn" type="button" id="sendVcode" value="获取验证码" >
+  </p>
+  <!--<p class="m_t15 t_c f_13 c_red">
+    请填写真实手机号，此号码将作为APP登录账号
+  </p>-->
+   <p class="m_t15 t_c">
+    <a class="f_16 c_blue2" onclick="login()">已有账号，立即登录</a>
+  </p>
+</div>
+<div class="enter-box m_t50">
+<div class="content  m_b10">
+  <p>
+    <input type="submit" class="enter-btn" id="register" value="注册购膜" >
+  </p>
+</div>
+</div>
+<script src="layer.m/layer.m.js"></script>
+<script>
+    $(function(){
+	 $("#C_NAME").html(getUrlParam('C_NAME'));
+	 //alert(getUrlParam('C_REFER_ID'));
+	 $("#C_REFER_ID").val(getUrlParam('C_REFER_ID'));
+	});
+	function getUrlParam(name)
+	{
+	var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+	var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+	if (r!=null) return decodeURI(r[2]); return null; //返回参数值
+	}
+	
+	var count = parseInt($.cookie("count"))||0;
+	var maxSubmitCount = 50;
+	var vFlag = false;
+	//客户注册获取验证码
+	$("#sendVcode").click(function(){
+		var _this = $(this);
+		if(vFlag) return false;
+		if(count > maxSubmitCount || $("#phonenum").val()==''){
+		    layer.msg("请输入您的手机号！");
+			return false;
+		}
+		_this.attr({'value':"验证码发送中..."});
+		vFlag = true;
+		  //www.ichujian.com/AppService1
+          //http://localhost:8081
+		$.ajax({
+			//url:'http://localhost:8081/ekeyUser/getValiCode_H5.action',
+			//url:'http://www.ichujian.com/IOSService1/ekeyUser/getValiCode_H5.action',
+			url:'http://www.ichujian.com/AppService1/ekeyUser/getValiCode_H5.action',
+		    data:{phonenum:$.base64.encode($("#phonenum").val()),type:$.base64.encode(1),sup:$.base64.encode("yiyou")},
+		    type:"GET",
+		    dataType:'jsonp',
+			jsonp:'callback',
+			crossDomain: true,
+			jsonpCallback : "MTIz",
+		    success:function(result){
+				var data = JSON.stringify(result);
+			    var json = $.parseJSON(data);
+			    var status = json.status;
+			    var info = json.info;
+				if(status=="N"){
+					 if(info=="1015"){
+					     _this.attr({'value':"发送验证码"});
+						 layer.msg("你已发送5条短信，请明天再次尝试");
+						 return false;
+					 }else{
+						_this.attr({'value':"发送验证码"});
+						layer.msg("短信验证码获取失败");
+						return false;
+					 }
+			    }else{
+			        $.cookie("smsVcodeTime", 60);
+					_this.attr({'value':"验证码已发送"});
+					//$("#R1_msgVcode_msg").removeClass().addClass("Validform_checktip Validform_right c_red").html("验证码已发送,30分钟内有效");
+					_this.attr({"disabled":"disabled"});
+					var ctime = 60;
+					var timerId = setInterval(function(){
+						$.cookie("smsVcodeTime", ctime);
+						if(ctime==0){clearInterval(timerId); 
+						vFlag=false; 
+						_this.removeAttr("disabled");
+						_this.attr({'value':"获取验证码"}); return;}
+					 	_this.attr({'value':"("+(ctime--)+"s)重新发送"});//(ctime--)+秒后，
+					},1000);
+			    }
+			}
+			
+		});
+		function MTIz(data){
+			alert(data); //
+		}
+	});
+	
+	//注册
+	$("#register").click(function(){
+		var phonenum = $("#phonenum").val();
+		var pwd=$("#pwd").val();
+		var new_pwd=$("#new_pwd").val();
+		var C_REFER_ID=$("#C_REFER_ID").val();
+		var valicode=$("#valicode").val();
+		var nick=$("#nick").val();
+		var _this = $(this);
+		if(C_REFER_ID==""){
+		 layer.msg("此次扫描已失效，请重新扫描二维码");
+		 return false;
+		}
+		if(phonenum==""){
+		 layer.msg("手机号不能为空");
+		 return false;
+		}
+		if(phonenum.length!=11){
+		 layer.msg("请输入11位正确手机号");
+		 return false;
+		}
+		if(nick==""){
+		 layer.msg("请输入您的真实姓名");
+		 return false;
+		}
+		if(pwd==""){
+		 layer.msg("密码不能为空");
+		 return false;
+		}
+		if(new_pwd==""){
+		 layer.msg("请再次输入6位密码");
+		 return false;
+		}
+		if(new_pwd != pwd){
+			layer.msg("两次密码不一致");
+			return false;
+		}
+		if(!new_pwd.match(/^\d{6}$/)){
+		   layer.msg("请输入6位数字密码");
+			return false;
+		}
+		if(!pwd.match(/^\d{6}$/)){
+		   layer.msg("请输入6位数字密码");
+			return false;
+		}
+		if(valicode==""){
+			layer.msg("请输入您的验证码");
+			return false;
+		}
+		_this.attr({"disabled":"disabled"});	
+        $.ajax({
+			//url:'http://localhost:8081/ekeyUser/register_H5.action',
+			//url:'http://www.ichujian.com/IOSService1/ekeyUser/register_H5.action',
+			url:'http://www.ichujian.com/AppService1/ekeyUser/register_H5.action',
+		    data:{phonenum:$.base64.encode(phonenum),type:$.base64.encode(1),pwd:$.base64.encode(pwd),valicode:$.base64.encode(valicode),C_REFER_ID:$.base64.encode(C_REFER_ID),nick:nick},
+		    type:"GET",
+		    dataType:'jsonp',
+			jsonp:'callback',
+			crossDomain: true,
+			jsonpCallback : "MTIz",
+		    success:function(result){
+				var data = JSON.stringify(result);
+			    var json = $.parseJSON(data);
+			    var status = json.status;
+			    var info = json.info;
+				_this.removeAttr("disabled");
+				if(status=="N"){
+					 if(info=="1001"){
+						 layer.msg("手机号/密码/验证码不能为空");
+						 return false;
+					 }else if(info=="1010"){
+						layer.msg("手机号已被注册");
+						return false;
+					 }else if(info=="1011"){
+					    layer.msg("验证码已失效，请重新发送");
+						return false;
+					 }else if(info=="2001"){
+					    layer.msg("非法请求");
+						return false;
+					 }else if(info=="1003"){
+					    layer.msg("系统错误");
+						return false;
+					 }
+			    }else{
+				$(json.userinfo).each(function(){
+				     layer.msg('<i class="icon iconfont icon-duihao c_green f_16"> </i>注册成功');
+				     //layer.alert(this.C_ID);
+					 var id =this.C_ID;
+					 var C_ID=$.base64.encode(id);
+                     location.href="http://www.ichujian.com/webView/rebate/purchase.html?id="+C_ID;
+					 //location.href="http://www.ichujian.com/ios/webView/rebate/purchase.html?id="+this.C_ID;  					 
+				  }); 
+				}
+			}			
+		});
+		function MTIz(data){
+			alert(data); //
+		}  	 
+	})
+	//登录
+function login(){
+	var C_REFER_ID=$("#C_REFER_ID").val();
+	var C_NAME=$("#C_NAME").text();
+   location.href="http://www.ichujian.com/webView/rebate/login.html?C_REFER_ID="+C_REFER_ID+"&C_NAME="+C_NAME;
+}
+</script>
+<!--提示！-->
+<script>
+$('#test1').on('click', function(){
+	layer.msg('手机号错误', function(){
+});
+});
+</script>
+<script>
+$('#test2').on('click', function(){
+	layer.msg('<i class="icon iconfont icon-duihao c_green f_16"> </i>注册成功');
+});
+</script>
+
+
+
+
+</body>
+</html>
